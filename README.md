@@ -9,7 +9,7 @@ CodebaseVisulizer3D is a bachelor project with the goal of making it easier to g
 - Zohaib Butt - 473219
 - Eldar Hauge Torkelsen - 473180
 
-# Install
+# Install guide
 
 # Examples of use
 
