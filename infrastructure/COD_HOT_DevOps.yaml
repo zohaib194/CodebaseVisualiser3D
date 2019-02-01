@@ -1,0 +1,134 @@
+description: HOT template for CodeBaseVisualizer3D with servers for jenkins/docker
+  swarm, development and operations
+heat_template_version: '2018-03-02'
+outputs: null
+parameter_groups: null
+parameters:
+  img_deb: {default: Debian 9.4.2 (Stretch) stable amd64, description: Name of image
+      to use for GNU/Linux servers, type: string}
+  key_name: {description: Name of keypair to assign to servers, type: string}
+  net_cidr:
+    type: string
+    description: Admin network address (CIDR notation)
+    default: 192.168.180.0/24
+  
+  net_gateway:
+    type: string
+    description: Admin network gateway address
+    default: 192.168.180.1
+  
+  net_pool_start:
+    type: string
+    description: Start of admin network IP address allocation pool
+    default: 192.168.180.100
+  
+  net_pool_end:
+    type: string
+    description: End of admin network IP address allocation pool
+    default: 192.168.180.199
+
+resources:
+  
+  cod_global_master_ip:
+    properties: 
+      floating_network: ntnu-global
+      port_id: { get_resource: port_srv_master }
+    type: OS::Neutron::FloatingIP
+  
+  cod_router:
+    properties:
+      external_gateway_info: {network: ntnu-global}
+    type: OS::Neutron::Router
+
+  router_interface:
+    type: OS::Neutron::RouterInterface
+    properties:
+      router_id: { get_resource: cod_router }
+      subnet_id: { get_resource: subnet_cod }
+  
+  net_cod:
+    properties: {name: net-global}
+    type: OS::Neutron::Net
+  
+  subnet_cod:
+    properties:
+      network_id: { get_resource: net_cod }
+      cidr: { get_param: net_cidr }
+      gateway_ip: { get_param: net_gateway }
+      allocation_pools:
+        - start: { get_param: net_pool_start }
+          end: { get_param: net_pool_end }
+    type: OS::Neutron::Subnet
+  
+  sec_group:
+    properties:
+      name: firewall-conf-cod
+      rules:
+      - {protocol: icmp, remote_ip_prefix: 0.0.0.0/0}
+      - {port_range_max: 22, port_range_min: 22, protocol: tcp, remote_ip_prefix: 0.0.0.0/0}
+      - {port_range_max: 8080, port_range_min: 8080, protocol: tcp, remote_ip_prefix: 0.0.0.0/0}
+    type: OS::Neutron::SecurityGroup
+  
+  srv_dev:
+    properties:
+      flavor: m1.medium
+      image: {get_param: img_deb}
+      key_name: {get_param: key_name}
+      name: development-web-gogl
+      networks:
+        - port: {get_resource: port_srv_dev}
+    type: OS::Nova::Server
+  
+  srv_master:
+    properties:
+      flavor: t1.large
+      image: {get_param: img_deb}
+      key_name: {get_param: key_name}
+      name: manager-web-jendoc
+      networks:
+        - port: {get_resource: port_srv_master}
+      user_data_format: RAW
+      user_data:
+        str_replace:
+          template: { get_file: installdocker.bash }
+          params:
+            dummy: ""
+    type: OS::Nova::Server
+  
+  srv_ops:
+    properties:
+      flavor: m1.large
+      image: {get_param: img_deb}
+      key_name: {get_param: key_name}
+      name: operation-web-gogl
+      networks:
+        - port: {get_resource: port_srv_ops}
+    type: OS::Nova::Server
+  
+  port_srv_master:
+    properties:
+      fixed_ips:
+      - subnet_id: {get_resource: subnet_cod}
+      network_id: {get_resource: net_cod}
+      security_groups: 
+        - {get_resource: sec_group}
+    type: OS::Neutron::Port
+
+  port_srv_ops:
+    properties:
+      fixed_ips:
+      - subnet_id: {get_resource: subnet_cod}
+      network_id: {get_resource: net_cod}
+      security_groups: 
+        - {get_resource: sec_group}
+    type: OS::Neutron::Port
+
+  port_srv_dev:
+    properties:
+      fixed_ips:
+      - subnet_id: {get_resource: subnet_cod}
+      network_id: {get_resource: net_cod}
+      security_groups: 
+        - {get_resource: sec_group}
+    type: OS::Neutron::Port
+  
