@@ -9,7 +9,8 @@ window.addEventListener("load", function() {
         var notificationbar = document.createElement("div");
         notificationbar.className = "notificationbar";
         document.body.insertBefore(notificationbar, document.body.firstChild);
-        notificationbar.innerHTML = "You're browser doesn't support WebGL! Visit: <a href=\"https://get.webgl.org/\">WebGL support!</a>";
+        notificationbar.innerHTML = "You're browser doesn't support WebGL! " + 
+            "Visit: <a href=\"https://get.webgl.org/\">WebGL support!</a>";
         notificationbar.style.visibility = "visible";
     }
 }, false);
