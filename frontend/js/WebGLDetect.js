@@ -1,5 +1,4 @@
 window.addEventListener("load", function() {
-    
     var canvas = document.createElement("canvas");
     canvas.style.visibility = "hidden";
 
