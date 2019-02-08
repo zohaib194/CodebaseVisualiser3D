@@ -7,24 +7,20 @@ public class Main {
     public static String flag;
     public static String target;
     public static String file;
-    public static boolean err = false;
     
     public static void main(String[] argv) throws IOException {
 
         parseArgs(argv);
 
-
+        target = target.toUpperCase();
         // Checks which language to be parse.
         switch(target){
-            case "cpp":
             case "CPP":
-            case "Cpp":
                 CppParserFacade cppParserFacade = new CppParserFacade();
                 cppParserFacade.parse(new File(file));
                 break;
             
-            case "java":
-            case "Java":
+            case "JAVA":
                 JavaParserFacade javaParserFacade = new JavaParserFacade();
                 javaParserFacade.parse(new File(file));
                 break;
@@ -46,26 +42,17 @@ public class Main {
             switch(flag){
                 case "--Target":
                 case "-t":
-                    target = argv[i + 1];
-                    i++;
+                    target = argv[++i];
                     break;
 
                 case "--File":
                 case "-f":
-                    file = argv[i + 1];
-                    i++;
+                    file = argv[++i];
                     break;
 
                 default:
                     System.err.println("[ERROR] Usage: java Main [-t | --Target] targetName [ -f | --File] fileName.");
-                    err = true;
-                    break;
-            }
-
-            // In case there is a error in syntax.
-            if(err){
-                err = false;
-                return;
+                    return;
             }
         }
     }

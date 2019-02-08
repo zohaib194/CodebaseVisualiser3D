@@ -7,6 +7,6 @@ public class JavaListener extends Java9BaseListener {
 
     @Override 
     public void enterMethodDeclarator(Java9Parser.MethodDeclaratorContext ctx) {  //see gramBaseListener for allowed functions
-        System.out.println("rule entered: " + ctx.getText());      //code that executes per rule
+        System.out.println("Function name: " + ctx.getText());     //code that executes per rule
     }
  }
