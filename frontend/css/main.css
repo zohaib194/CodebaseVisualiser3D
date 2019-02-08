@@ -1,0 +1,18 @@
+body {
+  margin: 0%;
+}
+
+.notificationbar {
+  position: absolute;
+  background: #ffd800;
+  height: 2em;
+  width: 100%;
+  text-align: center;
+  vertical-align: middle;
+  display: inline-block;
+  padding-top: 0.5em;
+  padding-bottom: auto;
+  visibility: hidden;
+}
+
+/*# sourceMappingURL=main.css.map */
