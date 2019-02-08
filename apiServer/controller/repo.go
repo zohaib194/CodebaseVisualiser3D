@@ -1,51 +1,49 @@
-//controller refers to controll part of mvc.
+//Package controller refers to controll part of mvc.
 //It performs validation, errorhandling and buisness logic
 package controller
 
 import (
 	"encoding/json"
-	"hash"
+	"github.com/zohaib194/CodebaseVisualizer3D/apiServer/model"
 	"log"
 	"net/http"
 	"regexp"
 )
 
-// Repo represents metadata for a git repository.
-type Repo struct {
-	uri  string    // Where the repository was found
-	name string    // The name of the repository
-	id   hash.Hash // Identifier for the repository
+// RepoController represents metadata for a git repository.
+type RepoController struct {
+	URI string // Where the repository was found
 }
 
-	/**
-	* @api {Post} /repo/add Add new git repository to server.
-	* @apiName Add repository.
-	* @apiGroup Repository
-	* @apiPermission none
-	* 
-	* 
-	* @apiParam {String} URI URI to git repository.
-	* 
-	* @apiParamExample {json} Add repository:
-	* 	{
-	*		uri: "git@github.com:zohaib194/CodebaseVisualizer3D.git"
-	*	}
-	* 
-	* @apiErrorExample {json} Post invalid git URI.
-	*	HTTP/1.1 400 Bad Request
-	*	{
-	*		Expected URI to git repository
-	*	}
-	*
-	* @apiErrorExample {json} Post invalid json.
-	*	HTTP/1.1 400 Bad Request
-	*	{
-	*		Invalid json
-	*	}
-	*/
+/**
+* @api {Post} /repo/add Add new git repository to server.
+* @apiName Add repository.
+* @apiGroup Repository
+* @apiPermission none
+*
+*
+* @apiParam {String} URI URI to git repository.
+*
+* @apiParamExample {json} Add repository:
+* 	{
+*		uri: "git@github.com:zohaib194/CodebaseVisualizer3D.git"
+*	}
+*
+* @apiErrorExample {json} Post invalid git URI.
+*	HTTP/1.1 400 Bad Request
+*	{
+*		Expected URI to git repository
+*	}
+*
+* @apiErrorExample {json} Post invalid json.
+*	HTTP/1.1 400 Bad Request
+*	{
+*		Invalid json
+*	}
+ */
 
 // NewRepoFromURI takes json request with uri field and stores the git repository it refers to.
-func (repo Repo) NewRepoFromURI(w http.ResponseWriter, r *http.Request) {
+func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request) {
 	http.Header.Add(w.Header(), "content-type", "application/json")
 
 	if r.Method == "POST" {
@@ -67,6 +65,21 @@ func (repo Repo) NewRepoFromURI(w http.ResponseWriter, r *http.Request) {
 			log.Println("Not a valid URI to git repository.")
 			return
 		}
+		repo.URI = postData["uri"]
+		err := model.RepoModel{URI: repo.URI}.Save()
+
+		if err != nil {
+			if err.Error() == "Already exists" {
+				http.Error(w, "Repository already exists", http.StatusConflict)
+				return
+
+			}
+
+			http.Error(w, "Database error", http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusCreated)
 
 	} else { // if not POST request
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)

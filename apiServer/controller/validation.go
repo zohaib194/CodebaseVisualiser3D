@@ -11,8 +11,8 @@ var uriPattern = `(?:[A-Za-z][A-Za-z0-9+\-.]*:(?://(?:(?:[A-Za-z0-9\-._~!$&'()*+
 // validateURI checks that given uri is valid and allows for extra validation to be executed afterwards.
 func validateURI(uri string, extraValidation func(string) (bool, error)) (bool, error) {
 
-	if isUri, err := regexp.Match(uriPattern, []byte(uri)); !isUri || (err != nil) {
-		return isUri, nil
+	if isURI, err := regexp.Match(uriPattern, []byte(uri)); !isURI || (err != nil) {
+		return isURI, nil
 	}
 
 	if extraValidation != nil {
