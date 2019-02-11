@@ -43,11 +43,6 @@ func (db *MongoDB) Init() error {
 		Sparse:     true,
 	}
 
-	if err != nil {
-		log.Println(logError + "Failed to drop databse!")
-		return err
-	}
-
 	// Ensure collation follows the index
 	log.Println(logInfo + "Make collection: " + db.RepoColl + "Ensure \"index\"")
 	err = session.DB(db.DatabaseName).C(db.RepoColl).EnsureIndex(index)
@@ -88,7 +83,7 @@ func (db *MongoDB) add(rm *RepoModel) error {
 }
 
 // findRepoByURI takes the repo with field uri as given uri.
-// It returns empty repo if it is not in db.  
+// It returns empty repo if it is not in db.
 func (db *MongoDB) findRepoByURI(uri string) (repo RepoModel, err error) {
 	session, err := mgo.Dial(db.DatabaseURL)
 	if err != nil {
@@ -96,11 +91,13 @@ func (db *MongoDB) findRepoByURI(uri string) (repo RepoModel, err error) {
 	}
 	defer session.Close()
 
-	// Retrun empty repo with error if error is not "Not found"
-	if err = session.DB(db.DatabaseName).C(db.RepoColl).Find(bson.M{"uri": uri}).One(&repo); err != nil && err.Error() != "not found" {
+	// Find any match in the database
+	err = session.DB(db.DatabaseName).C(db.RepoColl).Find(bson.M{"uri": uri}).One(&repo)
+
+	// Return empty repo and error if error is not trivial
+	if err != nil && err.Error() != "not found" {
 		return RepoModel{}, err
 	}
 
 	return repo, nil
-
 }

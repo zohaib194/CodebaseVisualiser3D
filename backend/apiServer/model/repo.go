@@ -38,7 +38,7 @@ func (repo RepoModel) Save() error {
 
 	// Clone repository into storage location with name given by database
 	cmd := exec.Command("git", "-C", RepoPath, "clone", repo.URI, repo.ID.Hex())
-	_, err = cmd.Output()	// TODO: Validate that git clone went well and prevent request for rsa password
+	_, err = cmd.Output() // TODO: Validate that git clone went well and prevent request for rsa password
 
 	return err
 }

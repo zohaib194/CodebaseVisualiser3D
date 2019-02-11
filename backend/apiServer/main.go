@@ -44,6 +44,6 @@ func main() {
 	http.HandleFunc("/repo/add", controller.RepoController{}.NewRepoFromURI)
 
 	// Start server
-	log.Printf(logInfo+"Listening on port: %v", port)
+	log.Printf("%s Listening on port: %v", logInfo, port)
 	http.ListenAndServe(":"+port, nil)
 }
