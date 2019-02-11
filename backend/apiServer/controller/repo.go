@@ -82,7 +82,7 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 		w.WriteHeader(http.StatusCreated)
 
 	} else { // if not POST request
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
 

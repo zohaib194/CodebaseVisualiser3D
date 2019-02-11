@@ -14,18 +14,12 @@ var RepoPath string
 
 // RepoModel represents metadata for a git repository.
 type RepoModel struct {
-	BasePath string        `json:"basepath"`               // Folder for repository to be saved in
 	URI      string        `json:"uri"`                    // Where the repository was found
 	ID       bson.ObjectId `json:"-" bson:"_id,omitempty"` // Folder name where repo is stored
 }
 
 // Save saves repo to database and clones repository
 func (repo RepoModel) Save() error {
-
-	// Assure repos storage location is set
-	if repo.BasePath != "" {
-		repo.BasePath = RepoPath
-	}
 
 	err := DB.add(&repo)
 
