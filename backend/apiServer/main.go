@@ -2,8 +2,8 @@
 package main
 
 import (
-	"github.com/zohaib194/CodebaseVisualizer3D/apiServer/controller"
-	"github.com/zohaib194/CodebaseVisualizer3D/apiServer/model"
+	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/controller"
+	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/model"
 	"log"
 	"net/http"
 	"os"

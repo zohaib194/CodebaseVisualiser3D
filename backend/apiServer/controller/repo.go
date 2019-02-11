@@ -4,7 +4,7 @@ package controller
 
 import (
 	"encoding/json"
-	"github.com/zohaib194/CodebaseVisualizer3D/apiServer/model"
+	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/model"
 	"log"
 	"net/http"
 	"regexp"
