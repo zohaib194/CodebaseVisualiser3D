@@ -94,7 +94,6 @@ function DisplayObject(position, color, name) {
             this.position.x - camera.position.x,
             this.position.y - camera.position.y,
             this.position.z - camera.position.z
-        
         );
         
         // If in-front of camera, display nameplate.
