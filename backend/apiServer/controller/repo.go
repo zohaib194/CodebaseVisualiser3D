@@ -160,7 +160,7 @@ func (repo RepoController) ParseSimpleFunc(w http.ResponseWriter, r *http.Reques
 		}
 
 		// Fetch all fuctions given in files.
-		functions, err := exstRepo.ParseFunctionsFromFiles(files, exstRepo)
+		functions, err := exstRepo.ParseFunctionsFromFiles(files)
 
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
