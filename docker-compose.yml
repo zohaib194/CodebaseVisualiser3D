@@ -18,7 +18,7 @@ services:
       dockerfile: Dockerfile
     ports:
       - ${api_port}:${api_port}
-      - ${apidoc_port}:${apidoc_port}
+      - ${apidoc_port}:80
     networks:
       - api-db
     depends_on:
