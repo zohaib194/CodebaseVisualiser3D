@@ -1,51 +1,26 @@
-function createCORSRequest(method, url){
-    var xhr = new XMLHttpRequest();
-    if ("withCredentials" in xhr){
-        xhr.open(method, url, true);
-    } else if (typeof XDomainRequest != "undefined"){
-        xhr = new XDomainRequest();
-        xhr.open(method, url);
-    } else {
-        xhr = null;
-    }
-    return xhr;
-}
-
 function submitRepoName(){
 	var repoName;
 
 	repoName = document.getElementById("reponame")
-	
 
-	console.log(repoName.value)
-
-
-	var xhr = createCORSRequest("post", "http://localhost:8080/repo/add");
+	// Create a http request
+	var xhr = new XMLHttpRequest();
 	var body = 	{
 					'uri': repoName.value
 			   	}
 
-    xhr.onreadystatechange = xhr.onreadystatechange = function() {	
+	
+	xhr.open("post", "http://localhost:8080/repo/add", true);
+
+    xhr.onreadystatechange = function() {	
 	    if(xhr.readyState == 4 && xhr.status == 200) {
 	        alert(xhr.responseText);
 	    }
 	}
     xhr.send(JSON.stringify(body));
 
-    /*
-	var url = 'http://localhost:8080/repo/add';
-	
-	xhr.open('POST', url, true);
+    // disable the form and enable a loader to the document.
+   	document.getElementById("repositoryform").style.display = "none";
+   	document.getElementById("loader").style.display = "block";
 
-	//Send the proper header information along with the request.
-	xhr.setRequestHeader("Content-Type", "application/json");
-
-	//Call a function when the state changes.
-	xhr.onreadystatechange = function() {	
-	    if(xhr.readyState == 4 && xhr.status == 200) {
-	        alert(xhr.responseText);
-	    }
-	}
-	xhr.send(JSON.stringify(body));*/
-	
 }

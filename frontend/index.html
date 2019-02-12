@@ -24,10 +24,14 @@
         <header></header>
         <main>
             
-            <form>
-                Git repository:<br>
-                <input type="text" name="reponame" id="reponame"><br>
-                <button type="button" onclick="submitRepoName()"> Submit </button>
+            <div id="loader"></div>
+
+            <form id="repositoryform">
+                <div class="repoform">
+                    <p id="gitrepotitle">Git Repository</p>
+                    <input type="text" name="reponame" id="reponame">
+                    <button type="button" onclick="submitRepoName()"> Submit </button>
+                </div>
             </form> 
 
         </main>
