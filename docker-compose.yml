@@ -1,0 +1,47 @@
+version: '3'
+services:
+
+  web:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        website_files: ${website_files}
+    ports: 
+      - "80:80"
+    depends_on:
+      - api
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - ${api_port}:${api_port}
+      - ${apidoc_port}:${apidoc_port}
+    networks:
+      - api-db
+    depends_on:
+      - mongo_db
+    volumes:
+      - repositoryStorage:/data/repos
+    environment: 
+      - DB_LOCATION=mongodb://mongo_db:27017
+      - REPOSITORY_PATH=/data/repos
+      - PORT=${api_port}
+      - DOC_PORT=${apidoc_port}
+      - JAVA_PARSER=/go/src/github.com/zohaib194/CodebaseVisualizer3D/backend/parser/build/classes/java/main
+
+  mongo_db:
+    image: "mongo:latest"
+    networks: 
+      - api-db
+    volumes: 
+      - DB-storage:/data/db
+
+volumes:
+  repositoryStorage:
+  DB-storage:
+
+networks:
+  api-db:
