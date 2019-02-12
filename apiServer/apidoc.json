@@ -1,8 +1,0 @@
-{
-  "name": "CodebaseVisualizer3D",
-  "description": "Servs REST API for visualizing codebases",
-  "title": "CodebaseVisualizer3D | api spesification",
-  "order": [
-  	"Repository"
-  ]
-}
