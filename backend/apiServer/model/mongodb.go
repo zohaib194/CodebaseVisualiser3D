@@ -101,3 +101,29 @@ func (db *MongoDB) findRepoByURI(uri string) (repo RepoModel, err error) {
 
 	return repo, nil
 }
+
+// FindRepoByID takes the repo with field id as given id.
+// It returns empty repo if it is not in db.
+func (db *MongoDB) FindRepoByID(id string) (repo RepoModel, err error) {
+	session, err := mgo.Dial(db.DatabaseURL)
+	if err != nil {
+		log.Fatalln(logError+"Can't connect to database: ", err)
+	}
+	defer session.Close()
+
+	if !bson.IsObjectIdHex(id) {
+		err = errors.New("Invalid id")
+		log.Println(logError+"Id received is incorrect: ", err)
+		return RepoModel{}, err
+	}
+
+	keyID := bson.ObjectIdHex(id)
+
+	// Retrun empty repo with error if error is not "Not found"
+	if err = session.DB(db.DatabaseName).C(db.RepoColl).Find(bson.M{"_id": keyID}).One(&repo); err != nil && err.Error() != "not found" {
+		return RepoModel{}, err
+	}
+
+	return repo, nil
+
+}

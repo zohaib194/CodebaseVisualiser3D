@@ -4,10 +4,12 @@ package controller
 
 import (
 	"encoding/json"
-	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/model"
 	"log"
 	"net/http"
 	"regexp"
+	"strings"
+	
+	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/model"
 )
 
 // RepoController represents metadata for a git repository.
@@ -87,4 +89,88 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 	}
 
 	return
+}
+
+
+/**
+* @api {Post} /repo/:id Parse the repository assosiated with id.
+* @apiName Parse repository.
+* @apiGroup Repository
+* @apiPermission none
+*
+* @apiParam {String} Id Id of submitted git repository.
+*
+* @apiParamExample {url} Parse repository:
+* 	/repo/:id
+*
+* @apiSuccessExample {json} Success-Response:
+* 	HTTP/1.1 200 OK
+*	{
+*	    "functions": [
+*	        {
+*	            "file": "main.cpp",
+*	            "function_names": [
+*	                {
+*	                    "name": "int main()"
+*	                }
+*	            ]
+*	        }
+*	    ]
+*	}
+*
+* @apiErrorExample {json} Post invalid id.
+*	HTTP/1.1 400 Bad Request
+*	{
+*		Invalid parameters
+*	}
+*
+* @apiErrorExample {json} Internal error.
+*	HTTP/1.1 500 Internal Server Error
+*	{
+*		Internal Server Error
+*	}
+*
+ */
+
+// ParseSimpleFunc parse a repository for functions of a certain project in repos directory.
+func (repo RepoController) ParseSimpleFunc(w http.ResponseWriter, r *http.Request) {
+	http.Header.Add(w.Header(), "content-type", "application/json")
+
+	if r.Method == "POST" {
+		id := strings.TrimPrefix(r.URL.Path, "/repo/")
+
+		// Validate that the project exist in DB.
+		exstRepo, err := model.RepoModel{}.GetRepoByID(id)
+
+		if err != nil {
+			http.Error(w, "Invalid parameters", http.StatusBadRequest)
+			log.Println("Could not find repo in db: ", err.Error())
+			return
+		}
+
+		// List all files in the repository directory.
+		files, err := exstRepo.GetRepoFile(model.RepoPath + "/" + exstRepo.ID.Hex())
+
+		if err != nil {
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			log.Println("Could not find files error: ", err.Error())
+			return
+		}
+
+		// Fetch all fuctions given in files.
+		functions, err := exstRepo.ParseFunctionsFromFiles(files, exstRepo)
+
+		if err != nil {
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			log.Println("Could not parse error: ", err.Error())
+			return
+		}
+
+		json.NewEncoder(w).Encode(functions)
+
+	} else { // if not POST request
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
 }
