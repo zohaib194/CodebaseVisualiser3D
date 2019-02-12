@@ -1,5 +1,7 @@
 var nameplate_container = document.getElementById("nameplate_container");
 
+var color_black = 0x000000;
+
 /**
  * Private function for placing nameplate on 3d objects.
  * @param {string} name - Name/Id of nameplate.
@@ -66,7 +68,7 @@ function DisplayObject(position, color, name) {
     // Cube's edge highlight setup.
     this.edgeGeometry = new THREE.EdgesGeometry(this.cube.geometry);
     this.edgeMaterial = new THREE.LineBasicMaterial({
-        color: 0xb70000, 
+        color: color_black, 
         linewidth: 1
     });
     this.wireframe = new THREE.LineSegments(this.edgeGeometry, this.edgeMaterial);

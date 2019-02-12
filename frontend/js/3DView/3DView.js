@@ -1,3 +1,7 @@
+var color_lightgray = 0x808080;
+var color_white = 0xffffff;
+var color_green = 0x00ff00;
+
 // Find canvas.
 var canvas = document.getElementById("output");
 
@@ -18,10 +22,10 @@ var controls = new THREE.OrbitControls(camera, renderer.domElement);
 controls.update();
 
 // Make lights.
-var light = new THREE.AmbientLight(0x808080); // Soft white light
+var light = new THREE.AmbientLight(color_lightgray); // Soft white light
 scene.add(light);
 
-var light = new THREE.PointLight(0xffffff, 1, 100);
+var light = new THREE.PointLight(color_white, 1, 100);
 light.position.set(10, 10, 10);
 scene.add(light);
 
@@ -34,10 +38,10 @@ window.addEventListener("resize", function() {
 
 // Add displaymanager for managing objects to draw.
 var displayMgr = new DisplayManager();
-displayMgr.addObject("function", new DisplayObject(new THREE.Vector3(0, 0, 0), 0x00ff00, "display1"));
-displayMgr.addObject("function", new DisplayObject(new THREE.Vector3(2, 0, 0), 0x00ff00, "display2"));
-displayMgr.addObject("function", new DisplayObject(new THREE.Vector3(0, 2, 0), 0x00ff00, "display3"));
-displayMgr.addObject("function", new DisplayObject(new THREE.Vector3(0, 0, 2), 0x00ff00, "display4"));
+displayMgr.addObject("function", new DisplayObject(new THREE.Vector3(0, 0, 0), color_green, "display1"));
+displayMgr.addObject("function", new DisplayObject(new THREE.Vector3(2, 0, 0), color_green, "display2"));
+displayMgr.addObject("function", new DisplayObject(new THREE.Vector3(0, 2, 0), color_green, "display3"));
+displayMgr.addObject("function", new DisplayObject(new THREE.Vector3(0, 0, 2), color_green, "display4"));
 
 /**
  * Program lifecycle function reponsible for updating the program state.
