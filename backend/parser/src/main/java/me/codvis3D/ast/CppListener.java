@@ -23,6 +23,6 @@ public class CppListener extends CPP14BaseListener {
 	    String funcName = input.getText(interval);
 	    funcName = funcName.substring(0, funcName.indexOf("{"));
 
-        System.out.println("Function name: " + funcName);      
+        System.out.println("function_name: " + funcName);      
     }
  }
