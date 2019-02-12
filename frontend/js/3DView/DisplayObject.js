@@ -29,8 +29,8 @@ let placeNameplate = function (name, x_pos, y_pos) {
 
     // Set position to be near the threejs object with name "name".
     // Using 'px' here cause it's the acutal screen position.
-    nameplate.style.left = (x_pos + 50) + 'px';
-    nameplate.style.top = (y_pos - 50) + 'px';
+    nameplate.style.left = x_pos + 'px';
+    nameplate.style.top = y_pos + 'px';
 
     // Add it.
     nameplate_container.appendChild(nameplate);
@@ -92,19 +92,25 @@ function DisplayObject(position, color, name) {
             controls.target.y - camera.position.y,
             controls.target.z - camera.position.z
         );
-        var camreaToObject = new THREE.Vector3(
+        var cameraToObject = new THREE.Vector3(
             this.position.x - camera.position.x,
             this.position.y - camera.position.y,
             this.position.z - camera.position.z
         );
         
         // If in-front of camera, display nameplate.
-        if (cameraForward.dot(camreaToObject) > 0) {
+        if (cameraForward.dot(cameraToObject) > 0) {
             var widthHalf = window.innerWidth / 2;
             var heightHalf = window.innerHeight / 2;
 
-            // Copy my position and convert to screen coords
+            var worldUp = new THREE.Vector3(0, 1, 0);
+            var cameraRight = cameraForward.cross(worldUp);
+            cameraRight.normalize();
+
+            // Copy my position (+ offset) and convert to screen coords.
             var pos = this.position.clone();
+            pos.add(cameraRight);
+            pos.add(worldUp);
             pos.project(camera);
 
             // Pos' axies goes from 0-1 only.
