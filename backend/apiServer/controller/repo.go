@@ -29,6 +29,12 @@ type RepoController struct {
 *		uri: "git@github.com:zohaib194/CodebaseVisualizer3D.git"
 *	}
 *
+* @apiSuccessExample {json} Success-Response:
+* 	HTTP/1.1 201 Created
+*	{
+*		"id": "5c62d1904122c760dafe9341"
+*	}
+*
 * @apiErrorExample {json} Post invalid git URI.
 *	HTTP/1.1 400 Bad Request
 *	{
@@ -67,7 +73,7 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 			return
 		}
 		repo.URI = postData["uri"]
-		err := model.RepoModel{URI: repo.URI}.Save()
+		id, err := model.RepoModel{URI: repo.URI}.Save()
 
 		if err != nil {
 			if err.Error() == "Already exists" {
@@ -80,7 +86,10 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 			return
 		}
 
+		ID := map[string]string {"id":id}
+
 		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(ID)
 
 	} else { // if not POST request
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
