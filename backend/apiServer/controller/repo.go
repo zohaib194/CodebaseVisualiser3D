@@ -101,7 +101,9 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 * @apiParam {String} Id Id of submitted git repository.
 *
 * @apiParamExample {url} Parse repository:
-* 	/repo/:id
+*     {
+*       "id": 5c62d1904122c760dafe9341
+*     }
 *
 * @apiSuccessExample {json} Success-Response:
 * 	HTTP/1.1 200 OK
@@ -149,7 +151,7 @@ func (repo RepoController) ParseSimpleFunc(w http.ResponseWriter, r *http.Reques
 		}
 
 		// List all files in the repository directory.
-		files, err := exstRepo.GetRepoFile(model.RepoPath + "/" + exstRepo.ID.Hex())
+		files, err := exstRepo.GetRepoFile()
 
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)

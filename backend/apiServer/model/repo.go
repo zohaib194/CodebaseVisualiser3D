@@ -84,8 +84,8 @@ func (repo RepoModel) GetRepoByID(id string) (rep RepoModel, err error) {
 }
 
 // GetRepoFile finds and return all files stored in repository directory.
-func (repo RepoModel) GetRepoFile(path string) (files string, err error) {
-	cmd := exec.Command("find", path)
+func (repo RepoModel) GetRepoFile() (files string, err error) {
+	cmd := exec.Command("find", RepoPath + "/" + ID.Hex())
 	cmd.Dir = path
 	bytes, err := cmd.CombinedOutput()
 
@@ -98,7 +98,7 @@ func (repo RepoModel) GetRepoFile(path string) (files string, err error) {
 }
 
 // ParseFunctionsFromFiles fetch all functions from gives files set.
-func (repo RepoModel) ParseFunctionsFromFiles(files string, exstRepo RepoModel) (functions Functions, err error) {
+func (repo RepoModel) ParseFunctionsFromFiles(files string) (functions Functions, err error) {
 
 	for _, sourceFiles := range strings.Split(strings.TrimSuffix(files, "\n"), "\n") {
 
@@ -106,7 +106,7 @@ func (repo RepoModel) ParseFunctionsFromFiles(files string, exstRepo RepoModel) 
 		if strings.Contains(sourceFiles, ".cpp") {
 
 			// Fetch function names from the file.
-			function, err := exstRepo.Load(sourceFiles, "cpp")
+			function, err := Load(sourceFiles, "cpp")
 
 			if err != nil {
 				log.Println("Could not parse error: ", err.Error())
@@ -117,7 +117,7 @@ func (repo RepoModel) ParseFunctionsFromFiles(files string, exstRepo RepoModel) 
 
 		} else if strings.Contains(sourceFiles, ".java") { // Search for java files
 
-			function, err := exstRepo.Load(sourceFiles, "java")
+			function, err := Load(sourceFiles, "java")
 
 			if err != nil {
 				log.Println("Could not parse error: ", err.Error())

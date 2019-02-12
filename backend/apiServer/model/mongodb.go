@@ -119,7 +119,7 @@ func (db *MongoDB) FindRepoByID(id string) (repo RepoModel, err error) {
 
 	keyID := bson.ObjectIdHex(id)
 
-	// Retrun empty repo with error if error is not "Not found"
+	// Return empty repo with error if error is not "Not found"
 	if err = session.DB(db.DatabaseName).C(db.RepoColl).Find(bson.M{"_id": keyID}).One(&repo); err != nil && err.Error() != "not found" {
 		return RepoModel{}, err
 	}
