@@ -18,7 +18,6 @@ services:
       dockerfile: Dockerfile
     ports:
       - ${api_port}:${api_port}
-      - ${apidoc_port}:80
     networks:
       - api-db
     depends_on:
@@ -29,8 +28,16 @@ services:
       - DB_LOCATION=mongodb://mongo_db:27017
       - REPOSITORY_PATH=/data/repos
       - PORT=${api_port}
-      - DOC_PORT=${apidoc_port}
       - JAVA_PARSER=/go/src/github.com/zohaib194/CodebaseVisualizer3D/backend/parser/build/classes/java/main
+
+  doc:
+    build:
+      context: ./backend/apiServer
+      dockerfile: Dockerfile
+    ports: 
+      - ${apidoc_port}:80
+    depends_on:
+      - api 
 
   mongo_db:
     image: "mongo:latest"
