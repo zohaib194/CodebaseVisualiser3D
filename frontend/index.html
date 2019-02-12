@@ -11,6 +11,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="./css/main.css">
         <script src="./js/WebGLDetect.js"></script>
+        <script src="./js/repository.js"></script>
     </head>
     <body>
         <!--[if lt IE 7]>
@@ -21,7 +22,15 @@
         <![endif]-->
         
         <header></header>
-        <main></main>
+        <main>
+            
+            <form>
+                Git repository:<br>
+                <input type="text" name="reponame" id="reponame"><br>
+                <button type="button" onclick="submitRepoName()"> Submit </button>
+            </form> 
+
+        </main>
         <footer></footer>
     </body>
 </html>

@@ -45,7 +45,8 @@ type RepoController struct {
 // NewRepoFromURI takes json request with uri field and stores the git repository it refers to.
 func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request) {
 	http.Header.Add(w.Header(), "content-type", "application/json")
-
+	http.Header.Add(w.Header(), "Access-Control-Allow-Origin", "*")
+	
 	if r.Method == "POST" {
 
 		decoder := json.NewDecoder(r.Body)
