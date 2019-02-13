@@ -86,7 +86,7 @@ func (repo RepoModel) GetRepoByID(id string) (rep RepoModel, err error) {
 // GetRepoFile finds and return all files stored in repository directory.
 func (repo RepoModel) GetRepoFile() (files string, err error) {
 	cmd := exec.Command("find", RepoPath + "/" + repo.ID.Hex())
-	cmd.Dir = path
+	cmd.Dir = JavaParserPath
 	bytes, err := cmd.CombinedOutput()
 
 	if err != nil {

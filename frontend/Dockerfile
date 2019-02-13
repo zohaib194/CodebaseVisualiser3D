@@ -10,5 +10,3 @@ ARG website_files
 
 # Copy files form host to apache2 htdocs.
 COPY ${website_files} /usr/local/apache2/htdocs/
-
-# TODO: Add go server setup here!
