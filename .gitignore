@@ -11,6 +11,8 @@ frontend/html/3DView_OLD.html
 frontend/js/3DView/3DView_OLD.js
 frontend/js/system.config.js
 
+backend/parser/.project
+
 ### Linux ###
 *~
 

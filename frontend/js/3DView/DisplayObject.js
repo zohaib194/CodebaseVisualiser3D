@@ -24,6 +24,7 @@ let placeNameplate = function (name, x_pos, y_pos) {
             text-align: center;
             display: block;
             color: #000000;
+            pointer-events: none;
         `;
     }
 

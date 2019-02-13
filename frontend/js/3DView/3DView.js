@@ -82,7 +82,7 @@ var id = new URL(window.location.href).searchParams.get("id");
 var xhr = new XMLHttpRequest();
 
 // Open the connection
-xhr.open("post", "http://localhost:8080/repo/" + id, true);
+xhr.open("get", "http://localhost:8080/repo/" + id, true);
 
 // Once ready, receive data and populate displaymanager.
 xhr.onreadystatechange = function() {
@@ -90,29 +90,43 @@ xhr.onreadystatechange = function() {
     if(xhr.readyState == 4 && xhr.status == 200) {
         data = JSON.parse(xhr.responseText);
         
-        // For every functions entry
-        data.functions.forEach(element => {
-            // For each function object
-            element.function_names.forEach((func) => {
-                // Add it for display.
-                displayMgr.addObject(
-                    "function", 
-                    new DisplayObject(
-                        new THREE.Vector3(
-                            // Random nr [0-2].
-                            Math.floor(Math.random() * 3), 
-                            Math.floor(Math.random() * 3), 
-                            Math.floor(Math.random() * 3)
-                        ), 
-                        color_green, 
-                        func.name
-                    )
-                );
-            });
-        });
+        if (typeof data === "undefined")
+            return;
+
+        displayFunctions(data);
     }
 }
 xhr.send();
+
+/**
+ * Function for displaying function data fron json object.
+ * @param {object} data - Object made from Json.parse().
+ */
+function displayFunctions(data) {
+    if (typeof data.functions === "undefined" || data.functions.lenght <= 0)
+        return;
+    
+    // For every functions entry
+    data.functions.forEach(element => {
+        // For each function object
+        element.function_names.forEach((func) => {
+            // Add it for display.
+            displayMgr.addObject(
+                "function", 
+                new DisplayObject(
+                    new THREE.Vector3(
+                        // Random nr [0-9].
+                        Math.floor(Math.random() * 10), 
+                        Math.floor(Math.random() * 10), 
+                        Math.floor(Math.random() * 10)
+                    ), 
+                    color_green, 
+                    func.name
+                )
+            );
+        });
+    });
+}
 
 // Start program loop.
 mainloop();

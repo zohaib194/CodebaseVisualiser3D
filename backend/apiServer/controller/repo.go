@@ -148,7 +148,7 @@ func (repo RepoController) ParseSimpleFunc(w http.ResponseWriter, r *http.Reques
 	http.Header.Add(w.Header(), "content-type", "application/json")
 	http.Header.Add(w.Header(), "Access-Control-Allow-Origin", "*")
 
-	if r.Method == "POST" {
+	if r.Method == "GET" {
 		id := strings.TrimPrefix(r.URL.Path, "/repo/")
 
 		// Validate that the project exist in DB.
