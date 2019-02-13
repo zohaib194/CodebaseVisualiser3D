@@ -23,13 +23,13 @@ type RepoModel struct {
 }
 
 // Save saves repo to database and clones repository
-func (repo RepoModel) Save() error {
+func (repo RepoModel) Save() (string, error) {
 
 	err := DB.add(&repo)
 
 	if err != nil {
 		log.Println("Could not add to database: ", err)
-		return err
+		return "", err
 	}
 
 	log.Println(repo.ID)
@@ -38,7 +38,7 @@ func (repo RepoModel) Save() error {
 	cmd := exec.Command("git", "-C", RepoPath, "clone", repo.URI, repo.ID.Hex())
 	_, err = cmd.Output() // TODO: Validate that git clone went well and prevent request for rsa password
 
-	return err
+	return repo.ID.Hex(), err
 }
 
 // Load loads java application to parse a specified file.
