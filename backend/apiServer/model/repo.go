@@ -18,8 +18,8 @@ var JavaParserPath string
 
 // RepoModel represents metadata for a git repository.
 type RepoModel struct {
-	URI      string        `json:"uri"`                    // Where the repository was found
-	ID       bson.ObjectId `json:"-" bson:"_id,omitempty"` // Folder name where repo is stored
+	URI string        `json:"uri"`                    // Where the repository was found
+	ID  bson.ObjectId `json:"-" bson:"_id,omitempty"` // Folder name where repo is stored
 }
 
 // Save saves repo to database and clones repository
@@ -85,8 +85,8 @@ func (repo RepoModel) GetRepoByID(id string) (rep RepoModel, err error) {
 
 // GetRepoFile finds and return all files stored in repository directory.
 func (repo RepoModel) GetRepoFile() (files string, err error) {
-	cmd := exec.Command("find", RepoPath + "/" + repo.ID.Hex())
-	cmd.Dir = path
+	cmd := exec.Command("find", RepoPath+"/"+repo.ID.Hex())
+	cmd.Dir = JavaParserPath
 	bytes, err := cmd.CombinedOutput()
 
 	if err != nil {
