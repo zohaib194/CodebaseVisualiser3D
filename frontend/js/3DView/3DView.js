@@ -100,9 +100,9 @@ xhr.onreadystatechange = function() {
                     new DisplayObject(
                         new THREE.Vector3(
                             // Random nr [0-2].
-                            Math.floor(Math.random() * 3), 
-                            Math.floor(Math.random() * 3), 
-                            Math.floor(Math.random() * 3)
+                            Math.floor(Math.random() * 10), 
+                            Math.floor(Math.random() * 10), 
+                            Math.floor(Math.random() * 10)
                         ), 
                         color_green, 
                         func.name

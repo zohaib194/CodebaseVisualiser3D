@@ -3,7 +3,7 @@ var repo;
 function submitRepoName(){
 	var repoName;
 
-	repoName = document.getElementById("reponame")
+	repoName = document.getElementById("reponame");
 
 	// Create a http request
 	var xhr = new XMLHttpRequest();
@@ -16,7 +16,7 @@ function submitRepoName(){
     xhr.onreadystatechange = function() {
 	    if(xhr.readyState == 4 && xhr.status == 201) {
 			repo = JSON.parse(xhr.responseText);
-			window.location.assign("../html/3DView.html?id=" + repo.id);
+			window.location.assign("./html/3DView.html?id=" + repo.id);
 	    }
 	}
     xhr.send(JSON.stringify(body));
