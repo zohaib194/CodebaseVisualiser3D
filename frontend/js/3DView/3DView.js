@@ -1,3 +1,5 @@
+var data;
+
 var color_lightgray = 0x808080;
 var color_white = 0xffffff;
 var color_green = 0x00ff00;
@@ -38,10 +40,6 @@ window.addEventListener("resize", function() {
 
 // Add displaymanager for managing objects to draw.
 var displayMgr = new DisplayManager();
-displayMgr.addObject("function", new DisplayObject(new THREE.Vector3(0, 0, 0), color_green, "display1"));
-displayMgr.addObject("function", new DisplayObject(new THREE.Vector3(2, 0, 0), color_green, "display2"));
-displayMgr.addObject("function", new DisplayObject(new THREE.Vector3(0, 2, 0), color_green, "display3"));
-displayMgr.addObject("function", new DisplayObject(new THREE.Vector3(0, 0, 2), color_green, "display4"));
 
 /**
  * Program lifecycle function reponsible for updating the program state.
@@ -75,6 +73,46 @@ function mainloop()
     update();
     render();
 }
+
+// Find id param form url-
+var id = new URL(window.location.href).searchParams.get("id");
+//console.log(id);
+
+// Create a http request
+var xhr = new XMLHttpRequest();
+
+// Open the connection
+xhr.open("post", "http://localhost:8080/repo/" + id, true);
+
+// Once ready, receive data and populate displaymanager.
+xhr.onreadystatechange = function() {
+    // Once ready and everything went ok.
+    if(xhr.readyState == 4 && xhr.status == 200) {
+        data = JSON.parse(xhr.responseText);
+        
+        // For every functions entry
+        data.functions.forEach(element => {
+            // For each function object
+            element.function_names.forEach((func) => {
+                // Add it for display.
+                displayMgr.addObject(
+                    "function", 
+                    new DisplayObject(
+                        new THREE.Vector3(
+                            // Random nr [0-2].
+                            Math.floor(Math.random() * 3), 
+                            Math.floor(Math.random() * 3), 
+                            Math.floor(Math.random() * 3)
+                        ), 
+                        color_green, 
+                        func.name
+                    )
+                );
+            });
+        });
+    }
+}
+xhr.send();
 
 // Start program loop.
 mainloop();

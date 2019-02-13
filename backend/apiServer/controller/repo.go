@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
-	
+
 	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/model"
 )
 
@@ -54,7 +54,7 @@ type RepoController struct {
 func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request) {
 	http.Header.Add(w.Header(), "content-type", "application/json")
 	http.Header.Add(w.Header(), "Access-Control-Allow-Origin", "*")
-	
+
 	if r.Method == "POST" {
 
 		decoder := json.NewDecoder(r.Body)
@@ -88,7 +88,7 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 			return
 		}
 
-		ID := map[string]string {"id":id}
+		ID := map[string]string{"id": id}
 
 		w.WriteHeader(http.StatusCreated)
 		json.NewEncoder(w).Encode(ID)
@@ -100,7 +100,6 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 
 	return
 }
-
 
 /**
 * @api {Post} /repo/:id Parse the repository assosiated with id.
@@ -147,6 +146,7 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 // ParseSimpleFunc parse a repository for functions of a certain project in repos directory.
 func (repo RepoController) ParseSimpleFunc(w http.ResponseWriter, r *http.Request) {
 	http.Header.Add(w.Header(), "content-type", "application/json")
+	http.Header.Add(w.Header(), "Access-Control-Allow-Origin", "*")
 
 	if r.Method == "POST" {
 		id := strings.TrimPrefix(r.URL.Path, "/repo/")
