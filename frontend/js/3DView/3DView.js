@@ -82,7 +82,7 @@ var id = new URL(window.location.href).searchParams.get("id");
 var xhr = new XMLHttpRequest();
 
 // Open the connection
-xhr.open("post", "http://localhost:8080/repo/" + id, true);
+xhr.open("get", "http://localhost:8080/repo/" + id, true);
 
 // Once ready, receive data and populate displaymanager.
 xhr.onreadystatechange = function() {
