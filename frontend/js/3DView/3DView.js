@@ -98,6 +98,10 @@ xhr.onreadystatechange = function() {
 }
 xhr.send();
 
+/**
+ * Function for displaying function data fron json object.
+ * @param {object} data - Object made from Json.parse().
+ */
 function displayFunctions(data) {
     if (typeof data.functions === "undefined" || data.functions.lenght <= 0)
         return;
