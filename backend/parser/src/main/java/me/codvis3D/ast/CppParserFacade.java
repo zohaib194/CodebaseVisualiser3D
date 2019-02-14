@@ -37,7 +37,7 @@ public class CppParserFacade {
      *
      * @throws     IOException  Input/output exception
      */
-    public void parse(File file) throws IOException {
+    public void parse(File file, String context) throws IOException {
         String code = readFile(file, Charset.forName("UTF-8"));
         CPP14Lexer lexer = new CPP14Lexer(new ANTLRInputStream(code));
 
@@ -45,9 +45,21 @@ public class CppParserFacade {
         CPP14Parser parser = new CPP14Parser(tokens);
 
         ParseTree tree = parser.translationunit();
-        CppListener listener = new CppListener();
-        ParseTreeWalker walker =  new ParseTreeWalker();
+
+        switch(context){
+            case "Initial":
+                CppLstnr_initial listener = new CppLstnr_initial();
+                break;
+            case "Hover":
+                break;
+
+            default:
+                System.err.println("[ERROR] Invalid context\n");
+                System.exit(0);
+        }
+
         
+        ParseTreeWalker walker =  new ParseTreeWalker();
         walker.walk(listener, tree);
     }
 }
