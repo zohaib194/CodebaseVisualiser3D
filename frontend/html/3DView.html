@@ -9,15 +9,18 @@
         <title></title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval' http://127.0.0.1:5500/frontend/">
+        <meta http-equiv="Content-Security-Policy" content="default-src 'self' *; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval' http://localhost:8080/repo/add">
 
         <link rel="stylesheet" href="../css/3DView.css">
+
+        <script src="../js/config.js"></script>
 
         <!--THREE.js + (soon to come) ImGUI imports-->
         <script src="../js/treejs/three.js"></script>
         <script src="../js/treejs/controls/OrbitControls.js"></script>
     </head>
-    <body>        
+    <body>
+        <div id="loader"></div>
         <canvas id="output"></canvas>
         <div id="nameplate_container"></div>
         <script src="../js/3DView/DisplayObject.js"></script>

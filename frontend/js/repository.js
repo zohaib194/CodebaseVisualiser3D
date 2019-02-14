@@ -1,6 +1,8 @@
 var repo;
+console.log("repo");
 
 function submitRepoName(){
+    console.log("http://" + api_ip + ":" + api_port + "/repo/add");
 	var repoName;
 
 	repoName = document.getElementById("reponame");
@@ -11,14 +13,15 @@ function submitRepoName(){
 					'uri': repoName.value
 				};
 
-	xhr.open("post", "http://localhost:8080/repo/add", true);
+	xhr.open("post", "http://" + api_ip + ":" + api_port + "/repo/add", true);
 
     xhr.onreadystatechange = function() {
 	    if(xhr.readyState == 4 && xhr.status == 201) {
 			repo = JSON.parse(xhr.responseText);
-			window.location.assign("./html/3DView.html?id=" + repo.id);
+			location.assign("./html/3DView.html?id=" + repo.id);
 	    }
-	}
+    }
+    console.log(JSON.stringify(body));
     xhr.send(JSON.stringify(body));
 
     // disable the form and enable a loader to the document.
