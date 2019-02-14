@@ -6,7 +6,7 @@ import me.codvis.ast.parser.CPP14Parser;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.CharStream;
 
-public class CppListener extends CPP14BaseListener {
+public class CppLstnr_initial extends CPP14BaseListener {
 
     @Override 
     public void enterFunctiondefinition(CPP14Parser.FunctiondefinitionContext ctx) {  

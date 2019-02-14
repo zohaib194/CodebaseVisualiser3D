@@ -13,7 +13,7 @@ public class Main {
 
         parseArgs(argv);
 
-        if(target != "" || file != "" || context != ""){
+        if(target == "" || file == "" || context == ""){
             System.err.println("Use: java Main --help for more information\n");
             System.err.println("[ERROR] Usage: java Main [-t | --Target] targetName [-f | --File] fileName [-c | --Context] context");
             System.exit(0);

@@ -2,6 +2,7 @@ package me.codvis.ast;
 
 import me.codvis.ast.parser.CPP14Lexer;
 import me.codvis.ast.parser.CPP14Parser;
+import me.codvis.ast.parser.CPP14BaseListener;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -45,10 +46,11 @@ public class CppParserFacade {
         CPP14Parser parser = new CPP14Parser(tokens);
 
         ParseTree tree = parser.translationunit();
-
+        
+        CPP14BaseListener listener = null;
         switch(context){
             case "Initial":
-                CppLstnr_initial listener = new CppLstnr_initial();
+                listener = new CppLstnr_initial();
                 break;
             case "Hover":
                 break;
@@ -57,9 +59,12 @@ public class CppParserFacade {
                 System.err.println("[ERROR] Invalid context\n");
                 System.exit(0);
         }
-
         
         ParseTreeWalker walker =  new ParseTreeWalker();
+        
+        if(listener == null){
+            System.exit(0);
+        }
         walker.walk(listener, tree);
     }
 }
