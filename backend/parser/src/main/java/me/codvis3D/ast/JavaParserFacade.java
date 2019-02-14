@@ -45,7 +45,7 @@ public class JavaParserFacade {
         Java9Parser parser = new Java9Parser(tokens);
 
         ParseTree tree = parser.compilationUnit();
-        JavaListener listener = new JavaListener();
+        JavaLstnr_initial listener = new JavaLstnr_initial();
         ParseTreeWalker walker =  new ParseTreeWalker();
 
         walker.walk(listener, tree);

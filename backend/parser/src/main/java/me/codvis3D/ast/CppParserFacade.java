@@ -45,7 +45,7 @@ public class CppParserFacade {
         CPP14Parser parser = new CPP14Parser(tokens);
 
         ParseTree tree = parser.translationunit();
-        CppListener listener = new CppListener();
+        CppLstnr_initial listener = new CppLstnr_initial();
         ParseTreeWalker walker =  new ParseTreeWalker();
         
         walker.walk(listener, tree);
