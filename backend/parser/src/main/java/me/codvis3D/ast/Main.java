@@ -4,10 +4,10 @@ import java.io.File;
 import java.io.IOException;
 
 public class Main {
-    public static String flag;
-    public static String target;
-    public static String context;
-    public static String file;
+    public static String flag="";
+    public static String target="";
+    public static String context="";
+    public static String file="";
     
     public static void main(String[] argv) throws IOException {
 
