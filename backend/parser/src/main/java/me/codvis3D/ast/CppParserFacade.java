@@ -9,6 +9,8 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -47,10 +49,10 @@ public class CppParserFacade {
 
         ParseTree tree = parser.translationunit();
         
-        CPP14BaseListener listener = null;
+        CppExtendedListener listener = null;
         switch(context){
             case "Initial":
-                listener = new CppLstnr_initial();
+                listener = new CppLstnr_Initial();
                 break;
             case "Hover":
                 break;
@@ -66,5 +68,7 @@ public class CppParserFacade {
             System.exit(0);
         }
         walker.walk(listener, tree);
+
+        System.out.println(listener.getParsedCode());
     }
 }

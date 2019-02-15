@@ -47,10 +47,10 @@ public class JavaParserFacade {
 
         ParseTree tree = parser.compilationUnit();
         
-        Java9BaseListener listener = null;
+        JavaExtendedListener listener = null;
         switch(context){
             case "Initial":
-                listener = new JavaLstnr_initial();
+                listener = new JavaLstnr_Initial(file.getName());
                 break;
             case "Hover":
                 break;
@@ -67,5 +67,7 @@ public class JavaParserFacade {
         }
         
         walker.walk(listener, tree);
+
+        System.out.println(listener.getParsedCode());
     }
 }
