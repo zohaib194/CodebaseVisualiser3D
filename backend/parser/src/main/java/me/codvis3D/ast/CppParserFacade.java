@@ -54,7 +54,8 @@ public class CppParserFacade {
             case "Initial":
                 listener = new CppLstnr_Initial(file.getName());
                 break;
-            case "Hover":
+            case "BodyExtraction":
+                listener = new CppLstnr_BodyExtraction(file.getName());
                 break;
 
             default:

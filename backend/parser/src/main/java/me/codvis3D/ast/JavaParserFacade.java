@@ -52,7 +52,8 @@ public class JavaParserFacade {
             case "Initial":
                 listener = new JavaLstnr_Initial(file.getName());
                 break;
-            case "Hover":
+            case "BodyExtraction":
+                listener = new JavaLstnr_BodyExtraction(file.getName());
                 break;
 
             default:

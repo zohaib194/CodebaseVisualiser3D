@@ -4,6 +4,7 @@ import org.json.JSONObject;
 
 public class FunctionModel {
 	private String name;
+	private String body;
 
 	FunctionModel(String name){
 		this.name = name;
@@ -13,10 +14,20 @@ public class FunctionModel {
 		return this.name;
 	}
 
+	public void setBody(String body){
+		this.body = body;
+	}
+
+	public String setBody(){
+		return this.body;
+	}
+
 	public JSONObject getParsedCode(){	
 		JSONObject parsedCode = new JSONObject();
 
 		parsedCode.put("name", this.name);
+		parsedCode.put("body", this.body);
 		return parsedCode;
 	}
+
 }

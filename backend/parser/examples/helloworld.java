@@ -1,3 +1,9 @@
+public class Foo {
+	String yes;
+	String no;
+}
+
+
 public class HelloWorld { 
    public static void main(String[] args) { 
    		if (TRUE) {
@@ -7,4 +13,13 @@ public class HelloWorld {
    		}
 
    }
+
+   public void lol(){
+
+   }
+
+
+   private List<Foo> getFooList(){
+   	
+   } 
 }
