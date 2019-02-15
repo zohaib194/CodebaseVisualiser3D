@@ -28,6 +28,6 @@ void hello::foo(){
 
 }
 
-void helloworld::print(){
+void helloworld::print() {
 
 }

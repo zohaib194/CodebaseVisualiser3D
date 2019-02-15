@@ -1,5 +1,6 @@
 package me.codvis.ast;
 
+import org.json.JSONObject;
 
 public class FunctionModel {
 	private String name;
@@ -12,4 +13,10 @@ public class FunctionModel {
 		return this.name;
 	}
 
+	public JSONObject getParsedCode(){	
+		JSONObject parsedCode = new JSONObject();
+
+		parsedCode.put("name", this.name);
+		return parsedCode;
+	}
 }

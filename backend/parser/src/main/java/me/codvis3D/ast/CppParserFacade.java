@@ -52,7 +52,7 @@ public class CppParserFacade {
         CppExtendedListener listener = null;
         switch(context){
             case "Initial":
-                listener = new CppLstnr_Initial();
+                listener = new CppLstnr_Initial(file.getName());
                 break;
             case "Hover":
                 break;
