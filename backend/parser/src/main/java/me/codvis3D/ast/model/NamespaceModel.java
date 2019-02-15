@@ -2,10 +2,10 @@ package me.codvis.ast;
 
 import org.json.JSONObject;
 
-public class FunctionModel extends Model{
+public class NamespaceModel extends Model {
 	private String name;
 
-	FunctionModel(String name){
+	NamespaceModel(String name){
 		this.name = name;
 	}
 
@@ -14,7 +14,7 @@ public class FunctionModel extends Model{
 	}
 
 	@Override
-	public JSONObject getParsedCode(){	
+	public JSONObject getParsedCode(){
 		JSONObject parsedCode = new JSONObject();
 
 		parsedCode.put("name", this.name);

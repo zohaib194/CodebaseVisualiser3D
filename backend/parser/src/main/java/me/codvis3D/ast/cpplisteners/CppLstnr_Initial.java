@@ -27,6 +27,11 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	    fileModel.addFunction(new FunctionModel(input.getText(interval)));
     }
 
+    @Override
+	public void enterOriginalnamespacedefinition(CPP14Parser.OriginalnamespacedefinitionContext ctx) { 
+		fileModel.addNamespace(new NamespaceModel(ctx.Identifier().getText()));
+	}
+
     public JSONObject getParsedCode() {  
 		JSONObject parsedCode = new JSONObject();
 
