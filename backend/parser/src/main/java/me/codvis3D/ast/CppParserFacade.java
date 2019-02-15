@@ -57,6 +57,9 @@ public class CppParserFacade {
             case "BodyExtraction":
                 listener = new CppLstnr_BodyExtraction(file.getName());
                 break;
+            case "ClassContext":
+                listener = new CppLstnr_ClassContext(file.getName());
+                break;
 
             default:
                 System.err.println("[ERROR] Invalid context\n");

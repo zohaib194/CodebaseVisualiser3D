@@ -1,14 +1,33 @@
 #include <iostream>
 
 using namespace std;
+
 class helloworld
 {
-public:
 	helloworld();
+public:
+	helloworld1();
 	print();
-	~helloworld();
+	~helloworld(){}
+private:
+	void compute();
+protected:
+	bool lol();
+	bool ha();
+	bool haha();
 	
 };
+
+void foo()
+{
+    class /* No name */ {
+		public:
+        float x;
+        float y;
+    } point;
+    
+    point.x = 42;
+}
 
 int main()
 {

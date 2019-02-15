@@ -2,7 +2,7 @@ package me.codvis.ast;
 
 import org.json.JSONObject;
 
-public class FunctionModel {
+public class FunctionModel extends Model{
 	private String name;
 	private String body;
 
@@ -18,10 +18,11 @@ public class FunctionModel {
 		this.body = body;
 	}
 
-	public String setBody(){
+	public String getBody(){
 		return this.body;
 	}
 
+	@Override
 	public JSONObject getParsedCode(){	
 		JSONObject parsedCode = new JSONObject();
 

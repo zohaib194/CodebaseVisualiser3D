@@ -5,17 +5,25 @@ import java.util.ArrayList;
 
 import org.json.JSONObject;
 
-public class FileModel {
+public class FileModel extends Model{
 	private String fileName;
 	private List<FunctionModel> functions;
+	private List<NamespaceModel> namespaces;
+	private List<UsingNamespaceModel> usingNamespace;
+	private List<ClassModel> classes;
 
 	FileModel(String fileName){
 		this.fileName = fileName;
 		this.functions = new ArrayList<>();
+		this.namespaces = new ArrayList<>();
 	}
 
 	public void addFunction(FunctionModel function){
 		this.functions.add(function);
+	}
+
+	public void addNamespace(NamespaceModel namespace){
+		this.namespaces.add(namespace);
 	}
 
 	public void setFunctions(List<FunctionModel> functions){
@@ -26,23 +34,22 @@ public class FileModel {
 		return this.functions;
 	}
 
+	@Override
 	public JSONObject getParsedCode(){
 		JSONObject parsedCode = new JSONObject();
 
-		parsedCode.put("file", this.fileName);
+		parsedCode.put("file_name", this.fileName);
 
-		if (functions.size() > 0) {
-			List<JSONObject> parsedFunctions = new ArrayList<>();
-
-			for (FunctionModel function : this.functions ) {
-				JSONObject parsedFunction = new JSONObject();
-				parsedFunction.put("function", function.getParsedCode());
-				parsedFunctions.add(parsedFunction);
-			}
-
+		List<JSONObject> parsedFunctions = this.convertClassListJsonObjectList(this.functions, "function");
+		if (parsedFunctions.size() > 0) {
 			parsedCode.put("functions", parsedFunctions);
 		}
 
+		List<JSONObject> parsedNamespaces = this.convertClassListJsonObjectList(this.namespaces, "namespace");
+		if (parsedFunctions.size() > 0) {
+			parsedCode.put("namespaces", parsedNamespaces);
+		}
+		
 		return parsedCode;
 	}
 
