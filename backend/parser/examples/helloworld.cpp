@@ -2,19 +2,27 @@
 
 using namespace std;
 
-class helloworld
+class Helloworld
 {
-	helloworld();
+	void privateFuncWithOutPrivateSpec();
 public:
-	helloworld1();
-	print();
-	~helloworld(){}
+	Helloworld();
+	void publicFunc2();
+	~Helloworld(){};
+	bool publicFuncWithBody(){return true;}
+
+	int i;
+	int j;
+	std::pair<std::string, std::string> pairTest;
 private:
-	void compute();
+	void privateFunc1();
+	
+	int x;
+	int y;
 protected:
-	bool lol();
-	bool ha();
-	bool haha();
+	bool protectedFunc1();
+	bool protectedFunc2();
+	bool protectedFunc3();
 	
 };
 

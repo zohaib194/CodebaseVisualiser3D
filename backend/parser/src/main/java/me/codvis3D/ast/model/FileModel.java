@@ -16,6 +16,7 @@ public class FileModel extends Model{
 		this.fileName = fileName;
 		this.functions = new ArrayList<>();
 		this.namespaces = new ArrayList<>();
+		this.classes = new ArrayList<>();
 	}
 
 	public void addFunction(FunctionModel function){
@@ -24,6 +25,10 @@ public class FileModel extends Model{
 
 	public void addNamespace(NamespaceModel namespace){
 		this.namespaces.add(namespace);
+	}
+
+	public void addClass(ClassModel classModel){
+		this.classes.add(classModel);
 	}
 
 	public void setFunctions(List<FunctionModel> functions){
@@ -41,13 +46,18 @@ public class FileModel extends Model{
 		parsedCode.put("file_name", this.fileName);
 
 		List<JSONObject> parsedFunctions = this.convertClassListJsonObjectList(this.functions, "function");
-		if (parsedFunctions.size() > 0) {
+		if (parsedFunctions != null && parsedFunctions.size() > 0) {
 			parsedCode.put("functions", parsedFunctions);
 		}
 
 		List<JSONObject> parsedNamespaces = this.convertClassListJsonObjectList(this.namespaces, "namespace");
-		if (parsedFunctions.size() > 0) {
+		if (parsedNamespaces != null && parsedNamespaces.size() > 0) {
 			parsedCode.put("namespaces", parsedNamespaces);
+		}
+
+		List<JSONObject> parsedClasses = this.convertClassListJsonObjectList(this.classes, "class");
+		if (parsedClasses != null && parsedClasses.size() > 0) {
+			parsedCode.put("classes", parsedClasses);
 		}
 		
 		return parsedCode;

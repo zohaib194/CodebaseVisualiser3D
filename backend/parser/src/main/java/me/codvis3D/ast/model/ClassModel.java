@@ -62,6 +62,7 @@ public class ClassModel extends Model{
 	public JSONObject getParsedCode(){	
 		JSONObject parsedCode = new JSONObject();
 
+		parsedCode.put("name", this.name);
 		parsedCode.put("public", this.publicData);
 		parsedCode.put("private", this.privateData);
 		parsedCode.put("protected", this.protectedData);
