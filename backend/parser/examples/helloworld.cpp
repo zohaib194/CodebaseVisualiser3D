@@ -3,9 +3,16 @@
 using namespace std;
 class helloworld
 {
+	class hei
+	{
+	public:
+		hei();
+		~hei();
+		
+	};
 public:
 	helloworld();
-	print();
+	void print();
 	~helloworld();
 	
 };
@@ -17,6 +24,8 @@ int main()
 }
 
 namespace hello{
+	#include <iostream>
+
 	void foo();
 
 	void boo(){
