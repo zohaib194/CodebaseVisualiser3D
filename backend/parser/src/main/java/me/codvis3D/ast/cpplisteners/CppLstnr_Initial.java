@@ -32,23 +32,15 @@ public class CppLstnr_Initial extends CppExtendedListener {
 		fileModel.addNamespace(new NamespaceModel(ctx.Identifier().getText()));
 	}
 
-    public JSONObject getParsedCode() {  
-		JSONObject parsedCode = new JSONObject();
-
-    	return parsedCode.put("file", this.fileModel.getParsedCode());
-    }
-
-     @Override 
+    @Override 
     public void enterClassspecifier(CPP14Parser.ClassspecifierContext ctx) {   
     	ClassModel classModel;
 
     	// If it is not a annonymous class.
     	if(ctx.classhead().classheadname() != null){
-    		System.out.println("class : " + ctx.classhead().classkey().getText() + " " + ctx.classhead().classheadname().getText() );
     		classModel = new ClassModel(ctx.classhead().classheadname().getText());
     		//fileModel.
     	} else {
-    		System.out.println("class : " + ctx.classhead().classkey().getText() + " " +  "null");
     		classModel = new ClassModel("null");
     	}
 
@@ -71,7 +63,6 @@ public class CppLstnr_Initial extends CppExtendedListener {
     			
     			if (currentAccessSpecifier != null) {
 
-		   			System.out.println(currentAccessSpecifier.getText() + ": " + input.getText(nameInterval));
 		   			switch(currentAccessSpecifier.getText()){
 		   				case "public":
 		   					classModel.addPublicData(input.getText(nameInterval));
@@ -87,7 +78,6 @@ public class CppLstnr_Initial extends CppExtendedListener {
     		
     			} else { // Or private member declaration exist without private access specifier.
 		   	
-		   			System.out.println("private : " + input.getText(nameInterval));	
 		   			classModel.addPrivateData(input.getText(nameInterval));
   			
 	  			}
@@ -99,5 +89,11 @@ public class CppLstnr_Initial extends CppExtendedListener {
     	}
 
     	fileModel.addClass(classModel);
+    }
+
+    public JSONObject getParsedCode() {  
+		JSONObject parsedCode = new JSONObject();
+
+    	return parsedCode.put("file", this.fileModel.getParsedCode());
     }
  }

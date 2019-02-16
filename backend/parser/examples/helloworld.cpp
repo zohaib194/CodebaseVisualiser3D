@@ -3,7 +3,16 @@
 using namespace std;
 
 class Helloworld
-{
+{	
+	class inneclass
+	{
+	public:
+		inneclass();
+		void foo();
+		~inneclass();
+	private:
+		bool lolFrominneClass();
+	};
 	void privateFuncWithOutPrivateSpec();
 public:
 	Helloworld();
@@ -55,6 +64,6 @@ void hello::foo(){
 
 }
 
-void helloworld::print() {
+void Helloworld::publicFunc2() {
 
 }
