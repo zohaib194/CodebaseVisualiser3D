@@ -41,11 +41,17 @@ window.addEventListener("resize", function() {
 // Add displaymanager for managing objects to draw.
 var displayMgr = new DisplayManager();
 
+// Cube marking origin of world.
+var geometry = new THREE.CubeGeometry(0.05, 0.05, 0.05);
+var material = new THREE.MeshBasicMaterial({color: 0x00ff00});
+var cube = new THREE.Mesh(geometry, material);
+cube.position.set(0, 0, 0);
+scene.add(cube);
+
 /**
  * Program lifecycle function reponsible for updating the program state.
  */
-function update()
-{
+function update() {
     // Update controls.
     controls.update();
 }
@@ -53,10 +59,9 @@ function update()
 /**
  * Program lifecycle function reponsible for rendering the scene.
  */
-function render()
-{
+function render() {
     // Display all functions.
-    displayMgr.draw(scene);
+    displayMgr.draw();
 
     // Draw scene.
     renderer.render(scene, camera);
@@ -65,8 +70,7 @@ function render()
 /**
  * Main loop of program.
  */
-function mainloop()
-{
+function mainloop() {
     // Schedule the next frame.
     requestAnimationFrame(mainloop);
 
@@ -74,29 +78,7 @@ function mainloop()
     render();
 }
 
-// Find id param form url-
-var id = new URL(window.location.href).searchParams.get("id");
-//console.log(id);
-
-// Create a http request
-var xhr = new XMLHttpRequest();
-
-// Open the connection
-xhr.open("get", "http://localhost:8080/repo/" + id, true);
-
-// Once ready, receive data and populate displaymanager.
-xhr.onreadystatechange = function() {
-    // Once ready and everything went ok.
-    if(xhr.readyState == 4 && xhr.status == 200) {
-        data = JSON.parse(xhr.responseText);
-        
-        if (typeof data === "undefined")
-            return;
-
-        displayFunctions(data);
-    }
-}
-xhr.send();
+// ########## DATA PROCESSING FUNCITONS ##########
 
 /**
  * Function for displaying function data fron json object.
@@ -127,6 +109,31 @@ function displayFunctions(data) {
         });
     });
 }
+
+// Find id param form url
+var id = new URL(window.location.href).searchParams.get("id");
+
+// Create a http request
+var xhr = new XMLHttpRequest();
+
+// Open the connection
+xhr.open("get", "http://localhost:8080/repo/" + id, true);
+
+// Once ready, receive data and populate displaymanager.
+xhr.onreadystatechange = function() {
+    // Once ready and everything went ok.
+    if(xhr.readyState == 4 && xhr.status == 200) {
+        data = JSON.parse(xhr.responseText);
+
+        // Didn't get data.
+        if (typeof data === "undefined") {
+            return;
+        }
+
+        displayFunctions(data);
+    }
+}
+xhr.send();
 
 // Start program loop.
 mainloop();
