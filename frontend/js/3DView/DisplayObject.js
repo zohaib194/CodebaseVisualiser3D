@@ -62,7 +62,7 @@ function DisplayObject(position, color, name) {
     this.name = name;
 
     // Cube setup.
-    this.geometry = new THREE.BoxGeometry(1, 1, 1);
+    this.geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
     this.material = new THREE.MeshStandardMaterial({ color: this.color });
     this.cube = new THREE.Mesh(this.geometry, this.material);
     scene.add(this.cube);
@@ -105,6 +105,9 @@ function DisplayObject(position, color, name) {
             var worldUp = new THREE.Vector3(0, 1, 0);
             var cameraRight = cameraForward.cross(worldUp);
             cameraRight.normalize();
+
+            worldUp.multiplyScalar(0.2);
+            cameraRight.multiplyScalar(0.2);
 
             // Copy my position (+ offset) and convert to screen coords.
             var pos = this.position.clone();
