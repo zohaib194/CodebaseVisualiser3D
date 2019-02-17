@@ -1,11 +1,12 @@
 package model
 
+// FunctionsModel is a wrapper for FunctionModel for json parsing
 type FunctionsModel struct {
 	Function FunctionModel `json:"function"`
 
 }
 
-// Function that represents a function from the source code.
+// FunctionModel represents code for a single function 
 type FunctionModel struct {
 	Name string `json:"name"`
 }
