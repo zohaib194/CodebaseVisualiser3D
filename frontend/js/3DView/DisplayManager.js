@@ -24,15 +24,13 @@ function DisplayManager() {
 
     /**
      * Function for drawing all registered objects.
-     * 
-     * @param {THREE.Scene} scene - Scene to add object too.
      */
-    this.draw = function(scene) {
+    this.draw = function() {
         if (this.objects != null) {                     // Map exists.
             this.objects.forEach((value, key, map) => { // Run though map.
                 if (value != null && value.length > 0){ // Object list exists.
                     value.forEach(object => {           // Run though objects.
-                        object.draw(scene);
+                        object.draw();
                     });
                 }
             });
