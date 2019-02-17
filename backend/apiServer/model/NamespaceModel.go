@@ -1,10 +1,11 @@
 package model
 
+// NamespacesModel is a wrapper for NamespaceModel for json parsing
 type NamespacesModel struct{
 
 	Namespace NamespaceModel `json:"namespace"`
 }
-
+// NamespaceModel represents code for a single namespace
 type NamespaceModel struct{
 
 	Functions []FunctionsModel `json:"functions"`
