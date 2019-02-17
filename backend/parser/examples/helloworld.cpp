@@ -32,6 +32,21 @@ protected:
 	bool protectedFunc1();
 	bool protectedFunc2();
 	bool protectedFunc3();
+
+
+class helloworld
+{
+	class hei
+	{
+	public:
+		hei();
+		~hei();
+		
+	};
+public:
+	helloworld();
+	void print();
+	~helloworld();
 	
 };
 
@@ -53,6 +68,8 @@ int main()
 }
 
 namespace hello{
+	#include <iostream>
+
 	void foo();
 
 	void boo(){

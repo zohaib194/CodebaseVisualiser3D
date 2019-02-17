@@ -11,6 +11,10 @@ public final class Foo {
 
 public static class HelloWorld { 
    private String test1;
+
+package hello.world;
+
+public class HelloWorld { 
    public static void main(String[] args) { 
    		if (TRUE) {
    			System.out.println("Hello, World");	

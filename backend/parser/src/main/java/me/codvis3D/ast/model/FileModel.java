@@ -9,13 +9,15 @@ public class FileModel extends Model{
 	private String fileName;
 	private List<FunctionModel> functions;
 	private List<NamespaceModel> namespaces;
-	private List<UsingNamespaceModel> usingNamespace;
+	private List<UsingNamespaceModel> usingNamespaces;
 	private List<ClassModel> classes;
+
 
 	FileModel(String fileName){
 		this.fileName = fileName;
 		this.functions = new ArrayList<>();
 		this.namespaces = new ArrayList<>();
+		this.usingNamespaces = new ArrayList<>();
 		this.classes = new ArrayList<>();
 	}
 
@@ -31,12 +33,28 @@ public class FileModel extends Model{
 		this.classes.add(classModel);
 	}
 
+	public void addUsingNamespace(UsingNamespaceModel namespace){
+		this.usingNamespaces.add(namespace);
+	}
+
 	public void setFunctions(List<FunctionModel> functions){
 		this.functions = functions;
 	}
 
+	public String getFilename(){
+		return this.fileName;
+	}
+
 	public List<FunctionModel> getFunctions(){
 		return this.functions;
+	}
+
+	public List<NamespaceModel> getNamespaces(){
+		return this.namespaces;
+	}
+
+	public List<UsingNamespaceModel> getUsingNamespaces(){
+		return this.usingNamespaces;
 	}
 
 	@Override
@@ -46,19 +64,27 @@ public class FileModel extends Model{
 		parsedCode.put("file_name", this.fileName);
 
 		List<JSONObject> parsedFunctions = this.convertClassListJsonObjectList(this.functions, "function");
-		if (parsedFunctions != null && parsedFunctions.size() > 0) {
+		if (parsedFunctions != null) {
 			parsedCode.put("functions", parsedFunctions);
 		}
 
 		List<JSONObject> parsedNamespaces = this.convertClassListJsonObjectList(this.namespaces, "namespace");
-		if (parsedNamespaces != null && parsedNamespaces.size() > 0) {
+		if (parsedNamespaces != null) {
 			parsedCode.put("namespaces", parsedNamespaces);
 		}
 
+		List<JSONObject> parsedUsingNamespaces = this.convertClassListJsonObjectList(this.usingNamespaces, "namespace");
+		if (parsedUsingNamespaces != null) {
+			parsedCode.put("using_namespaces", parsedUsingNamespaces);
+		}
+
 		List<JSONObject> parsedClasses = this.convertClassListJsonObjectList(this.classes, "class");
-		if (parsedClasses != null && parsedClasses.size() > 0) {
+		if (parsedClasses != null) {
 			parsedCode.put("classes", parsedClasses);
 		}
+
+
+
 		
 		return parsedCode;
 	}
