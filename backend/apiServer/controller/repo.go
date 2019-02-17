@@ -54,7 +54,6 @@ type RepoController struct {
 func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request) {
 	http.Header.Add(w.Header(), "content-type", "application/json")
 	http.Header.Add(w.Header(), "Access-Control-Allow-Origin", "*")
-
 	if r.Method == "POST" {
 
 		decoder := json.NewDecoder(r.Body)
@@ -170,7 +169,7 @@ func (repo RepoController) ParseSimpleFunc(w http.ResponseWriter, r *http.Reques
 		}
 
 		// Fetch all fuctions given in files.
-		functions, err := exstRepo.ParseFunctionsFromFiles(files)
+		projectModel, err := exstRepo.ParseFunctionsFromFiles(files)
 
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -178,7 +177,7 @@ func (repo RepoController) ParseSimpleFunc(w http.ResponseWriter, r *http.Reques
 			return
 		}
 
-		json.NewEncoder(w).Encode(functions)
+		json.NewEncoder(w).Encode(projectModel)
 
 	} else { // if not POST request
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
