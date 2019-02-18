@@ -11,14 +11,26 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
 import org.json.JSONObject;
-
+/**
+ * Class for exstending listeners and parsing code requiered for initial 3D view for code abstraction.
+ */
 public class CppLstnr_Initial extends CppExtendedListener {
 	private FileModel fileModel;
 
+	/**
+	 * Constructs the object, setting the filepath for file being parsed.
+	 *
+	 * @param      filePath  The file path
+	 */
 	CppLstnr_Initial(String filePath) {
 		this.fileModel = new FileModel(filePath);
 	}
 
+	/**
+	 * Listener for parsing a method/function declaration. Adding function name to filemodel.
+	 *
+	 * @param      ctx   The parsing context
+	 */
     @Override 
     public void enterFunctiondefinition(CPP14Parser.FunctiondefinitionContext ctx) {
         
@@ -31,6 +43,11 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	    fileModel.addFunction(new FunctionModel(input.getText(interval)));
     }
 
+    /**
+	 * Listener for parsing a namespace declaration. Adding namespace to filemodel.
+     *
+     * @param      ctx   The parsing context
+     */
     @Override
 	public void enterOriginalnamespacedefinition(CPP14Parser.OriginalnamespacedefinitionContext ctx) { 
 		NamespaceModel namespace = new NamespaceModel(ctx.Identifier().getText());
@@ -54,6 +71,11 @@ public class CppLstnr_Initial extends CppExtendedListener {
 		ctx.exitRule(this);
 	}
 
+	/**
+	 * Listener for parsing a using namespace declaration. Adding namespace to filemodel.
+	 *
+	 * @param      ctx   The parsing context
+	 */
 	@Override
 	public void enterUsingdirective(CPP14Parser.UsingdirectiveContext ctx) { 
 		if (ctx.nestednamespecifier() != null) {
@@ -64,12 +86,22 @@ public class CppLstnr_Initial extends CppExtendedListener {
 		}
 	}
 
+	/**
+	 * Gets the parsed code as JSONObject.
+	 *
+	 * @return     The parsed code.
+	 */
     public JSONObject getParsedCode() {  
 		JSONObject parsedCode = new JSONObject();
 
     	return parsedCode.put("file", this.fileModel.getParsedCode());
     }
 
+    /**
+     * Gets the file model.
+     *
+     * @return     The file model.
+     */
     public FileModel getFileModel(){
     	return this.fileModel;
     }

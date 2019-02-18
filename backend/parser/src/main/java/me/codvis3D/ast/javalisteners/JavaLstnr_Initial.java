@@ -9,25 +9,48 @@ import org.antlr.v4.runtime.ParserRuleContext;
 
 import org.json.JSONObject;
 
+/**
+ * Class for exstending listeners and parsing code requiered for initial 3D view for code abstraction.
+ */
 public class JavaLstnr_Initial extends JavaExtendedListener {
 	private FileModel fileModel;
 	private NamespaceModel namespace;
 
+	/**
+	 * Constructs the object, setting the filepath to file being parsed.
+	 *
+	 * @param      filePath  The file path
+	 */
 	JavaLstnr_Initial(String filePath) {
 		this.fileModel = new FileModel(filePath);
 	}
 
+	/**
+	 * Listener for parsing a method/function declaration. Adding function name to filemodel.
+	 *
+	 * @param      ctx   The parsing context
+	 */
     @Override 
     public void enterMethodDeclarator(Java9Parser.MethodDeclaratorContext ctx) {  //see gramBaseListener for allowed functions
       	
 	    fileModel.addFunction(new FunctionModel(ctx.getText()));
     }
 
+    /**
+     * Listener for parsing a package/namespace declaration. Adding package name to filemodel.
+     *
+     * @param      ctx   The parsing context
+     */
 	@Override
 	public void enterPackageDeclaration(Java9Parser.PackageDeclarationContext ctx){
 		this.namespace = new NamespaceModel(ctx.packageName().getText());
 	}
 
+	/**
+	 * Listener for parsing a package/namespace import. Adding package name to filemodel.
+	 *
+	 * @param      ctx   The parsing context
+	 */
 	@Override
 	public void enterImportDeclaration(Java9Parser.ImportDeclarationContext ctx){
 		Java9Parser.SingleStaticImportDeclarationContext importSingle = ctx.singleStaticImportDeclaration();
@@ -57,7 +80,12 @@ public class JavaLstnr_Initial extends JavaExtendedListener {
 		
 	}	
 
-
+	/**
+	 * Gets the parsed code as JSONObject.
+	 * Adding the file content as part of the package being declared at start of file.
+	 *
+	 * @return     The parsed code.
+	 */
     public JSONObject getParsedCode() {
 		JSONObject parsedCode = new JSONObject();
 

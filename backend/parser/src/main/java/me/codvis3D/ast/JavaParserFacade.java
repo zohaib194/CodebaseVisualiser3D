@@ -14,6 +14,9 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 
+/**
+ * Class for setting up java parsers.
+ */
 public class JavaParserFacade {
     
     /**
