@@ -7,8 +7,6 @@ import org.json.JSONObject;
 
 /**
  * Class for extending CPP14BaseListener and implementing result interface.
- * Class for extending Java9BaseListener and implementing reuslt interface.
- * 
  */
 public class CppExtendedListener extends CPP14BaseListener implements CppResultInterface{
 
