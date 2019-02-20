@@ -2,6 +2,7 @@ package me.codvis.ast;
 
 import me.codvis.ast.parser.Java9Lexer;
 import me.codvis.ast.parser.Java9Parser;
+import me.codvis.ast.parser.Java9BaseListener;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -13,6 +14,9 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 
+/**
+ * Class for setting up java parsers.
+ */
 public class JavaParserFacade {
     
     /**
@@ -37,7 +41,7 @@ public class JavaParserFacade {
      *
      * @throws     IOException  Input/output exception
      */
-    public void parse(File file) throws IOException {
+    public void parse(File file, String context) throws IOException {
         String code = readFile(file, Charset.forName("UTF-8"));
         Java9Lexer lexer = new Java9Lexer(new ANTLRInputStream(code));
 
@@ -45,9 +49,28 @@ public class JavaParserFacade {
         Java9Parser parser = new Java9Parser(tokens);
 
         ParseTree tree = parser.compilationUnit();
-        JavaListener listener = new JavaListener();
+        
+        JavaExtendedListener listener = null;
+        switch(context){
+            case "Initial":
+                listener = new JavaLstnr_Initial(file.getName());
+                break;
+            case "Hover":
+                break;
+
+            default:
+                System.err.println("[ERROR] Invalid context\n");
+                System.exit(0);
+        }
+
         ParseTreeWalker walker =  new ParseTreeWalker();
 
+        if(listener == null){
+            System.exit(0);
+        }
+        
         walker.walk(listener, tree);
+
+        System.out.println(listener.getParsedCode());
     }
 }
