@@ -9,12 +9,18 @@
         <title>Codebase Visualizer 3D</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval' http://localhost:5500/frontend/html/3DView.html">
-        
+        <!--<meta http-equiv="Content-Security-Policy" content="default-src * https://flyover.github.io/imgui-js ; style-src 'self' 'unsafe-inline'; media-src https://threejs.org ; script-src * 'unsafe-inline' 'unsafe-eval' https://flyover.github.io/imgui-js http://localhost:5500/frontend/html/3DView.html">
+        -->
         <link rel="stylesheet" href="./css/main.css">
         
         <script src="./js/WebGLDetect.js"></script>
         <script src="./js/repository.js"></script>
+
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/systemjs/0.21.4/system.js"></script>
+        <script type="text/javascript" src="./js/TestImgui.js"></script>
+                <!--THREE.js + (soon to come) ImGUI imports-->
+        <script src="./js/treejs/three.js"></script>
+        <script src="./js/treejs/controls/OrbitControls.js"></script>
     </head>
     <body>
         <!--[if lt IE 7]>
@@ -28,7 +34,7 @@
         <main>
             
             <div id="loader"></div>
-
+            <canvas id="output"></canvas>
             <form id="repositoryform">
                 <div class="repoform">
                     <p id="gitrepotitle">Git Repository</p>

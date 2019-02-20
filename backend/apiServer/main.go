@@ -46,7 +46,7 @@ func main() {
 
 	// API routings
 	http.HandleFunc("/repo/add", controller.RepoController{}.NewRepoFromURI)
-	http.HandleFunc("/repo/", controller.RepoController{}.ParseSimpleFunc)
+	http.HandleFunc("/repo/:id", controller.RepoController{}.ParseSimpleFunc)
 
 	// Start server
 	log.Printf("%s Listening on port: %v", logInfo, port)
