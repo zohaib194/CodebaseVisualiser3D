@@ -2,7 +2,7 @@ package model
 
 // ClassesModel is a wrapper for ClassModel for json parsing
 type ClassesModel struct{
-	Class ClassModel 	`son:"class"`
+	Class ClassModel 	`json:"class"`
 }
 
 
