@@ -54,34 +54,50 @@ let destroyNameplate = function(name) {
  * 
  * @param {THREE.Vector3} position - Position the cube willl be placed at.
  * @param {Integer} color - The color of the cube, preferrably not black.
- * @param {string} name - Name of the obejct to be display on hover (not active).
+ * @param {string} name - Name of the object to be display on hover (not active).
+ * @param {THREE.Mesh} threeShape - Mesh to display. Defualt white cube (0.1,0.1,0.1).
  */
-function DisplayObject(position, color, name) {
+function DisplayObject(
+        position, 
+        color, 
+        name, 
+        threeShape/* = new THREE.Mesh(
+            new THREE.BoxGeometry(0.1, 0.1, 0.1), 
+            new THREE.MeshStandardMaterial({ color: 0xffffff })
+        )*/
+    ) {
+
     this.position = position;
     this.color = color;
     this.name = name;
 
-    // Cube setup.
-    this.geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
-    this.material = new THREE.MeshStandardMaterial({ color: this.color });
-    this.cube = new THREE.Mesh(this.geometry, this.material);
-    scene.add(this.cube);
+    // Shape setup.
+    this.shape = threeShape;
+    this.shape.name = this.name;
+    scene.add(this.shape);
 
-    // Cube's edge highlight setup.
-    this.edgeGeometry = new THREE.EdgesGeometry(this.cube.geometry);
+    // Shapes' edge highlight setup.
+    this.edgeGeometry = new THREE.EdgesGeometry(this.shape.geometry);
     this.edgeMaterial = new THREE.LineBasicMaterial({
         color: color_black, 
         linewidth: 1
     });
     this.wireframe = new THREE.LineSegments(this.edgeGeometry, this.edgeMaterial);
+    this.wireframe.name = this.name + " | Wireframe";
     scene.add(this.wireframe);
 
     /**
      * Function for drawing object.
      */
     this.draw = function() {
-        // Position cube.
-        this.cube.position.set(this.position.x, this.position.y, this.position.z);
+        // Has no object to dsiplay, abort. 
+        if (typeof this.shape === "undefined") {
+            console.log("Missing object to display!");
+            return;
+        }
+
+        // Position THREE.js Shape.
+        this.shape.position.set(this.position.x, this.position.y, this.position.z);
 
         // Position wireframe.
         this.wireframe.position.set(this.position.x, this.position.y, this.position.z);
