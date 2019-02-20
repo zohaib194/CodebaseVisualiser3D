@@ -3,9 +3,11 @@
 package model
 
 import (
+	"encoding/json"
 	"log"
 	"os/exec"
 	"strings"
+	"bytes"
 
 	"gopkg.in/mgo.v2/bson"
 )
@@ -42,33 +44,27 @@ func (repo RepoModel) Save() (string, error) {
 }
 
 // Load loads java application to parse a specified file.
-func (repo RepoModel) Load(file string, target string) (function Function, err error) {
-
+func (repo RepoModel) Load(file string, target string) (data FilesModel, err error) {
 	// Setup the command to parse the file.
-	cmd := exec.Command("java", "me.codvis.ast.Main", "-f", file, "-t", target)
+	cmd := exec.Command("java", "me.codvis.ast.Main", "-f", file, "-t", target, "-c", "Initial")
 	cmd.Dir = JavaParserPath
-	bytes, err := cmd.CombinedOutput()
+	output, err := cmd.CombinedOutput()
 
 	if err != nil {
 		log.Println("Error executing java parser: ", err.Error())
-		return Function{}, err
+		return FilesModel{}, err
 	}
 
-	// Removing unnecessary data from the output.
-	output := strings.Replace(string(bytes), "function_name", "", -1)
-	output = strings.Replace(string(output), "\n", "", -1)
-	for _, line := range strings.Split(strings.TrimSuffix(output, "\n"), ": ") {
-		if line != "" {
+	ioReader := bytes.NewReader(output)
+	decoder := json.NewDecoder(ioReader)
 
-			// Adding function names into object.
-			function.Name = append(function.Name, map[string]string{"name": line})
-
-		}
+	if err := decoder.Decode(&data); err != nil {
+		log.Fatal("Could not decode json error: ", err.Error())
+		return FilesModel{}, err
 	}
 
-	function.File = file
 
-	return function, nil
+	return data, nil
 }
 
 // GetRepoByID finds repo in database and returns.
@@ -98,35 +94,32 @@ func (repo RepoModel) GetRepoFile() (files string, err error) {
 }
 
 // ParseFunctionsFromFiles fetch all functions from gives files set.
-func (repo RepoModel) ParseFunctionsFromFiles(files string) (functions Functions, err error) {
-
+func (repo RepoModel) ParseFunctionsFromFiles(files string) (projectModel ProjectModel, err error) {
 	for _, sourceFiles := range strings.Split(strings.TrimSuffix(files, "\n"), "\n") {
-
 		// Search for cpp files
 		if strings.Contains(sourceFiles, ".cpp") {
-
 			// Fetch function names from the file.
-			function, err := repo.Load(sourceFiles, "cpp")
+			data, err := repo.Load(sourceFiles, "cpp")
 
 			if err != nil {
 				log.Println("Could not parse error: ", err.Error())
-				return Functions{}, err
+				return ProjectModel{}, err
 			}
 
-			functions.Functions = append(functions.Functions, function)
+			projectModel.Files = append(projectModel.Files, data)
 
 		} else if strings.Contains(sourceFiles, ".java") { // Search for java files
 
-			function, err := repo.Load(sourceFiles, "java")
+			data, err := repo.Load(sourceFiles, "java")
 
 			if err != nil {
 				log.Println("Could not parse error: ", err.Error())
-				return Functions{}, err
+				return ProjectModel{}, err
 			}
 
-			functions.Functions = append(functions.Functions, function)
+			projectModel.Files = append(projectModel.Files, data)
 		}
-	}
 
-	return functions, nil
+	}
+	return projectModel, nil
 }

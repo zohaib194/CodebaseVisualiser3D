@@ -1,15 +1,42 @@
-#include <iostream.h>
+#include <iostream>
+
+using namespace std;
+class helloworld
+{
+	class hei
+	{
+	public:
+		hei();
+		~hei();
+		
+	};
+public:
+	helloworld();
+	void print();
+	~helloworld();
+	
+};
 
 int main()
 {
-    cout << "Hello World!";
+    std::cout << "Hello World!";
     return 0;
 }
 
-void foo(){
+namespace hello{
+	#include <iostream>
+
+	void foo();
+
+	void boo(){
+
+	}
+}
+
+void hello::foo(){
 
 }
 
-void boo(){
+void helloworld::print() {
 
 }
