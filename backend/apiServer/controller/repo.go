@@ -7,9 +7,9 @@ import (
 	"log"
 	"net/http"
 	"regexp"
-	"strings"
 
 	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/model"
+	"github.com/gorilla/mux"
 )
 
 // RepoController represents metadata for a git repository.
@@ -148,10 +148,10 @@ func (repo RepoController) ParseSimpleFunc(w http.ResponseWriter, r *http.Reques
 	http.Header.Add(w.Header(), "Access-Control-Allow-Origin", "*")
 
 	if r.Method == "GET" {
-		id := strings.TrimPrefix(r.URL.Path, "/repo/")
+		vars := mux.Vars(r)
 
 		// Validate that the project exist in DB.
-		exstRepo, err := model.RepoModel{}.GetRepoByID(id)
+		exstRepo, err := model.RepoModel{}.GetRepoByID(vars["repoId"])
 
 		if err != nil {
 			http.Error(w, "Invalid parameters", http.StatusBadRequest)

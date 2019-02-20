@@ -8,5 +8,7 @@ type FunctionsModel struct {
 
 // FunctionModel represents code for a single function 
 type FunctionModel struct {
-	Name string `json:"name"`
+	Name string 			`json:"name"`
+	StartLine int 			`json:"start_line"`
+	EndLine int 			`json:"end_line"`
 }

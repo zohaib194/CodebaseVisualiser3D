@@ -4,6 +4,7 @@ package main
 import (
 	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/controller"
 	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/model"
+	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"os"
@@ -17,6 +18,7 @@ const (
 )
 
 func main() {
+	r := mux.NewRouter()
 
 	// Get environment variables
 	port := os.Getenv("PORT")
@@ -45,10 +47,10 @@ func main() {
 	}
 
 	// API routings
-	http.HandleFunc("/repo/add", controller.RepoController{}.NewRepoFromURI)
-	http.HandleFunc("/repo/", controller.RepoController{}.ParseSimpleFunc)
+	r.HandleFunc("/repo/add", controller.RepoController{}.NewRepoFromURI)
+	r.HandleFunc("/repo/{repoId}", controller.RepoController{}.ParseSimpleFunc)
 
 	// Start server
 	log.Printf("%s Listening on port: %v", logInfo, port)
-	http.ListenAndServe(":"+port, nil)
+	http.ListenAndServe(":"+port, r)
 }
