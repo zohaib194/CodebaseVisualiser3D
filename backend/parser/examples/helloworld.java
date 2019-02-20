@@ -9,4 +9,14 @@ public class HelloWorld {
    		}
 
    }
+
+   public static final void boo (){
+   		if(true) {
+   			return;
+   		}
+   }
+
+   public Bool foo(){
+   		return true;
+   }
 }
