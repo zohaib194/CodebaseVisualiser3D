@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"regexp"
 
-	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/model"
 	"github.com/gorilla/mux"
+	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/model"
 )
 
 // RepoController represents metadata for a git repository.
@@ -101,7 +101,7 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 }
 
 /**
-* @api {Post} /repo/:id Parse the repository assosiated with id.
+* @api {GET} /repo/:id Parse the repository assosiated with id.
 * @apiName Parse repository.
 * @apiGroup Repository
 * @apiPermission none
@@ -177,6 +177,7 @@ func (repo RepoController) ParseSimpleFunc(w http.ResponseWriter, r *http.Reques
 			return
 		}
 
+		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(projectModel)
 
 	} else { // if not POST request

@@ -2,9 +2,9 @@
 package main
 
 import (
+	"github.com/gorilla/mux"
 	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/controller"
 	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/model"
-	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"os"
@@ -48,7 +48,8 @@ func main() {
 
 	// API routings
 	r.HandleFunc("/repo/add", controller.RepoController{}.NewRepoFromURI)
-	r.HandleFunc("/repo/{repoId}", controller.RepoController{}.ParseSimpleFunc)
+	r.HandleFunc("/repo/{repoId}/initial/", controller.RepoController{}.ParseSimpleFunc)
+	r.HandleFunc("/repo/{repoId}/file/read/", controller.FileController{}.GetImplementation)
 
 	// Start server
 	log.Printf("%s Listening on port: %v", logInfo, port)
