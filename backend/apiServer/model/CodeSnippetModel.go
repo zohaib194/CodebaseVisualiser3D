@@ -6,8 +6,6 @@ import (
 	"log"
 	"os/exec"
 	"strconv"
-	//"bytes"
-	//"encoding/json"
 
 	"gopkg.in/mgo.v2/bson"
 )
