@@ -31,9 +31,14 @@ public class JavaLstnr_Initial extends JavaExtendedListener {
 	 * @param      ctx   The parsing context
 	 */
     @Override 
-    public void enterMethodDeclarator(Java9Parser.MethodDeclaratorContext ctx) {  //see gramBaseListener for allowed functions
-      	
-	    fileModel.addFunction(new FunctionModel(ctx.getText()));
+    public void enterMethodDeclaration(Java9Parser.MethodDeclarationContext ctx) {  //see gramBaseListener for allowed functions
+
+	    // Set this function model with name, lineStart and lineEnd.
+      	FunctionModel functionModel = new FunctionModel(ctx.methodHeader().methodDeclarator().getText());
+      	functionModel.setLineStart(ctx.methodBody().start.getLine());
+      	functionModel.setLineEnd(ctx.methodBody().stop.getLine());
+	    
+	    fileModel.addFunction(functionModel);
     }
 
     /**

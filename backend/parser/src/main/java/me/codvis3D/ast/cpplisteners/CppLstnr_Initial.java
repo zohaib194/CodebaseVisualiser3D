@@ -40,7 +40,12 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	    // Get the input stream of function definition rule.
 	    CharStream input = ctx.start.getInputStream();
 
-	    fileModel.addFunction(new FunctionModel(input.getText(interval)));
+	    // Set this function model with name, lineStart and lineEnd.
+	    FunctionModel functionModel = new FunctionModel(input.getText(interval));
+	    functionModel.setLineStart(ctx.functionbody().start.getLine());
+	    functionModel.setLineEnd(ctx.functionbody().stop.getLine());
+
+	    fileModel.addFunction(functionModel);
     }
 
     /**
