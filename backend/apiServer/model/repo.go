@@ -3,11 +3,11 @@
 package model
 
 import (
+	"bytes"
 	"encoding/json"
 	"log"
 	"os/exec"
 	"strings"
-	"bytes"
 
 	"gopkg.in/mgo.v2/bson"
 )
@@ -63,7 +63,6 @@ func (repo RepoModel) Load(file string, target string) (data FilesModel, err err
 		return FilesModel{}, err
 	}
 
-
 	return data, nil
 }
 
@@ -93,6 +92,13 @@ func (repo RepoModel) GetRepoFile() (files string, err error) {
 	return string(bytes), nil
 }
 
+// SanitizeFilePath removes the repopath from the filepaths.
+func (repo RepoModel) SanitizeFilePath(projectModel ProjectModel) {
+	for index, file := range projectModel.Files {
+		projectModel.Files[index].File.FileName = strings.Replace(file.File.FileName, RepoPath+"/", "", -1)
+	}
+}
+
 // ParseFunctionsFromFiles fetch all functions from gives files set.
 func (repo RepoModel) ParseFunctionsFromFiles(files string) (projectModel ProjectModel, err error) {
 	for _, sourceFiles := range strings.Split(strings.TrimSuffix(files, "\n"), "\n") {
@@ -119,6 +125,8 @@ func (repo RepoModel) ParseFunctionsFromFiles(files string) (projectModel Projec
 
 			projectModel.Files = append(projectModel.Files, data)
 		}
+
+		repo.SanitizeFilePath(projectModel)
 
 	}
 	return projectModel, nil

@@ -7,8 +7,8 @@ import (
 	"log"
 	"net/http"
 	"regexp"
-	"strings"
 
+	"github.com/gorilla/mux"
 	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/model"
 )
 
@@ -101,7 +101,7 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 }
 
 /**
-* @api {Post} /repo/:id Parse the repository assosiated with id.
+* @api {GET} /repo/:id/initial/ Parse the repository assosiated with id.
 * @apiName Parse repository.
 * @apiGroup Repository
 * @apiPermission none
@@ -148,10 +148,10 @@ func (repo RepoController) ParseSimpleFunc(w http.ResponseWriter, r *http.Reques
 	http.Header.Add(w.Header(), "Access-Control-Allow-Origin", "*")
 
 	if r.Method == "GET" {
-		id := strings.TrimPrefix(r.URL.Path, "/repo/")
+		vars := mux.Vars(r)
 
 		// Validate that the project exist in DB.
-		exstRepo, err := model.RepoModel{}.GetRepoByID(id)
+		exstRepo, err := model.RepoModel{}.GetRepoByID(vars["repoId"])
 
 		if err != nil {
 			http.Error(w, "Invalid parameters", http.StatusBadRequest)
@@ -177,6 +177,7 @@ func (repo RepoController) ParseSimpleFunc(w http.ResponseWriter, r *http.Reques
 			return
 		}
 
+		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(projectModel)
 
 	} else { // if not POST request
