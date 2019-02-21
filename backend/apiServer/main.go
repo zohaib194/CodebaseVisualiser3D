@@ -18,7 +18,7 @@ const (
 )
 
 func main() {
-	r := mux.NewRouter()
+	router := mux.NewRouter()
 
 	// Get environment variables
 	port := os.Getenv("PORT")
@@ -47,11 +47,11 @@ func main() {
 	}
 
 	// API routings
-	r.HandleFunc("/repo/add", controller.RepoController{}.NewRepoFromURI)
-	r.HandleFunc("/repo/{repoId}/initial/", controller.RepoController{}.ParseSimpleFunc)
-	r.HandleFunc("/repo/{repoId}/file/read/", controller.FileController{}.GetImplementation)
+	router.HandleFunc("/repo/add", controller.RepoController{}.NewRepoFromURI)
+	router.HandleFunc("/repo/{repoId}/initial/", controller.RepoController{}.ParseSimpleFunc)
+	router.HandleFunc("/repo/{repoId}/file/read/", controller.FileController{}.GetImplementation)
 
 	// Start server
 	log.Printf("%s Listening on port: %v", logInfo, port)
-	http.ListenAndServe(":"+port, r)
+	http.ListenAndServe(":"+port, router)
 }
