@@ -164,7 +164,7 @@ var id = new URL(window.location.href).searchParams.get("id");
 var xhr = new XMLHttpRequest();
 
 // Open the connection
-xhr.open("get", "http://localhost:8080/repo/" + id, true);
+xhr.open("get", "http://" + api_ip + ":" + api_port + "/repo/" + id, true);
 
 // Once ready, receive data and populate displaymanager.
 xhr.onreadystatechange = function () {
@@ -180,6 +180,9 @@ xhr.onreadystatechange = function () {
 
         // Parse data and perform fdg.
         runFDGOnJSONData(data);
+        
+        // Disable the loader icon.
+        document.getElementById("loader").style.display = "none";
     }
 }
 xhr.send();
