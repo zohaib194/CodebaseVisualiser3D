@@ -101,7 +101,7 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 }
 
 /**
-* @api {GET} /repo/:id Parse the repository assosiated with id.
+* @api {GET} /repo/:id/initial/ Parse the repository assosiated with id.
 * @apiName Parse repository.
 * @apiGroup Repository
 * @apiPermission none

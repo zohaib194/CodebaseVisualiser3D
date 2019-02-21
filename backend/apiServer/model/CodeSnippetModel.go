@@ -12,8 +12,8 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-// File represents metadata for a file from a git project.
-type File struct {
+// CodeSnippetModel represents metadata for a file from a git project.
+type CodeSnippetModel struct {
 	FilePath  string        `json:"file_path"`              // File name to be searched through.
 	ID        bson.ObjectId `json:"-" bson:"_id,omitempty"` // Folder name where repo is stored
 	StartLine int           `json:"start_line"`
@@ -21,10 +21,10 @@ type File struct {
 }
 
 // FetchLinesOfCode fetch loc from specified range.
-func (file File) FetchLinesOfCode() (string, error) {
+func (codeSnippet CodeSnippetModel) FetchLinesOfCode() (string, error) {
 
 	// Command to run sed for fetching file content.
-	cmd := exec.Command("sed", "-n", strconv.Itoa(file.StartLine)+","+strconv.Itoa(file.EndLine)+"p;", RepoPath+"/"+file.FilePath)
+	cmd := exec.Command("sed", "-n", strconv.Itoa(codeSnippet.StartLine)+","+strconv.Itoa(codeSnippet.EndLine)+"p;", RepoPath+"/"+codeSnippet.FilePath)
 	output, err := cmd.CombinedOutput()
 
 	if err != nil {

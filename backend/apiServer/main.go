@@ -49,7 +49,7 @@ func main() {
 	// API routings
 	router.HandleFunc("/repo/add", controller.RepoController{}.NewRepoFromURI)
 	router.HandleFunc("/repo/{repoId}/initial/", controller.RepoController{}.ParseSimpleFunc)
-	router.HandleFunc("/repo/{repoId}/file/read/", controller.FileController{}.GetImplementation)
+	router.HandleFunc("/repo/{repoId}/file/read/", controller.CodeSnippetController{}.GetImplementation)
 
 	// Start server
 	log.Printf("%s Listening on port: %v", logInfo, port)

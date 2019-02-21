@@ -14,7 +14,7 @@ import (
 )
 
 // FileController represents metadata for a file from a git project.
-type FileController struct {
+type CodeSnippetController struct {
 }
 
 /**
@@ -58,7 +58,7 @@ type FileController struct {
 */
 
 // GetImplementation fetch implementation of data structure based upon query parameters.
-func (file FileController) GetImplementation(w http.ResponseWriter, r *http.Request) {
+func (codeSnippet CodeSnippetController) GetImplementation(w http.ResponseWriter, r *http.Request) {
 	http.Header.Add(w.Header(), "content-type", "application/json")
 	http.Header.Add(w.Header(), "Access-Control-Allow-Origin", "*")
 
@@ -103,7 +103,7 @@ func (file FileController) GetImplementation(w http.ResponseWriter, r *http.Requ
 		}
 
 		// Fetch the content of file.
-		implementation, err := model.File{
+		implementation, err := model.CodeSnippetModel{
 			FilePath:  filePath[0],
 			ID:        bson.ObjectIdHex(vars["repoId"]),
 			StartLine: startLine,
