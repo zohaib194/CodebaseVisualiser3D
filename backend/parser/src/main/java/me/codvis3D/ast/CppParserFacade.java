@@ -55,7 +55,7 @@ public class CppParserFacade {
         CppExtendedListener listener = null;
         switch(context){
             case "Initial":
-                listener = new CppLstnr_Initial(file.getName());
+                listener = new CppLstnr_Initial(file.getPath());
                 break;
             case "Hover":
                 break;
