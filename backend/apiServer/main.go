@@ -2,6 +2,7 @@
 package main
 
 import (
+	"github.com/gorilla/mux"
 	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/controller"
 	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/model"
 	"log"
@@ -17,6 +18,7 @@ const (
 )
 
 func main() {
+	router := mux.NewRouter()
 
 	// Get environment variables
 	port := os.Getenv("PORT")
@@ -45,10 +47,11 @@ func main() {
 	}
 
 	// API routings
-	http.HandleFunc("/repo/add", controller.RepoController{}.NewRepoFromURI)
-	http.HandleFunc("/repo/", controller.RepoController{}.ParseSimpleFunc)
+	router.HandleFunc("/repo/add", controller.RepoController{}.NewRepoFromURI)
+	router.HandleFunc("/repo/{repoId}/initial/", controller.RepoController{}.ParseSimpleFunc)
+	router.HandleFunc("/repo/{repoId}/file/read/", controller.CodeSnippetController{}.GetImplementation)
 
 	// Start server
 	log.Printf("%s Listening on port: %v", logInfo, port)
-	http.ListenAndServe(":"+port, nil)
+	http.ListenAndServe(":"+port, router)
 }
