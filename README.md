@@ -10,6 +10,14 @@ CodebaseVisulizer3D is a bachelor project with the goal of making it easier to g
 - Eldar Hauge Torkelsen - 473180
 
 # Install guide
+- Clone the repository.
+
+### Setup frontend
+- Download and Install [Emscripten](http://kripken.github.io/emscripten-site/docs/getting_started/downloads.html)
+- Navigate to the root folder of repository and run the following command.
+    - git submodule update --init --recursive
+
+### Setup backend
 
 # Examples of use
 
