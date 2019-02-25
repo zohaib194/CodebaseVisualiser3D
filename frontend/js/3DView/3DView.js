@@ -115,11 +115,11 @@ function runFDGOnJSONData(data) {
             if (type == "cube")
             return new THREE.BoxGeometry(0.1, 0.1, 0.1);
             else if (type == "sphere")
-                return new THREE.SphereGeometry(0.1, 32, 32);
+                return new THREE.SphereGeometry(0.1, 32, 16);
             else if (type == "cylinder")
-                return new THREE.CylinderGeometry(0.05, 0.05, 0.1, 32);
+                return new THREE.CylinderGeometry(0.05, 0.05, 0.1, 16);
             else if (type == "cone")
-                return new THREE.ConeGeometry(0.05, 0.1, 32);
+                return new THREE.ConeGeometry(0.05, 0.1, 16);
             else if (type == "dodecahedron")
                 return new THREE.DodecahedronGeometry(0.05);
             else if (type == "icosahedron")
