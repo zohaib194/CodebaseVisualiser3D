@@ -12,13 +12,24 @@
 
         <link rel="stylesheet" href="../css/3DView.css">
 
+        <!-- Module loader -->
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/systemjs/0.21.4/system.js"></script>
+
         <script src="../js/localization/locale.js"></script>
+        <script src="../js/config/SystemJsConfig.js"></script>
         <script src="../js/config/config.js"></script>
         <script src="../js/config/style.js"></script>
 
         <!-- THREE.js + (soon to come) ImGUI imports -->
         <script src="../js/treejs/three.js"></script>
         <script src="../js/treejs/controls/OrbitControls.js"></script>
+
+        <script src="../js/GUI/Menubar.js"></script>
+        <script src="../js/GUI/FiletreeWindow.js"></script>
+        <script src="../js/GUI/CodeInspectionWindow.js"></script>
+        <script src="../js/GUI/NamespaceWindow.js"></script>
+        <script src="../js/GUI/QualityMetricsWindow.js"></script>
+        <script src="../js/GUI/WindowManager.js"></script>
     </head>
     <body>
         <div id="loader"></div>

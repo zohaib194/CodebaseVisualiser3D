@@ -55,6 +55,9 @@ var displayMgr = new DisplayManager();
 // Force-Directed-Graph for managing object grouping.
 var fdg = new FDG(1, 1, 0.1, new THREE.Vector3(0, 0, 0));
 
+// Window manager
+var windowMgr = new WindowManager();
+
 /**
  * Program lifecycle function reponsible for updating the program state.
  */
@@ -78,11 +81,15 @@ function render() {
  * Main loop of program.
  */
 function mainloop(time) {
-    // Schedule the next frame.
-    requestAnimationFrame(mainloop);
 
     update();
+    windowMgr.ImGuiUpdate(time);
+
     render();
+    windowMgr.ImGuiRender();
+    
+    // Schedule the next frame.
+    requestAnimationFrame(mainloop);
 }
 
 // ########## DATA PROCESSING FUNCITONS ##########
@@ -208,7 +215,7 @@ function runFDGOnJSONData(data) {
 // Find id param form url
 var id = new URL(window.location.href).searchParams.get("id");
 
-fetch("http://" + config.serverInfo.api_ip + ":" + config.serverInfo.api_port + "/repo/" + id)
+fetch("http://" + config.serverInfo.api_ip + ":" + config.serverInfo.api_port + "/repo/" + id + "/initial/")
 .then((response) => {
     // Once ready and everything went ok.
     if (response.status == 200) {
