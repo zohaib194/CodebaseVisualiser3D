@@ -54,8 +54,8 @@ function handleClassData(classData) {
 }
 
 /**
- * Function for handling namepspace data in JSONObject.
- * @param {*} namespaceData 
+ * Function for handling namespace data in JSONObject.
+ * @param {JSONObject} namespaceData - Data about namespace.
  */
 function handleNamespaceData(namespaceData) {
     // Add node and save index to stack.
