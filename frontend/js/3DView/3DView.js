@@ -136,30 +136,39 @@ function runFDGOnJSONData(data) {
         var supportedType = false;
         var drawableGeometry;
         var drawableColor;
-            
+
         // Select shape and color based on node type.
-        if (nodeType == "function") {
-            drawableColor = STYLE.getDrawables().function.color;
-            drawableGeometry = getDrawableGeometry(
-                STYLE.getDrawables().function.shape
-            );
-            supportedType = true;
-        } else if (nodeType == "class") {
-            drawableGeometry = getDrawableGeometry(
-                STYLE.getDrawables().class.shape
-            );
-            drawableColor = STYLE.getDrawables().class.color;
-            supportedType = true;
-        } else if (nodeType == "namespace") {
-            drawableGeometry = getDrawableGeometry(
-                STYLE.getDrawables().namespace.shape
-            );
-            drawableColor = STYLE.getDrawables().namespace.color;
-            supportedType = true;
-        } else {    // Unsupported node type, mention this!
-            console.log(
-                LOCALE.getSentence("geometry_invalid_type") + ": " + node.getType()
-            );
+        switch (nodeType) {
+            case "function": {
+                drawableColor = STYLE.getDrawables().function.color;
+                drawableGeometry = getDrawableGeometry(
+                    STYLE.getDrawables().function.shape
+                );
+                supportedType = true;
+                break;
+            }
+            case "class": {
+                drawableGeometry = getDrawableGeometry(
+                    STYLE.getDrawables().class.shape
+                );
+                drawableColor = STYLE.getDrawables().class.color;
+                supportedType = true;
+                break;
+            }
+            case "namespace": {
+                drawableGeometry = getDrawableGeometry(
+                    STYLE.getDrawables().namespace.shape
+                );
+                drawableColor = STYLE.getDrawables().namespace.color;
+                supportedType = true;
+                break;
+            }
+            default: {   // Unsupported node type, mention this!
+                console.log(
+                    LOCALE.getSentence("geometry_invalid_type") + ": " + node.getType()
+                );
+                break;
+            }
         }
         
         // Found a supported type.
