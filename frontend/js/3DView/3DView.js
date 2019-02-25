@@ -113,7 +113,7 @@ function runFDGOnJSONData(data) {
          */
         let getDrawableGeometry = (function(type) {
             if (type == "cube")
-            return new THREE.BoxGeometry(0.1, 0.1, 0.1);
+                return new THREE.BoxGeometry(0.1, 0.1, 0.1);
             else if (type == "sphere")
                 return new THREE.SphereGeometry(0.1, 32, 16);
             else if (type == "cylinder")
