@@ -1,5 +1,9 @@
-const host_ip = "localhost";
-const host_port = "80";
-const api_ip = "localhost";
-const api_port = "8080";
-const api_servername = "apiServer";
+const config = {
+    serverInfo: {
+        host_ip: "localhost",
+        host_port: "80",
+        api_ip: "localhost",
+        api_port: "8080",
+        api_servername: "apiServer"
+    }
+};
