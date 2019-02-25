@@ -15,7 +15,18 @@ CodebaseVisulizer3D is a bachelor project with the goal of making it easier to g
 ### Setup frontend
 - Download and Install [Emscripten](http://kripken.github.io/emscripten-site/docs/getting_started/downloads.html)
 - Navigate to the root folder of repository and run the following command.
-	- ```git submodule update --init --recursive```
+  - ```git submodule update --init --recursive```
+- Configuration: 
+  - Connections: 
+    - Navigate to the frontend/js/config folder and open the config.js file. 
+    - Fill all fields with appropriate information:
+      - "host_ip" is the clients ip address.
+      - "host_port" is the clients port.
+      - "api_ip" is api/back-end servers ip.
+      - "api_port" is api/back-end servers port.
+      - "api_servername" is api/back-end servers name (not really needed at this point).
+  - Style: 
+    - If you have a custom style you can edit it in frontend/js/config/style.js file. 
 
 ### Setup backend
 
