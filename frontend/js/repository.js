@@ -4,7 +4,8 @@ function submitRepoName(){
 	var repoName;
 
 	repoName = document.getElementById("reponame");
-
+    
+    // Create a http request
 	fetch("http://" + config.serverInfo.api_ip + ":" + config.serverInfo.api_port + "/repo/add", {
         method: "POST",
 		body: JSON.stringify({
@@ -27,21 +28,6 @@ function submitRepoName(){
     }).catch((error) => {
         console.log("Error: " + error);
     });
-
-	// Create a http request
-	/*var xhr = new XMLHttpRequest();
-	var body = 	;
-
-	xhr.open("post", , true);
-
-    xhr.onreadystatechange = function() {
-	    if(xhr.readyState == 4 && xhr.status == 201) {
-			repo = JSON.parse(xhr.responseText);
-			location.assign("./html/3DView.html?id=" + repo.id);
-	    }
-    }
-		
-    xhr.send(JSON.stringify(body));*/
 
     // disable the form and enable a loader to the document.
    	document.getElementById("repositoryform").style.display = "none";
