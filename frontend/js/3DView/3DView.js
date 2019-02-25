@@ -112,22 +112,24 @@ function runFDGOnJSONData(data) {
          * @param {string} type - The type of node.
          */
         let getDrawableGeometry = (function(type) {
-            if (type == "cube")
-                return new THREE.BoxGeometry(0.1, 0.1, 0.1);
-            else if (type == "sphere")
-                return new THREE.SphereGeometry(0.1, 32, 16);
-            else if (type == "cylinder")
-                return new THREE.CylinderGeometry(0.05, 0.05, 0.1, 16);
-            else if (type == "cone")
-                return new THREE.ConeGeometry(0.05, 0.1, 16);
-            else if (type == "dodecahedron")
-                return new THREE.DodecahedronGeometry(0.05);
-            else if (type == "icosahedron")
-                return new THREE.IcosahedronGeometry(0.05);
-            else if (type == "octahedron")
-                return new THREE.OctahedronGeometry(0.05);
-            else if (type == "tetrahedron")
-                return new THREE.TetrahedronGeometry(0.05);
+            switch(type) {
+                case "cube":
+                    return new THREE.BoxGeometry(0.1, 0.1, 0.1);
+                case "sphere":
+                    return new THREE.SphereGeometry(0.1, 32, 16);
+                case "cylinder":
+                    return new THREE.CylinderGeometry(0.05, 0.05, 0.1, 16);
+                case "cone":
+                    return new THREE.ConeGeometry(0.05, 0.1, 16);
+                case "dodecahedron":
+                    return new THREE.DodecahedronGeometry(0.05);
+                case "icosahedron":
+                    return new THREE.IcosahedronGeometry(0.05);
+                case "octahedron":
+                    return new THREE.OctahedronGeometry(0.05);
+                case "tetrahedron":
+                    return new THREE.TetrahedronGeometry(0.05);
+            }
         });
 
         var nodeType = node.getType();
