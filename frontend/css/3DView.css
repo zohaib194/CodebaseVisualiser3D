@@ -13,4 +13,40 @@ body {
   overflow: hidden;
 }
 
+#loader {
+  border: 0.1em solid #f3f3f3;
+  border-top-color: #f3f3f3;
+  border-top-style: solid;
+  border-top-width: 0.1em;
+  border-radius: 50%;
+  border-top: 0.1em solid #3498db;
+  width: 5em;
+  height: 5em;
+  top: 45%;
+  left: 45%;
+  position: fixed;
+  display: block;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
+  z-index: 9999;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+  }
+}
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 /*# sourceMappingURL=3DView.css.map */

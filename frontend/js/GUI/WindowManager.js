@@ -8,42 +8,40 @@ SystemJS.config({
   }
 });
 
-// Global vars.
+// Vars.
 let ImGui;
 let ImGui_Impl;
 
+var WindowManager = (function(){
 
-Promise.resolve().then(() => {
-    return System.import("imgui-js").then((module) => {
-        ImGui = module;
-        return ImGui.default();
+    Promise.resolve().then(() => {
+        return System.import("imgui-js").then((module) => {
+            ImGui = module;
+            return ImGui.default();
+        });
+    }).then(() => {
+        return System.import("imgui-js/example/imgui_impl").then((module) => {
+            ImGui_Impl = module;
+        });
+    }).then(() => {
+        const canvas = document.getElementById("output");
+
+
+        ImGui.CreateContext();
+        ImGui_Impl.Init(canvas);
+
+        ImGui.StyleColorsDark();
+        //ImGui.StyleColorsClassic();
+    }).catch((error) => {
+        console.log("Error: " + error);
     });
-}).then(() => {
-    return System.import("imgui-js/example/imgui_impl").then((module) => {
-        ImGui_Impl = module;
-    });
-}).then(() => {
-    const canvas = document.getElementById("output");
-
-
-    ImGui.CreateContext();
-    ImGui_Impl.Init(canvas);
-
-    ImGui.StyleColorsDark();
-    //ImGui.StyleColorsClassic();
-
-
-    let done = false;
-    window.requestAnimationFrame(ImGuiLoop);
 
     /**
      * Loop for rendering imgui components.
      *
-     * @class      ImGuiLoop (name)
      * @param      {float}  time    The time
      */
-    function ImGuiLoop(time) {
-      
+    function ImGuiUpdate(time) {
         ImGui_Impl.NewFrame(time);
         ImGui.NewFrame();
         
@@ -67,24 +65,29 @@ Promise.resolve().then(() => {
         qualityMetricsWindow.initializeWindow();
 
         ImGui.EndFrame();
+    }
 
+    /**
+     * Render imgui components and restore gl data.
+     *
+     */
+    function ImGuiRender(){
         ImGui.Render();
-
-
-
         ImGui_Impl.RenderDrawData(ImGui.GetDrawData());
-
-        // TODO: restore WebGL state in ImGui Impl
         renderer.state.reset();
-
-        window.requestAnimationFrame(done ? doneLoop : ImGuiLoop);
     }
 
     /**
      * Destroy imgui components.
      */
-    function doneLoop() {
+    function ImGuiDestroy() {
         ImGui_Impl.Shutdown();
         ImGui.DestroyContext();
     }
+
+    return {
+        ImGuiUpdate: ImGuiUpdate,
+        ImGuiRender: ImGuiRender,
+        ImGuiDestroy: ImGuiDestroy
+    };
 });
