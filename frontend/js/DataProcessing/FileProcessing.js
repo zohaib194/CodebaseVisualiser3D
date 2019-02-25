@@ -5,10 +5,10 @@ var indexStack = new Array();
  */
 function randomPosition() {
     return new THREE.Vector3(
-        // Random nr [0-9].
-        Math.floor(Math.random() * 10),
-        Math.floor(Math.random() * 10),
-        Math.floor(Math.random() * 10)
+        // Random nr [0-19].
+        Math.floor(Math.random() * 20),
+        Math.floor(Math.random() * 20),
+        Math.floor(Math.random() * 20)
     );
 }
 /**
@@ -23,7 +23,7 @@ function linkElements() {
             new LinkProperties(1)
         );
     } else {    // Missing parrent, state so.
-        console.log("Parent missing!");
+        console.log(LOCALE.getSentence("fdg_link_missing_parent"));
     }
 }
 

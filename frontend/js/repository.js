@@ -1,19 +1,38 @@
 var repo;
-console.log("repo");
 
 function submitRepoName(){
-    console.log("http://" + api_ip + ":" + api_port + "/repo/add");
 	var repoName;
 
 	repoName = document.getElementById("reponame");
 
-	// Create a http request
-	var xhr = new XMLHttpRequest();
-	var body = 	{
-					'uri': repoName.value
-				};
+	fetch("http://" + config.serverInfo.api_ip + ":" + config.serverInfo.api_port + "/repo/add", {
+        method: "POST",
+		body: JSON.stringify({
+			"uri": repoName.value,
+		})
+    }).then((response) => {
+        // Once ready and everything went ok.
+        if (response.status == 200 || response.status == 201) {
+            console.log("Got something, moving on!");
+            return response.json();
+        }
 
-	xhr.open("post", "http://" + api_ip + ":" + api_port + "/repo/add", true);
+        console.log("Didn't receive anything!");
+        // Something went wrong.
+        return Promise.reject();
+    }).then((json) => {
+        console.log(json);
+        // Redirect to 3DView.js.
+        location.assign("./html/3DView.html?id=" + json.id);
+    }).catch((error) => {
+        console.log("Error: " + error);
+    });
+
+	// Create a http request
+	/*var xhr = new XMLHttpRequest();
+	var body = 	;
+
+	xhr.open("post", , true);
 
     xhr.onreadystatechange = function() {
 	    if(xhr.readyState == 4 && xhr.status == 201) {
@@ -21,8 +40,8 @@ function submitRepoName(){
 			location.assign("./html/3DView.html?id=" + repo.id);
 	    }
     }
-    console.log(JSON.stringify(body));
-    xhr.send(JSON.stringify(body));
+		
+    xhr.send(JSON.stringify(body));*/
 
     // disable the form and enable a loader to the document.
    	document.getElementById("repositoryform").style.display = "none";

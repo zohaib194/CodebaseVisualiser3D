@@ -1,22 +1,21 @@
-var data;
-
-var color_lightgray = 0x808080;
-var color_white = 0xffffff;
-var color_green = 0x00ff00;
-
 // Find canvas.
 var canvas = document.getElementById("output");
 
 // Make as setup renderer for rendering on canvas. 
 var renderer = new THREE.WebGLRenderer({ canvas: canvas });
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setClearColor(0xffffff, 1);
+renderer.setClearColor(STYLE.getColors().background, 1);
 
 // Make scene to render.
 const scene = new THREE.Scene();
 
 // Setup camera.
-var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+var camera = new THREE.PerspectiveCamera(
+    STYLE.getGraphics().camera.fov, 
+    window.innerWidth / window.innerHeight, 
+    STYLE.getGraphics().camera.nearPlane,
+    STYLE.getGraphics().camera.farPlane,
+);
 camera.position.set(0, 0, 5);
 
 // Add controls on camera and update to apply camera position change.
@@ -24,12 +23,17 @@ var controls = new THREE.OrbitControls(camera, renderer.domElement);
 controls.update();
 
 // Make lights.
-var light = new THREE.AmbientLight(color_lightgray); // Soft white light
+var light = new THREE.AmbientLight(
+    STYLE.getColors().ambient
+);
 scene.add(light);
 
-var light = new THREE.PointLight(color_white, 1, 100);
-light.position.set(10, 10, 10);
-scene.add(light);
+var directionalLight = new THREE.DirectionalLight(
+    STYLE.getColors().light, 
+    0.5
+);
+directionalLight.position.set(1, 1, 1);
+scene.add(directionalLight);
 
 // Add resize listener to resize renderer and camera.
 window.addEventListener("resize", function () {
@@ -39,11 +43,11 @@ window.addEventListener("resize", function () {
 });
 
 // Cube marking origin of world.
-var geometry = new THREE.CubeGeometry(0.05, 0.05, 0.05);
-var material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-var cube = new THREE.Mesh(geometry, material);
-cube.position.set(0, 0, 0);
-scene.add(cube);
+var originGeometry = new THREE.CubeGeometry(0.05, 0.05, 0.05);
+var originMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+var originCube = new THREE.Mesh(originGeometry, originMaterial);
+originCube.position.set(0, 0, 0);
+scene.add(originCube);
 
 // Add displaymanager for managing objects to draw.
 var displayMgr = new DisplayManager();
@@ -73,7 +77,7 @@ function render() {
 /**
  * Main loop of program.
  */
-function mainloop() {
+function mainloop(time) {
     // Schedule the next frame.
     requestAnimationFrame(mainloop);
 
@@ -92,8 +96,8 @@ function runFDGOnJSONData(data) {
     handleProjectData(data);
 
     // Apply negative links on those who aren't related
-    for (i = 0; i < fdg.nodes.length; i++) {
-        for (j = 0; j < fdg.nodes.length; j++) {
+    for (i = 0; i < fdg.getNodes().length; i++) {
+        for (j = 0; j < fdg.getNodes().length; j++) {
             fdg.addLink(i, j, new LinkProperties(-1));
         }
     }
@@ -102,90 +106,128 @@ function runFDGOnJSONData(data) {
     fdg.execute(100);
 
     // Draw nodes using display manager.
-    fdg.nodes.forEach((node) => {
-        var supportedType = false;
-        var shapeGeometry;
+    fdg.getNodes().forEach((node) => {
+        /**
+         * Function for selecting proper type from configuration.
+         * @param {string} type - The type of node.
+         */
+        let getDrawableGeometry = (function(type) {
+            if (type == "cube")
+            return new THREE.BoxGeometry(0.1, 0.1, 0.1);
+            else if (type == "sphere")
+                return new THREE.SphereGeometry(0.1, 32, 32);
+            else if (type == "cylinder")
+                return new THREE.CylinderGeometry(0.05, 0.05, 0.1, 32);
+            else if (type == "cone")
+                return new THREE.ConeGeometry(0.05, 0.1, 32);
+            else if (type == "dodecahedron")
+                return new THREE.DodecahedronGeometry(0.05);
+            else if (type == "icosahedron")
+                return new THREE.IcosahedronGeometry(0.05);
+            else if (type == "octahedron")
+                return new THREE.OctahedronGeometry(0.05);
+            else if (type == "tetrahedron")
+                return new THREE.TetrahedronGeometry(0.05);
+        });
 
-        // Select shape based on node type.
-        if (node.type == "function") {
-            shapeGeometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
+        var nodeType = node.getType();
+        var supportedType = false;
+        var drawableGeometry;
+        var drawableColor;
+            
+        // Select shape and color based on node type.
+        if (nodeType == "function") {
+            drawableColor = STYLE.getDrawables().function.color;
+            drawableGeometry = getDrawableGeometry(
+                STYLE.getDrawables().function.shape
+            );
             supportedType = true;
-        } else if (node.type == "class") {
-            shapeGeometry = new THREE.CylinderGeometry(0.05, 0.05, 0.1, 32);
+        } else if (nodeType == "class") {
+            drawableGeometry = getDrawableGeometry(
+                STYLE.getDrawables().class.shape
+            );
+            drawableColor = STYLE.getDrawables().class.color;
             supportedType = true;
-        } else if (node.type == "namespace") {
-            shapeGeometry = new THREE.ConeGeometry(0.05, 0.1, 32);
+        } else if (nodeType == "namespace") {
+            drawableGeometry = getDrawableGeometry(
+                STYLE.getDrawables().namespace.shape
+            );
+            drawableColor = STYLE.getDrawables().namespace.color;
             supportedType = true;
         } else {    // Unsupported node type, mention this!
-            console.log("Unsupported type! " + node.type);
-        }
-        
-        // Foudn a supported type.
-        if (supportedType) {
-            // Add it for display.
-            displayMgr.addObject(
-                "function",
-                new DisplayObject(
-                    node.position,
-                    color_green,
-                    node.name,
-                    new THREE.Mesh(
-                        shapeGeometry,
-                        new THREE.MeshStandardMaterial({ color: 0x00ff00 })
-                    )
-                )
+            console.log(
+                LOCALE.getSentence("geometry_invalid_type") + ": " + node.getType()
             );
         }
         
-        // Draw nodes links with three.js
-        node.links.forEach((link, otherIndex) => {
-            if (link.attraction > 0) {
-                var material = new THREE.LineBasicMaterial({
-                    color: 0x0000ff
-                });
-                
-                var geometry = new THREE.Geometry();
-                geometry.vertices.push(
-                    node.position,
-                    fdg.nodes[otherIndex].position
-                );
-                
-                var line = new THREE.Line(geometry, material);
-                scene.add(line);
-            }
-        });
+        // Found a supported type.
+        if (supportedType) {
+            // Add it for display.
+            displayMgr.addObject(
+                node.getType(),
+                new Drawable(
+                    node.getPosition(),
+                    drawableColor,
+                    node.getName(),
+                    drawableGeometry
+                )
+            );
+
+            // Draw nodes links with three.js
+            node.getLinks().forEach((link, otherIndex) => {
+                if (link.attraction > 0) {
+                    var material = new THREE.LineBasicMaterial({
+                        color: STYLE.getDrawables().link.color
+                    });
+                    
+                    var geometry = new THREE.Geometry();
+                    geometry.vertices.push(
+                        node.getPosition(),
+                        fdg.getNodes()[otherIndex].getPosition()
+                    );
+                    
+                    var line = new THREE.Line(geometry, material);
+                    scene.add(line);
+                }
+            });
+        }
     });
 }
 
 // Find id param form url
 var id = new URL(window.location.href).searchParams.get("id");
 
-// Create a http request
-var xhr = new XMLHttpRequest();
-
-// Open the connection
-xhr.open("get", "http://" + api_ip + ":" + api_port + "/repo/" + id, true);
-
-// Once ready, receive data and populate displaymanager.
-xhr.onreadystatechange = function () {
-    console.log("Got the data from backend!");
+fetch("http://" + config.serverInfo.api_ip + ":" + config.serverInfo.api_port + "/repo/" + id)
+.then((response) => {
     // Once ready and everything went ok.
-    if (xhr.readyState == 4 && xhr.status == 200) {
-        data = JSON.parse(xhr.responseText);
-
-        // Didn't get data, abort.
-        if (typeof data === "undefined" || data == null) {
-            return;
-        }
-
-        // Parse data and perform fdg.
-        runFDGOnJSONData(data);
-        
-        // Disable the loader icon.
-        document.getElementById("loader").style.display = "none";
+    if (response.status == 200) {
+        console.log("Got something, moving on!");
+        return response.json();
     }
-}
-xhr.send();
 
-// Start program loop.
-mainloop();
+    console.log("Didn't receive anything!");
+    // Something went wrong.
+    return Promise.reject();
+}).then((json) => {
+    var sentence = LOCALE.getSentence("backend_data_received");
+    console.log(sentence);
+    
+    // Didn't get data, abort.
+    if (typeof json === "undefined" || json == null) {
+        // Json missing or unparsable.
+        return Promise.reject();
+    }
+    
+    console.log("Got valid data!");
+
+    // Parse data and perform fdg.
+    runFDGOnJSONData(json);
+    
+    // Disable the loader icon.
+    document.getElementById("loader").style.display = "none";
+    
+    // Start program loop.
+    requestAnimationFrame(mainloop);
+}).catch((error) => {
+    console.log("Error: " + error);
+});
