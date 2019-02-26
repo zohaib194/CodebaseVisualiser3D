@@ -130,6 +130,45 @@ var LOCALE = (function() {
                         value: "Antall funksjoner"
                     }
                 ]
+            },
+            {
+                id: "quality_metric_class_count",
+                values: [
+                    {
+                        language: "english",
+                        value: "Number of classes"
+                    },
+                    {
+                        language: "norwegian",
+                        value: "Antall klasser"
+                    }
+                ]
+            },
+            {
+                id: "generic_undefined",
+                values: [
+                    {
+                        language: "english",
+                        value: "Variable can't be undefined"
+                    },
+                    {
+                        language: "norwegian",
+                        value: "Variabel can ikke være udefinert"
+                    }
+                ]
+            },
+            {
+                id: "generic_negative",
+                values: [
+                    {
+                        language: "english",
+                        value: "Variable can't be negative"
+                    },
+                    {
+                        language: "norwegian",
+                        value: "Variabel can ikke være negativ"
+                    }
+                ]
             }
         ]
     };
@@ -187,7 +226,6 @@ var LOCALE = (function() {
         if (result != "") {
             return result;
         }
-
         console.log(getSentence("language_not_found"));
     }
     

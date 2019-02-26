@@ -10,6 +10,8 @@ let qualityMetrics = (function (previousWindowSize, previousWindowPos){
     
     var functionCount = 0;
 
+    var classCount = 0;
+
     /**
      * Initialize quality metrics window.
      */
@@ -20,7 +22,10 @@ let qualityMetrics = (function (previousWindowSize, previousWindowPos){
         ImGui.Begin("Quality Metrics");
         this.wSize = ImGui.GetWindowSize();
         this.wPos = ImGui.GetWindowPos();
-
+        
+        ImGui.Text(
+            LOCALE.getSentence("quality_metric_class_count") + ": " + classCount
+        );
         ImGui.Text(
             LOCALE.getSentence("quality_metric_funciton_count") + ": " + functionCount
         );
@@ -51,15 +56,38 @@ let qualityMetrics = (function (previousWindowSize, previousWindowPos){
      * @param {int} count - Amount of functions in program.
      */
     function setFunctionCount(count) {
-        if (count >= 0 && count !== "undefined") {
-            functionCount = count;
+        if (count === "undefined") {
+            console.log(LOCALE.getSentence("generic_undefined"));
+            return;
+        } else if (count < 0) {
+            console.log(LOCALE.getSentence("generic_negative"));
+            return;
         }
+
+        functionCount = count;
+    }
+
+    /**
+     * Setter of the amount of classes.
+     * @param {int} count - Amount of classes in program.
+     */
+    function setClassCount(count){
+        if (count === "undefined") {
+            console.log(LOCALE.getSentence("generic_undefined"));
+            return;
+        } else if (count < 0) {
+            console.log(LOCALE.getSentence("generic_negative"));
+            return;
+        }
+
+        classCount = count;
     }
 
     return {
         initializeWindow: init,
         getWindowPosition: getPosition,
         getWindowSize: getSize,
-        setFunctionCount: setFunctionCount
+        setFunctionCount: setFunctionCount,
+        setClassCount: setClassCount
     };
 });

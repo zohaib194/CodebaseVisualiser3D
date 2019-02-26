@@ -4,6 +4,8 @@ let ImGui_Impl;
 
 var WindowManager = (function(){
 
+    var classCount = 0;
+
     Promise.resolve().then(() => {
         return System.import("imgui-js").then((module) => {
             ImGui = module;
@@ -40,20 +42,21 @@ var WindowManager = (function(){
         menubar.initializeWindow();
 
         // File tree window.
-        fileTreeWindow = fileTree(menubar.getWindowSize(), menubar.getWindowPosition())
+        fileTreeWindow = fileTree(menubar.getWindowSize(), menubar.getWindowPosition());
         fileTreeWindow.initializeWindow();
 
         // Namespace window.
-        namespaceWindow = namespace(fileTreeWindow.getWindowSize(), fileTreeWindow.getWindowPosition())
+        namespaceWindow = namespace(fileTreeWindow.getWindowSize(), fileTreeWindow.getWindowPosition());
         namespaceWindow.initializeWindow();
 
         // Code Inpection window.
-        codeInspectionWindow = codeInspection(namespaceWindow.getWindowSize(), namespaceWindow.getWindowPosition())
+        codeInspectionWindow = codeInspection(namespaceWindow.getWindowSize(), namespaceWindow.getWindowPosition());
         codeInspectionWindow.initializeWindow();
         
         // Quality metrics window.
-        qualityMetricsWindow = qualityMetrics(codeInspectionWindow.getWindowSize(), codeInspectionWindow.getWindowPosition())
+        qualityMetricsWindow = qualityMetrics(codeInspectionWindow.getWindowSize(), codeInspectionWindow.getWindowPosition());
         qualityMetricsWindow.setFunctionCount(functionCount);
+        qualityMetricsWindow.setClassCount(classCount);
         qualityMetricsWindow.initializeWindow();
 
         ImGui.EndFrame();
@@ -85,10 +88,19 @@ var WindowManager = (function(){
         functionCount = count;
     }
 
+    /**
+     * Setter the amount of functions.
+     * @param {int} count - Amount of functions in program.
+     */
+    function setClassCount(count){
+       classCount = count;
+    }
+
     return {
         ImGuiUpdate: ImGuiUpdate,
         ImGuiRender: ImGuiRender,
         ImGuiDestroy: ImGuiDestroy,
-        setFunctionCount: setFunctionCount
+        setFunctionCount: setFunctionCount,
+        setClassCount: setClassCount
     };
 });
