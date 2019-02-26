@@ -58,6 +58,10 @@ var fdg = new FDG(1, 1, 0.1, new THREE.Vector3(0, 0, 0));
 // Window manager
 var windowMgr = new WindowManager();
 
+// Mouse event variables
+var raycaster = new THREE.Raycaster();
+var mouse = new THREE.Vector2();
+
 /**
  * Program lifecycle function reponsible for updating the program state.
  */
@@ -214,6 +218,68 @@ function runFDGOnJSONData(data) {
 
 // Find id param form url
 var id = new URL(window.location.href).searchParams.get("id");
+
+// ########## Mouse events functions ##########
+
+/**
+ * On click mouse event function.
+ *
+ * @param      {Event}  event   The event.
+ */
+function onMouseClick( event ) {
+
+    // calculate mouse position in normalized device coordinates
+    // (-1 to +1) for both components
+
+    mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+    mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+    // update the picking ray with the camera and mouse position
+    raycaster.setFromCamera( mouse, camera );
+
+    // calculate objects intersecting the picking ray
+    var intersects = raycaster.intersectObjects( scene.children , true);
+
+    //for ( var i = 0; i < intersects.length; i++ ) {
+    if(intersects !== "undefined" && intersects.length > 0){
+        //console.log(intersects[0]);
+        var funcName = intersects[0].object.name.substr(0, intersects[0].object.name.indexOf(' |'));
+
+        fetch("http://" + config.serverInfo.api_ip + ":" + config.serverInfo.api_port + 
+            "/repo/" + id + "/file/read/?lineStart=" + functionModels.get(funcName).getStartLine() + 
+            "&lineEnd=" + functionModels.get(funcName).getEndLine() +
+            "&filePath=" + functionModels.get(funcName).getFileName())
+        .then((response) => {
+            // Once ready and everything went ok.
+            if (response.status == 200) {
+                console.log("Got something, moving on!");
+                return response.json();
+            }
+
+            console.log("Didn't receive anything!");
+            // Something went wrong.
+            return Promise.reject();
+        }).then((json) => {
+            var sentence = LOCALE.getSentence("backend_data_received");
+            console.log(sentence);
+            
+            // Didn't get data, abort.
+            if (typeof json === "undefined" || json == null) {
+                // Json missing or unparsable.
+                return Promise.reject();
+            }
+            
+            console.log(json);
+            console.log("Got valid data!");
+
+        }).catch((error) => {
+            console.log(error);
+        });
+    }
+}
+
+window.addEventListener( 'mousedown', onMouseClick);
+
 
 fetch("http://" + config.serverInfo.api_ip + ":" + config.serverInfo.api_port + "/repo/" + id + "/initial/")
 .then((response) => {
