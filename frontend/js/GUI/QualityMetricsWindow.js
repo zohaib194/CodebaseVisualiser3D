@@ -51,7 +51,7 @@ let qualityMetrics = (function (previousWindowSize, previousWindowPos){
      * @param {int} count - Amount of functions in program.
      */
     function setFunctionCount(count) {
-        if (count >= 0) {
+        if (count >= 0 && count !== "undefined") {
             functionCount = count;
         }
     }
