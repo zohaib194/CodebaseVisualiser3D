@@ -1,0 +1,26 @@
+{
+  "name": "codebasevisualizer3d",
+  "version": "0.0.1",
+  "description": "Servs REST API for visualizing codebases",
+  "main": "main.go",
+  "dependencies": {
+    "apidoc": "^0.17.7"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "go test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zohaib194/CodebaseVisualizer3D.git"
+  },
+  "keywords": [
+    "devTool"
+  ],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/zohaib194/CodebaseVisualizer3D/issues"
+  },
+  "homepage": "https://github.com/zohaib194/CodebaseVisualizer3D#readme"
+}

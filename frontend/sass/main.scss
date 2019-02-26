@@ -1,0 +1,68 @@
+$color_notification: #ffd800;
+
+body {
+    margin: 0%;
+}
+
+.notificationbar {
+    position: absolute;
+    background: $color_notification;
+    height: 2em;
+    width: 100%;
+    text-align: center;
+    vertical-align: middle;
+    display: inline-block;
+    padding-top: 0.5em;
+    padding-bottom: auto;
+    visibility: hidden;
+}
+
+.repoform {
+    height: 2em;
+    width: 35em;
+    position: fixed;
+    top: 50%;
+    left: 45%;
+    margin-top: -1em;
+    margin-left: -10em;
+}
+
+#reponame {
+    width: 25em;
+}
+
+#gitrepotitle {
+    margin: 0em;
+    display: inline;
+}
+
+// Reference for the loader css code:  https://www.w3schools.com/howto/howto_css_loader.asp
+#loader {
+border: 0.1em solid #f3f3f3;
+
+    border-top-color: rgb(243, 243, 243);
+    border-top-style: solid;
+    border-top-width: 0.1em;
+    border-radius: 50%;
+    border-top: 0.1em solid #3498db;
+    width: 5em;
+    height: 5em;
+    top: 45%;
+    left: 45%;
+    position: fixed;
+    display: none;
+    -webkit-animation: spin 2s linear infinite;
+    animation: spin 2s linear infinite;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
