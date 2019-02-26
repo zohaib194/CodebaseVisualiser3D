@@ -145,6 +145,19 @@ var LOCALE = (function() {
                 ]
             },
             {
+                id: "quality_metric_namespace_count",
+                values: [
+                    {
+                        language: "english",
+                        value: "Number of namespaces"
+                    },
+                    {
+                        language: "norwegian",
+                        value: "Antall \"namespace\"'s"
+                    }
+                ]
+            },
+            {
                 id: "generic_undefined",
                 values: [
                     {

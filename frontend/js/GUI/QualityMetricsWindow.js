@@ -9,8 +9,8 @@
 let qualityMetrics = (function (previousWindowSize, previousWindowPos){
     
     var functionCount = 0;
-
     var classCount = 0;
+    var namespaceCount = 0;
 
     /**
      * Initialize quality metrics window.
@@ -23,6 +23,9 @@ let qualityMetrics = (function (previousWindowSize, previousWindowPos){
         this.wSize = ImGui.GetWindowSize();
         this.wPos = ImGui.GetWindowPos();
         
+        ImGui.Text(
+            LOCALE.getSentence("quality_metric_namespace_count") + ": " + namespaceCount
+        );
         ImGui.Text(
             LOCALE.getSentence("quality_metric_class_count") + ": " + classCount
         );
@@ -83,11 +86,28 @@ let qualityMetrics = (function (previousWindowSize, previousWindowPos){
         classCount = count;
     }
 
+    /**
+     * Setter of the amount of namespaces.
+     * @param {int} count - Amount of namespaces in program.
+     */
+    function setNamespaceCount(count){
+        if (count === "undefined") {
+            console.log(LOCALE.getSentence("generic_undefined"));
+            return;
+        } else if (count < 0) {
+            console.log(LOCALE.getSentence("generic_negative"));
+            return;
+        }
+
+        namespaceCount = count;
+    }
+
     return {
         initializeWindow: init,
         getWindowPosition: getPosition,
         getWindowSize: getSize,
         setFunctionCount: setFunctionCount,
-        setClassCount: setClassCount
+        setClassCount: setClassCount,
+        setNamespaceCount: setNamespaceCount    
     };
 });

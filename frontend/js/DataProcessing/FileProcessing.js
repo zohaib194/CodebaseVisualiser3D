@@ -7,6 +7,9 @@ var classCount = 0;
 // Number of functions found in the project.
 var functionCount = 0;
 
+// Number of namespaces found in the project.
+var namespaceCount = 0;
+
 /**
  * Function to get new random position.
  */
@@ -79,6 +82,8 @@ function handleNamespaceData(namespaceData) {
 
     // If I have a parent, add link between us.
     linkElements();
+
+    namespaceCount++;
 
     // Handle any children.
     handleCodeData(namespaceData.namespace);
@@ -156,6 +161,7 @@ function handleProjectData(projectData) {
     // Reset metadata for current project
     classCount = 0;
     functionCount = 0;
+    namespaceCount = 0;
 
     // Handle every file given.
     projectData.files.forEach((file) => {
@@ -164,4 +170,5 @@ function handleProjectData(projectData) {
 
     windowMgr.setFunctionCount(functionCount);
     windowMgr.setClassCount(classCount);
+    windowMgr.setNamespaceCount(namespaceCount);
 }
