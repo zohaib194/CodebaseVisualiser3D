@@ -249,25 +249,20 @@ function onMouseClick( event ) {
         .then((response) => {
             // Once ready and everything went ok.
             if (response.status == 200) {
-                console.log("Got something, moving on!");
                 return response.json();
             }
 
-            console.log("Didn't receive anything!");
             // Something went wrong.
+            console.log(LOCALE.getSentence("backend_data_not_received"));
             return Promise.reject();
         }).then((json) => {
-            var sentence = LOCALE.getSentence("backend_data_received");
-            console.log(sentence);
+            console.log(LOCALE.getSentence("backend_data_received"));
             
             // Didn't get data, abort.
             if (typeof json === "undefined" || json == null) {
                 // Json missing or unparsable.
                 return Promise.reject();
             }
-            
-            console.log(json);
-            console.log("Got valid data!");
 
         }).catch((error) => {
             console.log(error);
