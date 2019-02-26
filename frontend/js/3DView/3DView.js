@@ -230,7 +230,6 @@ function onMouseClick( event ) {
 
     // calculate mouse position in normalized device coordinates
     // (-1 to +1) for both components
-
     mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
     mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
@@ -240,9 +239,7 @@ function onMouseClick( event ) {
     // calculate objects intersecting the picking ray
     var intersects = raycaster.intersectObjects( scene.children , true);
 
-    //for ( var i = 0; i < intersects.length; i++ ) {
     if(intersects !== "undefined" && intersects.length > 0){
-        //console.log(intersects[0]);
         var funcName = intersects[0].object.name.substr(0, intersects[0].object.name.indexOf(' |'));
 
         fetch("http://" + config.serverInfo.api_ip + ":" + config.serverInfo.api_port + 
