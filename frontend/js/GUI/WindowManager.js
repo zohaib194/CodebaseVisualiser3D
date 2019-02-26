@@ -89,10 +89,18 @@ var WindowManager = (function(){
     }
 
     /**
-     * Setter the amount of functions.
-     * @param {int} count - Amount of functions in program.
+     * Setter the amount of classes.
+     * @param {int} count - Amount of classes in program.
      */
     function setClassCount(count){
+       classCount = count;
+    }
+
+    /**
+     * Setter the amount of namespaces.
+     * @param {int} count - Amount of namespaces in program.
+     */
+    function setNamespaceCount(count){
        classCount = count;
     }
 
@@ -101,6 +109,7 @@ var WindowManager = (function(){
         ImGuiRender: ImGuiRender,
         ImGuiDestroy: ImGuiDestroy,
         setFunctionCount: setFunctionCount,
-        setClassCount: setClassCount
+        setClassCount: setClassCount,
+        setNamespaceCount: setNamespaceCount
     };
 });
