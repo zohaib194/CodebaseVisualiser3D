@@ -88,8 +88,6 @@ function handleNamespaceData(namespaceData) {
  * @param {JSONObject} functionData - Data about a function JSONObject.
  */
 function handleFunctionData(functionData) {
-    classCount++;
-
     // Add node and save index to stack.
     indexStack.push(
         fdg.addNode(
