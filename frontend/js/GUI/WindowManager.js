@@ -16,7 +16,6 @@ var WindowManager = (function(){
     }).then(() => {
         const canvas = document.getElementById("output");
 
-
         ImGui.CreateContext();
         ImGui_Impl.Init(canvas);
 
@@ -25,6 +24,8 @@ var WindowManager = (function(){
     }).catch((error) => {
         console.log("Error: " + error);
     });
+
+    var functionCount = 0;
 
     /**
      * Loop for rendering imgui components.
@@ -49,9 +50,10 @@ var WindowManager = (function(){
         // Code Inpection window.
         codeInspectionWindow = codeInspection(namespaceWindow.getWindowSize(), namespaceWindow.getWindowPosition())
         codeInspectionWindow.initializeWindow();
-
+        
         // Quality metrics window.
         qualityMetricsWindow = qualityMetrics(codeInspectionWindow.getWindowSize(), codeInspectionWindow.getWindowPosition())
+        qualityMetricsWindow.setFunctionCount(functionCount);
         qualityMetricsWindow.initializeWindow();
 
         ImGui.EndFrame();
@@ -75,9 +77,18 @@ var WindowManager = (function(){
         ImGui.DestroyContext();
     }
 
+    /**
+     * Setter the amount of functions.
+     * @param {int} count - Amount of functions in program.
+     */
+    function setFunctionCount(count) {
+        functionCount = count;
+    }
+
     return {
         ImGuiUpdate: ImGuiUpdate,
         ImGuiRender: ImGuiRender,
-        ImGuiDestroy: ImGuiDestroy
+        ImGuiDestroy: ImGuiDestroy,
+        setFunctionCount: setFunctionCount
     };
 });

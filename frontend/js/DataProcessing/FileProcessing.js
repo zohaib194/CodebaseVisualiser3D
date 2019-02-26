@@ -1,5 +1,7 @@
 var indexStack = new Array();
 
+var functionCount = 0;
+
 /**
  * Function to get new random position.
  */
@@ -98,6 +100,8 @@ function handleFunctionData(functionData) {
     // If I have a parent, add link between us.
     linkElements();
 
+    functionCount++;
+
     // Handle any children.
     handleCodeData(functionData.function);
 
@@ -111,7 +115,7 @@ function handleFunctionData(functionData) {
  */
 function handleCodeData(codeData) {
     if (codeData.namespaces != null) {
-        // Handle all namepspaces
+        // Handle all namespaces
         codeData.namespaces.forEach((object) => {
             handleNamespaceData(object);
         });
@@ -133,9 +137,10 @@ function handleCodeData(codeData) {
  * @param {JSONObject} projectData - Data about project files as JSONObject.
  */
 function handleProjectData(projectData) {
-
     // Handle every file given.
     projectData.files.forEach((file) => {
         handleCodeData(file.file);        
     });
+
+    windowMgr.setFunctionCount(functionCount);
 }

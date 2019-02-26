@@ -104,6 +104,19 @@ var LOCALE = (function() {
                         value: "Invalid stil navn"
                     }
                 ]
+            },
+            {
+                id: "quality_metric_funciton_count",
+                values: [
+                    {
+                        language: "english",
+                        value: "Nr of functions"
+                    },
+                    {
+                        language: "norwegian",
+                        value: "Antall funksjoner"
+                    }
+                ]
             }
         ]
     };

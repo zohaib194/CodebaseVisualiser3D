@@ -1,3 +1,4 @@
+
 /**
  * Function makes quality metrics imgui window.
  *
@@ -6,6 +7,8 @@
  * @return     {Object}  object contains qualityMetrics functions.
  */
 let qualityMetrics = (function (previousWindowSize, previousWindowPos){
+    
+    var functionCount = 0;
 
     /**
      * Initialize quality metrics window.
@@ -17,6 +20,10 @@ let qualityMetrics = (function (previousWindowSize, previousWindowPos){
         ImGui.Begin("Quality Metrics");
         this.wSize = ImGui.GetWindowSize();
         this.wPos = ImGui.GetWindowPos();
+
+        ImGui.Text(
+            LOCALE.getSentence("quality_metric_funciton_count") + ": " + functionCount
+        );
 
         ImGui.End();
     }
@@ -39,9 +46,20 @@ let qualityMetrics = (function (previousWindowSize, previousWindowPos){
         return this.wSize;
     }
 
+    /**
+     * Setter of the amount of functions.
+     * @param {int} count - Amount of functions in program.
+     */
+    function setFunctionCount(count) {
+        if (count >= 0) {
+            functionCount = count;
+        }
+    }
+
     return {
         initializeWindow: init,
         getWindowPosition: getPosition,
         getWindowSize: getSize,
+        setFunctionCount: setFunctionCount
     };
 });

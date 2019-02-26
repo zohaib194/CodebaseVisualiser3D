@@ -247,5 +247,5 @@ fetch("http://" + config.serverInfo.api_ip + ":" + config.serverInfo.api_port + 
     // Start program loop.
     requestAnimationFrame(mainloop);
 }).catch((error) => {
-    console.log("Error: " + error);
+    console.log(error);
 });
