@@ -17,27 +17,39 @@
         <script src="./js/repository.js"></script>
     </head>
     <body>
-        <!--[if lt IE 7]>
-            <p class="browsehappy">
-                You are using an <strong>outdated</strong> browser. 
-                Please upgrade your browser to improve your experience.
-            </p>
-        <![endif]-->
-        
-        <header></header>
-        <main>
+        <div class="container">
+            <!--[if lt IE 7]>
+                <p class="browsehappy">
+                    You are using an <strong>outdated</strong> browser. 
+                    Please upgrade your browser to improve your experience.
+                </p>
+            <![endif]-->
             
-            <div id="loader"></div>
+            <header>
+                <h3>Gain a better understanding of libraries by visualizing their code</h3>
+                <p>
+                    If you consider using an external library, but are unsure of the arcitecural quality
+                    or afraid of shortcommings, then perhaps it would help with a 3D representation of the codebase.
+                    That is the aim of Codebase Visualizer 3D.
+                </p>
+                <p>
+                    Submit a gir repository link in the field below to check it out.
+                </p>
+            </header>
+            <main>
+                
+                <div id="loader"></div>
 
-            <form id="repositoryform">
-                <div class="repoform">
-                    <p id="gitrepotitle">Git Repository</p>
-                    <input type="text" name="reponame" id="reponame">
-                    <button type="button" onclick="submitRepoName()"> Submit </button>
-                </div>
-            </form> 
+                <form id="repositoryform">
+                    <div class="repoform">
+                        <p id="gitrepotitle">Git Repository</p>
+                        <input type="text" name="reponame" id="reponame">
+                        <button type="button" onclick="submitRepoName()"> Submit </button>
+                    </div>
+                </form> 
 
-        </main>
-        <footer></footer>
+            </main>
+            <footer></footer>
+        </div>
     </body>
 </html>
