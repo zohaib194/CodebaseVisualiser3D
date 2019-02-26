@@ -18,7 +18,6 @@ var WindowManager = (function(){
     }).then(() => {
         const canvas = document.getElementById("output");
 
-
         ImGui.CreateContext();
         ImGui_Impl.Init(canvas);
 
@@ -27,6 +26,8 @@ var WindowManager = (function(){
     }).catch((error) => {
         console.log("Error: " + error);
     });
+
+    var functionCount = 0;
 
     /**
      * Loop for rendering imgui components.
@@ -41,19 +42,20 @@ var WindowManager = (function(){
         menubar.initializeWindow();
 
         // File tree window.
-        fileTreeWindow = fileTree(menubar.getWindowSize(), menubar.getWindowPosition())
+        fileTreeWindow = fileTree(menubar.getWindowSize(), menubar.getWindowPosition());
         fileTreeWindow.initializeWindow();
 
         // Namespace window.
-        namespaceWindow = namespace(fileTreeWindow.getWindowSize(), fileTreeWindow.getWindowPosition())
+        namespaceWindow = namespace(fileTreeWindow.getWindowSize(), fileTreeWindow.getWindowPosition());
         namespaceWindow.initializeWindow();
 
         // Code Inpection window.
-        codeInspectionWindow = codeInspection(namespaceWindow.getWindowSize(), namespaceWindow.getWindowPosition())
+        codeInspectionWindow = codeInspection(namespaceWindow.getWindowSize(), namespaceWindow.getWindowPosition());
         codeInspectionWindow.initializeWindow();
-
+        
         // Quality metrics window.
-        qualityMetricsWindow = qualityMetrics(codeInspectionWindow.getWindowSize(), codeInspectionWindow.getWindowPosition())
+        qualityMetricsWindow = qualityMetrics(codeInspectionWindow.getWindowSize(), codeInspectionWindow.getWindowPosition());
+        qualityMetricsWindow.setFunctionCount(functionCount);
         qualityMetricsWindow.setClassCount(classCount);
         qualityMetricsWindow.initializeWindow();
 
@@ -78,6 +80,18 @@ var WindowManager = (function(){
         ImGui.DestroyContext();
     }
 
+    /**
+     * Setter the amount of functions.
+     * @param {int} count - Amount of functions in program.
+     */
+    function setFunctionCount(count) {
+        functionCount = count;
+    }
+
+    /**
+     * Setter the amount of functions.
+     * @param {int} count - Amount of functions in program.
+     */
     function setClassCount(count){
        classCount = count;
     }
@@ -86,6 +100,7 @@ var WindowManager = (function(){
         ImGuiUpdate: ImGuiUpdate,
         ImGuiRender: ImGuiRender,
         ImGuiDestroy: ImGuiDestroy,
+        setFunctionCount: setFunctionCount,
         setClassCount: setClassCount
     };
 });

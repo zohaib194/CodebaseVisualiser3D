@@ -6,7 +6,7 @@ frontend/logs/
 frontend/docs/
 
 backend/parser/.project
-
+backend/parser/.classpath
 ### Linux ###
 *~
 

@@ -119,7 +119,20 @@ var LOCALE = (function() {
                 ]
             },
             {
-                id: "window_classCount",
+                id: "quality_metric_funciton_count",
+                values: [
+                    {
+                        language: "english",
+                        value: "Nr of functions"
+                    },
+                    {
+                        language: "norwegian",
+                        value: "Antall funksjoner"
+                    }
+                ]
+            },
+            {
+                id: "quality_metric_class_count",
                 values: [
                     {
                         language: "english",
