@@ -1,10 +1,10 @@
 var indexStack = new Array();
-
-// Number of classes found in the project
-var classCount;
-
 var functionModels = new Map();
 
+// Number of classes found in the project
+var classCount = 0;
+
+// Number of functions found in the project.
 var functionCount = 0;
 
 /**
@@ -153,20 +153,15 @@ function handleCodeData(codeData) {
  * @param {JSONObject} projectData - Data about project files as JSONObject.
  */
 function handleProjectData(projectData) {
-<<<<<<< HEAD
-=======
     // Reset metadata for current project
     classCount = 0;
-    
->>>>>>> e2422c14a3a562fb433d835bcb07f71a401931bf
+    functionCount = 0;
+
     // Handle every file given.
     projectData.files.forEach((file) => {
         handleCodeData(file.file);        
     });
 
-<<<<<<< HEAD
     windowMgr.setFunctionCount(functionCount);
-=======
     windowMgr.setClassCount(classCount);
->>>>>>> e2422c14a3a562fb433d835bcb07f71a401931bf
 }
