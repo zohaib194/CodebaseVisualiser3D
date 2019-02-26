@@ -46,12 +46,11 @@ let qualityMetrics = (function (previousWindowSize, previousWindowPos){
         if (count === "undefined") {
             console.log(LOCALE.getSentence("generic_undefined"));
             return;
-        }else if (count < 0) {
+        } else if (count < 0) {
             console.log(LOCALE.getSentence("generic_negative"));
             return;
         }
 
-        if (true) {}
         classCount = count;
     }
 
