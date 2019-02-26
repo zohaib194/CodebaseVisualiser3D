@@ -153,7 +153,7 @@ var LOCALE = (function() {
                     },
                     {
                         language: "norwegian",
-                        value: "Antall \"namespace\"'s"
+                        value: "Antall \"namespace\"s"
                     }
                 ]
             },
