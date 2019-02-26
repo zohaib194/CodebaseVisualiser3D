@@ -104,6 +104,19 @@ var LOCALE = (function() {
                         value: "Invalid stil navn"
                     }
                 ]
+            },
+            {
+                id: "window_classCount",
+                values: [
+                    {
+                        language: "english",
+                        value: "Number of classes"
+                    },
+                    {
+                        language: "norwegian",
+                        value: "Antall klasser"
+                    }
+                ]
             }
         ]
     };

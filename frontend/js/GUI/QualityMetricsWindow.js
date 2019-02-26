@@ -17,7 +17,7 @@ let qualityMetrics = (function (previousWindowSize, previousWindowPos){
         ImGui.SetNextWindowSize(new ImGui.ImVec2(290, canvas.height/4), ImGui.Cond.Always);
         ImGui.SetNextWindowCollapsed(false);
         ImGui.Begin("Quality Metrics");
-        ImGui.Text("Number of classes:      " + classCount);
+        ImGui.Text(LOCALE.getSentence("window_classCount") + "\t" + classCount);
         this.wSize = ImGui.GetWindowSize();
         this.wPos = ImGui.GetWindowPos();
 
