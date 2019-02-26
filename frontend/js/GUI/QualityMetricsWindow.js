@@ -7,6 +7,8 @@
  */
 let qualityMetrics = (function (previousWindowSize, previousWindowPos){
 
+    var classCount = 0;
+
     /**
      * Initialize quality metrics window.
      */
@@ -15,6 +17,7 @@ let qualityMetrics = (function (previousWindowSize, previousWindowPos){
         ImGui.SetNextWindowSize(new ImGui.ImVec2(290, canvas.height/4), ImGui.Cond.Always);
         ImGui.SetNextWindowCollapsed(false);
         ImGui.Begin("Quality Metrics");
+        ImGui.Text("Number of classes:      " + classCount);
         this.wSize = ImGui.GetWindowSize();
         this.wPos = ImGui.GetWindowPos();
 
@@ -39,9 +42,14 @@ let qualityMetrics = (function (previousWindowSize, previousWindowPos){
         return this.wSize;
     }
 
+    function setClassCount(count){
+        classCount = count;
+    }
+
     return {
         initializeWindow: init,
+        setClassCount: setClassCount,
         getWindowPosition: getPosition,
-        getWindowSize: getSize,
+        getWindowSize: getSize
     };
 });

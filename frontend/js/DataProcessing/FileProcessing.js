@@ -1,5 +1,8 @@
 var indexStack = new Array();
 
+// Number of classes found in the project
+var classCount;
+
 /**
  * Function to get new random position.
  */
@@ -32,6 +35,7 @@ function linkElements() {
  * @param {JSONObject} classData - Data about a class.
  */
 function handleClassData(classData) {
+    classCount++;
     // Add node and save index.
     indexStack.push(
         fdg.addNode(
@@ -84,6 +88,8 @@ function handleNamespaceData(namespaceData) {
  * @param {JSONObject} functionData - Data about a function JSONObject.
  */
 function handleFunctionData(functionData) {
+    classCount++;
+
     // Add node and save index to stack.
     indexStack.push(
         fdg.addNode(
@@ -133,9 +139,13 @@ function handleCodeData(codeData) {
  * @param {JSONObject} projectData - Data about project files as JSONObject.
  */
 function handleProjectData(projectData) {
-
+    // Reset metadata for current project
+    classCount = 0;
+    
     // Handle every file given.
     projectData.files.forEach((file) => {
         handleCodeData(file.file);        
     });
+
+    windowMgr.setClassCount(classCount);
 }

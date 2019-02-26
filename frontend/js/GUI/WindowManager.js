@@ -4,6 +4,8 @@ let ImGui_Impl;
 
 var WindowManager = (function(){
 
+    var classCount = 0;
+
     Promise.resolve().then(() => {
         return System.import("imgui-js").then((module) => {
             ImGui = module;
@@ -52,6 +54,7 @@ var WindowManager = (function(){
 
         // Quality metrics window.
         qualityMetricsWindow = qualityMetrics(codeInspectionWindow.getWindowSize(), codeInspectionWindow.getWindowPosition())
+        qualityMetricsWindow.setClassCount(classCount);
         qualityMetricsWindow.initializeWindow();
 
         ImGui.EndFrame();
@@ -75,9 +78,14 @@ var WindowManager = (function(){
         ImGui.DestroyContext();
     }
 
+    function setClassCount(count){
+       classCount = count;
+    }
+
     return {
         ImGuiUpdate: ImGuiUpdate,
         ImGuiRender: ImGuiRender,
-        ImGuiDestroy: ImGuiDestroy
+        ImGuiDestroy: ImGuiDestroy,
+        setClassCount: setClassCount
     };
 });
