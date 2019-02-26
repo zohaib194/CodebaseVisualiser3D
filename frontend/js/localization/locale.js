@@ -52,6 +52,19 @@ var LOCALE = (function() {
                         value: "Mottat data fra API server"
                     }
                 ]
+            },  
+            {
+                id: "backend_data_not_received",
+                values: [
+                    {
+                        language: "english",
+                        value: "Didn't receive data from backend"
+                    },
+                    {
+                        language: "norwegian",
+                        value: "Mottok ikke data fra API server"
+                    }
+                ]
             },
             {
                 id: "displayobject_undefined",

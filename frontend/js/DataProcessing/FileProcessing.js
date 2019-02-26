@@ -3,6 +3,7 @@ var indexStack = new Array();
 // Number of classes found in the project
 var classCount;
 
+var functionModels = new Map();
 /**
  * Function to get new random position.
  */
@@ -87,7 +88,7 @@ function handleNamespaceData(namespaceData) {
  * Function for handling function data in JSONObject.
  * @param {JSONObject} functionData - Data about a function JSONObject.
  */
-function handleFunctionData(functionData) {
+function handleFunctionData(functionData, fileName) {
     // Add node and save index to stack.
     indexStack.push(
         fdg.addNode(
@@ -96,6 +97,16 @@ function handleFunctionData(functionData) {
                 functionData.function.name, 
                 "function"
             )
+        )
+    );
+
+    // Save the function data in function model.
+    functionModels.set(
+        functionData.function.name,
+        new FunctionMetaData( 
+            fileName,
+            functionData.function.start_line, 
+            functionData.function.end_line
         )
     );
 
@@ -127,7 +138,7 @@ function handleCodeData(codeData) {
     } else if (codeData.functions != null) {
         // Handle all functions
         codeData.functions.forEach((object) => {
-            handleFunctionData(object);
+            handleFunctionData(object, codeData.file_name);
         });
     }
 }
