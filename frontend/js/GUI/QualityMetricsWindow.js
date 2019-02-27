@@ -1,3 +1,4 @@
+
 /**
  * Function makes quality metrics imgui window.
  *
@@ -6,8 +7,10 @@
  * @return     {Object}  object contains qualityMetrics functions.
  */
 let qualityMetrics = (function (previousWindowSize, previousWindowPos){
-
+    
+    var functionCount = 0;
     var classCount = 0;
+    var namespaceCount = 0;
 
     /**
      * Initialize quality metrics window.
@@ -17,9 +20,18 @@ let qualityMetrics = (function (previousWindowSize, previousWindowPos){
         ImGui.SetNextWindowSize(new ImGui.ImVec2(290, canvas.height/4), ImGui.Cond.Always);
         ImGui.SetNextWindowCollapsed(false);
         ImGui.Begin("Quality Metrics");
-        ImGui.Text(LOCALE.getSentence("window_classCount") + "\t" + classCount);
         this.wSize = ImGui.GetWindowSize();
         this.wPos = ImGui.GetWindowPos();
+        
+        ImGui.Text(
+            LOCALE.getSentence("quality_metric_namespace_count") + ": " + namespaceCount
+        );
+        ImGui.Text(
+            LOCALE.getSentence("quality_metric_class_count") + ": " + classCount
+        );
+        ImGui.Text(
+            LOCALE.getSentence("quality_metric_funciton_count") + ": " + functionCount
+        );
 
         ImGui.End();
     }
@@ -42,6 +54,26 @@ let qualityMetrics = (function (previousWindowSize, previousWindowPos){
         return this.wSize;
     }
 
+    /**
+     * Setter of the amount of functions.
+     * @param {int} count - Amount of functions in program.
+     */
+    function setFunctionCount(count) {
+        if (count === "undefined") {
+            console.log(LOCALE.getSentence("generic_undefined"));
+            return;
+        } else if (count < 0) {
+            console.log(LOCALE.getSentence("generic_negative"));
+            return;
+        }
+
+        functionCount = count;
+    }
+
+    /**
+     * Setter of the amount of classes.
+     * @param {int} count - Amount of classes in program.
+     */
     function setClassCount(count){
         if (count === "undefined") {
             console.log(LOCALE.getSentence("generic_undefined"));
@@ -54,10 +86,28 @@ let qualityMetrics = (function (previousWindowSize, previousWindowPos){
         classCount = count;
     }
 
+    /**
+     * Setter of the amount of namespaces.
+     * @param {int} count - Amount of namespaces in program.
+     */
+    function setNamespaceCount(count){
+        if (count === "undefined") {
+            console.log(LOCALE.getSentence("generic_undefined"));
+            return;
+        } else if (count < 0) {
+            console.log(LOCALE.getSentence("generic_negative"));
+            return;
+        }
+
+        namespaceCount = count;
+    }
+
     return {
         initializeWindow: init,
-        setClassCount: setClassCount,
         getWindowPosition: getPosition,
-        getWindowSize: getSize
+        getWindowSize: getSize,
+        setFunctionCount: setFunctionCount,
+        setClassCount: setClassCount,
+        setNamespaceCount: setNamespaceCount    
     };
 });

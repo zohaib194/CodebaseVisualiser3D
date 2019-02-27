@@ -119,7 +119,20 @@ var LOCALE = (function() {
                 ]
             },
             {
-                id: "window_classCount",
+                id: "quality_metric_funciton_count",
+                values: [
+                    {
+                        language: "english",
+                        value: "Nr of functions"
+                    },
+                    {
+                        language: "norwegian",
+                        value: "Antall funksjoner"
+                    }
+                ]
+            },
+            {
+                id: "quality_metric_class_count",
                 values: [
                     {
                         language: "english",
@@ -128,6 +141,19 @@ var LOCALE = (function() {
                     {
                         language: "norwegian",
                         value: "Antall klasser"
+                    }
+                ]
+            },
+            {
+                id: "quality_metric_namespace_count",
+                values: [
+                    {
+                        language: "english",
+                        value: "Number of namespaces"
+                    },
+                    {
+                        language: "norwegian",
+                        value: "Antall \"namespace\"s"
                     }
                 ]
             },

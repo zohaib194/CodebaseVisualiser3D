@@ -264,7 +264,7 @@ function onMouseClick( event ) {
                 return Promise.reject();
             }
 
-            windowMgr.setImplementationInCodeInspection(json.implementation);
+            windowMgr.setDataStructureImplementation(json.implementation);
         }).catch((error) => {
             console.log(error);
         });
@@ -306,5 +306,5 @@ fetch("http://" + config.serverInfo.api_ip + ":" + config.serverInfo.api_port + 
     // Start program loop.
     requestAnimationFrame(mainloop);
 }).catch((error) => {
-    console.log("Error: " + error);
+    console.log(error);
 });

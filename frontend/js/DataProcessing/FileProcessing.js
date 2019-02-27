@@ -1,9 +1,15 @@
 var indexStack = new Array();
+var functionModels = new Map();
 
 // Number of classes found in the project
-var classCount;
+var classCount = 0;
 
-var functionModels = new Map();
+// Number of functions found in the project.
+var functionCount = 0;
+
+// Number of namespaces found in the project.
+var namespaceCount = 0;
+
 /**
  * Function to get new random position.
  */
@@ -77,6 +83,8 @@ function handleNamespaceData(namespaceData) {
     // If I have a parent, add link between us.
     linkElements();
 
+    namespaceCount++;
+
     // Handle any children.
     handleCodeData(namespaceData.namespace);
 
@@ -113,6 +121,8 @@ function handleFunctionData(functionData, fileName) {
     // If I have a parent, add link between us.
     linkElements();
 
+    functionCount++;
+
     // Handle any children.
     handleCodeData(functionData.function);
 
@@ -126,7 +136,7 @@ function handleFunctionData(functionData, fileName) {
  */
 function handleCodeData(codeData) {
     if (codeData.namespaces != null) {
-        // Handle all namepspaces
+        // Handle all namespaces
         codeData.namespaces.forEach((object) => {
             handleNamespaceData(object);
         });
@@ -150,11 +160,15 @@ function handleCodeData(codeData) {
 function handleProjectData(projectData) {
     // Reset metadata for current project
     classCount = 0;
-    
+    functionCount = 0;
+    namespaceCount = 0;
+
     // Handle every file given.
     projectData.files.forEach((file) => {
         handleCodeData(file.file);        
     });
 
+    windowMgr.setFunctionCount(functionCount);
     windowMgr.setClassCount(classCount);
+    windowMgr.setNamespaceCount(namespaceCount);
 }

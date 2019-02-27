@@ -1,8 +1,8 @@
+// Vars.
 var ImGui;
 var ImGui_Impl;
 
 var WindowManager = (function(){
-    // Vars.
 
     var classCount = 0;
     var implementation = "";
@@ -19,10 +19,6 @@ var WindowManager = (function(){
     }).then(() => {
         const canvas = document.getElementById("output");
 
-        if(ImGui_Impl == null){
-            console.log("ImGui_Impl is null");
-        }
-
         ImGui.CreateContext();
         ImGui_Impl.Init(canvas);
 
@@ -31,6 +27,8 @@ var WindowManager = (function(){
     }).catch((error) => {
         console.log(error);
     });
+
+    var functionCount = 0;
 
     /**
      * Loop for rendering imgui components.
@@ -45,20 +43,21 @@ var WindowManager = (function(){
         menubar.initializeWindow();
 
         // File tree window.
-        fileTreeWindow = fileTree(menubar.getWindowSize(), menubar.getWindowPosition())
+        fileTreeWindow = fileTree(menubar.getWindowSize(), menubar.getWindowPosition());
         fileTreeWindow.initializeWindow();
 
         // Namespace window.
-        namespaceWindow = namespace(fileTreeWindow.getWindowSize(), fileTreeWindow.getWindowPosition())
+        namespaceWindow = namespace(fileTreeWindow.getWindowSize(), fileTreeWindow.getWindowPosition());
         namespaceWindow.initializeWindow();
 
         // Code Inpection window.
         codeInspectionWindow = codeInspection(namespaceWindow.getWindowSize(), namespaceWindow.getWindowPosition())
         codeInspectionWindow.setImplementation(implementation);
         codeInspectionWindow.initializeWindow();
-
+        
         // Quality metrics window.
-        qualityMetricsWindow = qualityMetrics(codeInspectionWindow.getWindowSize(), codeInspectionWindow.getWindowPosition())
+        qualityMetricsWindow = qualityMetrics(codeInspectionWindow.getWindowSize(), codeInspectionWindow.getWindowPosition());
+        qualityMetricsWindow.setFunctionCount(functionCount);
         qualityMetricsWindow.setClassCount(classCount);
         qualityMetricsWindow.initializeWindow();
 
@@ -83,11 +82,36 @@ var WindowManager = (function(){
         ImGui.DestroyContext();
     }
 
+    /**
+     * Setter the amount of functions.
+     * @param {int} count - Amount of functions in program.
+     */
+    function setFunctionCount(count) {
+        functionCount = count;
+    }
+
+    /**
+     * Setter the amount of classes.
+     * @param {int} count - Amount of classes in program.
+     */
     function setClassCount(count){
        classCount = count;
     }
 
-    function setImplementationInCodeInspection(data){
+    /**
+     * Setter the amount of namespaces.
+     * @param {int} count - Amount of namespaces in program.
+     */
+    function setNamespaceCount(count){
+       classCount = count;
+    }
+
+    /**
+     * Sets the implementation in code inspection.
+     *
+     * @param      {string}  data    The multiline string of implementation.
+     */
+    function setDataStructureImplementation(data){
         implementation = data;
     }
 
@@ -95,7 +119,9 @@ var WindowManager = (function(){
         ImGuiUpdate: ImGuiUpdate,
         ImGuiRender: ImGuiRender,
         ImGuiDestroy: ImGuiDestroy,
+        setFunctionCount: setFunctionCount,
         setClassCount: setClassCount,
-        setImplementationInCodeInspection: setImplementationInCodeInspection
+        setNamespaceCount: setNamespaceCount,
+        setDataStructureImplementation: setDataStructureImplementation
     };
 });
