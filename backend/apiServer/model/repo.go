@@ -47,6 +47,7 @@ func (repo RepoModel) Save() (string, error) {
 
 // Load loads java application to parse a specified file.
 func (repo RepoModel) Load(file string, target string) (data FilesModel, err error) {
+	fmt.Println("Parsed: ", file)
 	data.File.Parsed = false
 	data.File.FileName = file
 
@@ -104,9 +105,10 @@ func (repo RepoModel) GetRepoByID(id string) (rep RepoModel, err error) {
 	return exstRepo, nil
 }
 
-// GetRepoFiles finds and return all files stored in repository directory.
+// GetRepoFiles finds and returns all files stored in repository directory.
+// Excludes directories them selfs (as files) and anything from ".git" folder
 func (repo RepoModel) GetRepoFiles() (files string, err error) {
-	cmd := exec.Command("find", RepoPath+"/"+repo.ID.Hex(), "-type", "f", "-not", "-path", "\"*/.git/*\"")
+	cmd := exec.Command("find", RepoPath+"/"+repo.ID.Hex(), "-type", "f", "-not", "-path", "*/.git/*")
 	cmd.Dir = JavaParserPath
 	bytes, err := cmd.CombinedOutput()
 
@@ -127,7 +129,6 @@ func (repo RepoModel) SanitizeFilePath(projectModel ProjectModel) {
 
 // ParseDataFromFiles fetch all functions from gives files set.
 func (repo RepoModel) ParseDataFromFiles(files string) (projectModel ProjectModel, err error) {
-	fmt.Println(files)
 	for _, sourceFiles := range strings.Split(strings.TrimSuffix(files, "\n"), "\n") {
 		// Search for cpp files
 		if strings.Contains(sourceFiles, ".cpp") {
