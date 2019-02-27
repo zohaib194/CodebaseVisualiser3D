@@ -7,8 +7,10 @@ type FilesModel struct {
 
 // FileModel represents a single code file
 type FileModel struct {
-	FileName   string            `json:"file_name"`
-	Functions  []FunctionsModel  `json:"functions"`
-	Namespaces []NamespacesModel `json:"namespaces"`
-	Classes    []ClassesModel    `json:"classes"`
+	Parsed      bool              `json:"parsed"`
+	FileName    string            `json:"file_name"`
+	Functions   []FunctionsModel  `json:"functions"`
+	Namespaces  []NamespacesModel `json:"namespaces"`
+	Classes     []ClassesModel    `json:"classes"`
+	LinesInFile int               `json:"linesInFile"`
 }

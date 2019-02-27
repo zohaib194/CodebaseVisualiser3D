@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"log"
 	"os/exec"
+	"strconv"
 	"strings"
 
 	"gopkg.in/mgo.v2/bson"
@@ -45,14 +46,34 @@ func (repo RepoModel) Save() (string, error) {
 
 // Load loads java application to parse a specified file.
 func (repo RepoModel) Load(file string, target string) (data FilesModel, err error) {
-	// Setup the command to parse the file.
-	cmd := exec.Command("java", "me.codvis.ast.Main", "-f", file, "-t", target, "-c", "Initial")
-	cmd.Dir = JavaParserPath
+	parsed := false
+
+	// Ready  word count command and execute it.
+	cmd := exec.Command("wc", "-l", file)
 	output, err := cmd.CombinedOutput()
 
 	if err != nil {
+		log.Println("Error could not count lines!: ", err.Error())
+		return FilesModel{File: FileModel{Parsed: parsed, FileName: file}}, err
+	}
+
+	// Split the output on space and grab the first entry (lines in file)
+	splitWCOutput := strings.Split(string(output), " ")
+	linesOfCode, err := strconv.Atoi(splitWCOutput[0])
+
+	if err != nil {
+		log.Println("Error could not convert string to int: ", err.Error())
+		return FilesModel{File: FileModel{Parsed: parsed, FileName: file}}, err
+	}
+
+	// Setup the command to parse the file.
+	cmd = exec.Command("java", "me.codvis.ast.Main", "-f", file, "-t", target, "-c", "Initial")
+	cmd.Dir = JavaParserPath
+	output, err = cmd.CombinedOutput()
+
+	if err != nil {
 		log.Println("Error executing java parser: ", err.Error())
-		return FilesModel{}, err
+		return FilesModel{File: FileModel{Parsed: parsed, FileName: file}}, err
 	}
 
 	ioReader := bytes.NewReader(output)
@@ -60,8 +81,12 @@ func (repo RepoModel) Load(file string, target string) (data FilesModel, err err
 
 	if err := decoder.Decode(&data); err != nil {
 		log.Fatal("Could not decode json error: ", err.Error())
-		return FilesModel{}, err
+		return FilesModel{File: FileModel{Parsed: parsed, FileName: file}}, err
 	}
+
+	parsed = true
+	data.File.LinesInFile = linesOfCode
+	data.File.Parsed = parsed
 
 	return data, nil
 }
@@ -99,8 +124,8 @@ func (repo RepoModel) SanitizeFilePath(projectModel ProjectModel) {
 	}
 }
 
-// ParseFunctionsFromFiles fetch all functions from gives files set.
-func (repo RepoModel) ParseFunctionsFromFiles(files string) (projectModel ProjectModel, err error) {
+// ParseDataFromFiles fetch all functions from gives files set.
+func (repo RepoModel) ParseDataFromFiles(files string) (projectModel ProjectModel, err error) {
 	for _, sourceFiles := range strings.Split(strings.TrimSuffix(files, "\n"), "\n") {
 		// Search for cpp files
 		if strings.Contains(sourceFiles, ".cpp") {

@@ -142,8 +142,8 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 *
  */
 
-// ParseSimpleFunc parse a repository for functions of a certain project in repos directory.
-func (repo RepoController) ParseSimpleFunc(w http.ResponseWriter, r *http.Request) {
+// ParseInitial parse a repository for functions of a certain project in repos directory.
+func (repo RepoController) ParseInitial(w http.ResponseWriter, r *http.Request) {
 	http.Header.Add(w.Header(), "content-type", "application/json")
 	http.Header.Add(w.Header(), "Access-Control-Allow-Origin", "*")
 
@@ -169,7 +169,7 @@ func (repo RepoController) ParseSimpleFunc(w http.ResponseWriter, r *http.Reques
 		}
 
 		// Fetch all fuctions given in files.
-		projectModel, err := exstRepo.ParseFunctionsFromFiles(files)
+		projectModel, err := exstRepo.ParseDataFromFiles(files)
 
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)

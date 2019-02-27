@@ -2,12 +2,13 @@
 package main
 
 import (
-	"github.com/gorilla/mux"
-	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/controller"
-	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/model"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/gorilla/mux"
+	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/controller"
+	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/model"
 )
 
 // Indicate the importance of a warning
@@ -48,7 +49,7 @@ func main() {
 
 	// API routings
 	router.HandleFunc("/repo/add", controller.RepoController{}.NewRepoFromURI)
-	router.HandleFunc("/repo/{repoId}/initial/", controller.RepoController{}.ParseSimpleFunc)
+	router.HandleFunc("/repo/{repoId}/initial/", controller.RepoController{}.ParseInitial)
 	router.HandleFunc("/repo/{repoId}/file/read/", controller.CodeSnippetController{}.GetImplementation)
 
 	// Start server

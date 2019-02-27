@@ -165,7 +165,15 @@ function handleProjectData(projectData) {
 
     // Handle every file given.
     projectData.files.forEach((file) => {
-        handleCodeData(file.file);        
+
+        // If file is not parsed, skip it 
+        // ("return" returns from lambda not forEach).
+        if (file.file.parsed != true) {
+            return;
+        }
+    
+        // File is parsed correctly, process it.
+        handleCodeData(file.file);
     });
 
     windowMgr.setFunctionCount(functionCount);
