@@ -46,7 +46,8 @@ func (repo RepoModel) Save() (string, error) {
 
 // Load loads java application to parse a specified file.
 func (repo RepoModel) Load(file string, target string) (data FilesModel, err error) {
-	parsed := false
+	data.File.Parsed = false
+	data.File.FileName = file
 
 	// Ready  word count command and execute it.
 	cmd := exec.Command("wc", "-l", file)
@@ -54,7 +55,7 @@ func (repo RepoModel) Load(file string, target string) (data FilesModel, err err
 
 	if err != nil {
 		log.Println("Error could not count lines!: ", err.Error())
-		return FilesModel{File: FileModel{Parsed: parsed, FileName: file}}, err
+		return data, err
 	}
 
 	// Split the output on space and grab the first entry (lines in file)
@@ -63,7 +64,7 @@ func (repo RepoModel) Load(file string, target string) (data FilesModel, err err
 
 	if err != nil {
 		log.Println("Error could not convert string to int: ", err.Error())
-		return FilesModel{File: FileModel{Parsed: parsed, FileName: file}}, err
+		return data, err
 	}
 
 	// Setup the command to parse the file.
@@ -73,7 +74,7 @@ func (repo RepoModel) Load(file string, target string) (data FilesModel, err err
 
 	if err != nil {
 		log.Println("Error executing java parser: ", err.Error())
-		return FilesModel{File: FileModel{Parsed: parsed, FileName: file}}, err
+		return data, err
 	}
 
 	ioReader := bytes.NewReader(output)
@@ -81,12 +82,11 @@ func (repo RepoModel) Load(file string, target string) (data FilesModel, err err
 
 	if err := decoder.Decode(&data); err != nil {
 		log.Fatal("Could not decode json error: ", err.Error())
-		return FilesModel{File: FileModel{Parsed: parsed, FileName: file}}, err
+		return data, err
 	}
 
-	parsed = true
 	data.File.LinesInFile = linesOfCode
-	data.File.Parsed = parsed
+	data.File.Parsed = true
 
 	return data, nil
 }
