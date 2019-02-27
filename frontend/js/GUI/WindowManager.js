@@ -1,10 +1,11 @@
-// Vars.
-let ImGui;
-let ImGui_Impl;
+var ImGui;
+var ImGui_Impl;
 
 var WindowManager = (function(){
+    // Vars.
 
     var classCount = 0;
+    var implementation = "";
 
     Promise.resolve().then(() => {
         return System.import("imgui-js").then((module) => {
@@ -18,6 +19,9 @@ var WindowManager = (function(){
     }).then(() => {
         const canvas = document.getElementById("output");
 
+        if(ImGui_Impl == null){
+            console.log("ImGui_Impl is null");
+        }
 
         ImGui.CreateContext();
         ImGui_Impl.Init(canvas);
@@ -25,7 +29,7 @@ var WindowManager = (function(){
         ImGui.StyleColorsDark();
         //ImGui.StyleColorsClassic();
     }).catch((error) => {
-        console.log("Error: " + error);
+        console.log(error);
     });
 
     /**
@@ -50,6 +54,7 @@ var WindowManager = (function(){
 
         // Code Inpection window.
         codeInspectionWindow = codeInspection(namespaceWindow.getWindowSize(), namespaceWindow.getWindowPosition())
+        codeInspectionWindow.setImplementation(implementation);
         codeInspectionWindow.initializeWindow();
 
         // Quality metrics window.
@@ -82,10 +87,15 @@ var WindowManager = (function(){
        classCount = count;
     }
 
+    function setImplementationInCodeInspection(data){
+        implementation = data;
+    }
+
     return {
         ImGuiUpdate: ImGuiUpdate,
         ImGuiRender: ImGuiRender,
         ImGuiDestroy: ImGuiDestroy,
-        setClassCount: setClassCount
+        setClassCount: setClassCount,
+        setImplementationInCodeInspection: setImplementationInCodeInspection
     };
 });
