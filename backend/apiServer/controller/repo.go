@@ -180,7 +180,31 @@ func (repo RepoController) ParseSimpleFunc(w http.ResponseWriter, r *http.Reques
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(projectModel)
 
-	} else { // if not POST request
+	} else { // if not GET request
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+}
+
+// GetAllRepos gets all repositories stored.
+func (repo RepoController) GetAllRepos(w http.ResponseWriter, r *http.Request) {
+	http.Header.Add(w.Header(), "content-type", "application/json")
+	http.Header.Add(w.Header(), "Access-Control-Allow-Origin", "*")
+
+	if r.Method == "GET" {
+		repos, err := model.RepoModel{}.FetchAll()
+
+		if err != nil {
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			log.Println("Could not find repositories error: ", err.Error())
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(repos)
+
+	} else { // if not GET request
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}

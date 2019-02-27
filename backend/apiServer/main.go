@@ -48,6 +48,7 @@ func main() {
 
 	// API routings
 	router.HandleFunc("/repo/add", controller.RepoController{}.NewRepoFromURI)
+	router.HandleFunc("/repo/list", controller.RepoController{}.GetAllRepos)
 	router.HandleFunc("/repo/{repoId}/initial/", controller.RepoController{}.ParseSimpleFunc)
 	router.HandleFunc("/repo/{repoId}/file/read/", controller.CodeSnippetController{}.GetImplementation)
 
