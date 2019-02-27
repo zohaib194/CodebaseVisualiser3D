@@ -160,7 +160,7 @@ func (repo RepoController) ParseInitial(w http.ResponseWriter, r *http.Request) 
 		}
 
 		// List all files in the repository directory.
-		files, err := exstRepo.GetRepoFile()
+		files, err := exstRepo.GetRepoFiles()
 
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)

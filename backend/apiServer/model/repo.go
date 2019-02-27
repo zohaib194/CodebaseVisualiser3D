@@ -5,6 +5,7 @@ package model
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"log"
 	"os/exec"
 	"strconv"
@@ -103,9 +104,9 @@ func (repo RepoModel) GetRepoByID(id string) (rep RepoModel, err error) {
 	return exstRepo, nil
 }
 
-// GetRepoFile finds and return all files stored in repository directory.
-func (repo RepoModel) GetRepoFile() (files string, err error) {
-	cmd := exec.Command("find", RepoPath+"/"+repo.ID.Hex())
+// GetRepoFiles finds and return all files stored in repository directory.
+func (repo RepoModel) GetRepoFiles() (files string, err error) {
+	cmd := exec.Command("find", RepoPath+"/"+repo.ID.Hex(), "-type", "f", "-not", "-path", "\"*/.git/*\"")
 	cmd.Dir = JavaParserPath
 	bytes, err := cmd.CombinedOutput()
 
@@ -126,6 +127,7 @@ func (repo RepoModel) SanitizeFilePath(projectModel ProjectModel) {
 
 // ParseDataFromFiles fetch all functions from gives files set.
 func (repo RepoModel) ParseDataFromFiles(files string) (projectModel ProjectModel, err error) {
+	fmt.Println(files)
 	for _, sourceFiles := range strings.Split(strings.TrimSuffix(files, "\n"), "\n") {
 		// Search for cpp files
 		if strings.Contains(sourceFiles, ".cpp") {
@@ -134,7 +136,10 @@ func (repo RepoModel) ParseDataFromFiles(files string) (projectModel ProjectMode
 
 			if err != nil {
 				log.Println("Could not parse error: ", err.Error())
-				return ProjectModel{}, err
+				//projectModelError := ProjectModel{}
+				projectModel.Files = append(projectModel.Files,
+					FilesModel{File: FileModel{Parsed: false, FileName: sourceFiles}})
+				//return projectModelError, err
 			}
 
 			projectModel.Files = append(projectModel.Files, data)
@@ -145,10 +150,17 @@ func (repo RepoModel) ParseDataFromFiles(files string) (projectModel ProjectMode
 
 			if err != nil {
 				log.Println("Could not parse error: ", err.Error())
-				return ProjectModel{}, err
+				//projectModelError := ProjectModel{}
+				projectModel.Files = append(projectModel.Files,
+					FilesModel{File: FileModel{Parsed: false, FileName: sourceFiles}})
+				//return projectModelError, err
 			}
 
 			projectModel.Files = append(projectModel.Files, data)
+
+		} else { // File using unsupported language.
+			projectModel.Files = append(projectModel.Files,
+				FilesModel{File: FileModel{Parsed: false, FileName: sourceFiles}})
 		}
 
 		repo.SanitizeFilePath(projectModel)
