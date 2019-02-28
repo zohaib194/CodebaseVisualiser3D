@@ -181,7 +181,7 @@ func (repo RepoController) ParseSimpleFunc(w http.ResponseWriter, r *http.Reques
 		json.NewEncoder(w).Encode(projectModel)
 
 	} else { // if not GET request
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
 
