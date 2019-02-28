@@ -163,9 +163,13 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 		}
 		repo.URI = postData["uri"]
 
+		// Setting up channel and go routine to save the new repo in database and on file
 		saverChannel := make(chan model.SaveResponse)
 		go model.RepoModel{URI: repo.URI}.Save(saverChannel)
+
+		// Expecting response of save to contain save status and potential error. 
 		saverResponse := <-saverChannel
+
 		// For each new message from save()
 		for {
 
