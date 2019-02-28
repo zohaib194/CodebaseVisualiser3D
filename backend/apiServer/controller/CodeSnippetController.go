@@ -13,7 +13,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-// FileController represents metadata for a file from a git project.
+// CodeSnippetController represents a section of code in a given file.
 type CodeSnippetController struct {
 }
 
