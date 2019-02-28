@@ -138,17 +138,7 @@ func (db *MongoDB) FindAllURI() (repos []bson.M, err error) {
 
 	// Return empty repos array with error if error is not "Not found"
 	// aggregate([{$group: {_id: "$_id", uri: {$addToSet: "$uri"}}}])
-	if err = session.DB(db.DatabaseName).C(db.RepoColl).Pipe(
-		[]bson.M {
-			bson.M {
-				"$group": bson.M {
-					"_id": "$_id", 
-					"uri": bson.M {
-						"$first": "$uri"
-					}
-				}
-			}
-		}).All(&repos); err != nil && err.Error() != "not found" {
+	if err = session.DB(db.DatabaseName).C(db.RepoColl).Pipe([]bson.M {bson.M {"$group": bson.M {"_id": "$_id", "uri": bson.M {"$first": "$uri"}}}}).All(&repos); err != nil && err.Error() != "not found" {
 			return []bson.M{}, err
 	}
 
