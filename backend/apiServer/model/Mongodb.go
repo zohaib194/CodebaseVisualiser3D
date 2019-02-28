@@ -127,3 +127,30 @@ func (db *MongoDB) FindRepoByID(id string) (repo RepoModel, err error) {
 	return repo, nil
 
 }
+
+// FindAll finds and returns all the repos stored in DB.
+func (db *MongoDB) FindAllURI() (repos []bson.M, err error) {
+	session, err := mgo.Dial(db.DatabaseURL)
+	if err != nil {
+		log.Fatalln(logError+"Can't connect to database: ", err)
+	}
+	defer session.Close()
+
+	// Return empty repos array with error if error is not "Not found"
+	// aggregate([{$group: {_id: "$_id", uri: {$addToSet: "$uri"}}}])
+	if err = session.DB(db.DatabaseName).C(db.RepoColl).Pipe(
+		[]bson.M {
+			bson.M {
+				"$group": bson.M {
+					"_id": "$_id", 
+					"uri": bson.M {
+						"$first": "$uri"
+					}
+				}
+			}
+		}).All(&repos); err != nil && err.Error() != "not found" {
+			return []bson.M{}, err
+	}
+
+	return repos, nil
+}
