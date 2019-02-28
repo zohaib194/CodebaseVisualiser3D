@@ -254,6 +254,12 @@ function onMouseClick( event ) {
 
 window.addEventListener( 'mousedown', onMouseClick);
 
+/**
+ * Sends a get request to given url.
+ *
+ * @param      {string}  url     The url
+ * @return     {Promise}  A promise containing json from the response.
+ */
 function sendGetRequest(url){
     return fetch(url)
             .then((response) => {
@@ -291,6 +297,5 @@ sendGetRequest("http://" + config.serverInfo.api_ip + ":" + config.serverInfo.ap
 
 sendGetRequest("http://" + config.serverInfo.api_ip + ":" + config.serverInfo.api_port + "/repo/list")
 .then(json => {
-    console.log("passed");
    windowMgr.setRepositories(json); 
 });

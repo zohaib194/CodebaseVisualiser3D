@@ -1,12 +1,18 @@
-
-let repositories = (function (previousWindowSize, previousWindowPos){
+/**
+ * Function makes repositories imgui window.
+ *
+ * @param      {<type>}  rootWindowSize  The root(menubar) window size
+ * @param      {<type>}  rootWindowPos   The root(menubar) window position
+ * @return     {Object}  object contains repository window related functions.
+ */
+let repositories = (function (rootWindowSize, rootWindowPos){
 	var uri = new Array();
 
    	/**
    	 * Initialize repository window.
    	 */
     function init(){
-        ImGui.SetNextWindowPos(new ImGui.ImVec2(previousWindowSize.x - 289, previousWindowSize.y), ImGui.Cond.Always);
+        ImGui.SetNextWindowPos(new ImGui.ImVec2(rootWindowSize.x - 289, rootWindowSize.y), ImGui.Cond.Always);
         ImGui.SetNextWindowSize(new ImGui.ImVec2(290, canvas.height), ImGui.Cond.Always);
         ImGui.SetNextWindowCollapsed(false);
         ImGui.Begin("Repositories");
@@ -37,6 +43,11 @@ let repositories = (function (previousWindowSize, previousWindowPos){
         return this.wSize;
     }
 
+    /**
+     * Sets the uri array.
+     *
+     * @param      {array}  data    The data contains uris.
+     */
     function setReposURI(data){
     	uri = data;
     }
