@@ -97,6 +97,7 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 	if r.Method == "GET" {
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
+			http.Error(w, "Expecte to established WebSocket", http.StatusBadRequest)
 			log.Println("Could not upgrade:", err)
 			return
 		}
