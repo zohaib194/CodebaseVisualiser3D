@@ -1,11 +1,12 @@
 // Vars.
-var ImGui;
-var ImGui_Impl;
+let ImGui;
+let ImGui_Impl;
 
 var WindowManager = (function(){
 
     var classCount = 0;
     var implementation = "";
+    var repos = new Array();
 
     Promise.resolve().then(() => {
         return System.import("imgui-js").then((module) => {
@@ -13,7 +14,7 @@ var WindowManager = (function(){
             return ImGui.default();
         });
     }).then(() => {
-        return System.import("imgui-js/example/imgui_impl").then((module) => {
+        return System.import("imgui-js/example/imgui_impl.js").then((module) => {
             ImGui_Impl = module;
         });
     }).then(() => {
@@ -36,6 +37,10 @@ var WindowManager = (function(){
      * @param      {float}  time    The time
      */
     function ImGuiUpdate(time) {
+        if (typeof ImGui_Impl === "undefined" || typeof ImGui === "undefined") {
+            return ;
+        }
+
         ImGui_Impl.NewFrame(time);
         ImGui.NewFrame();
         
@@ -61,6 +66,11 @@ var WindowManager = (function(){
         qualityMetricsWindow.setClassCount(classCount);
         qualityMetricsWindow.initializeWindow();
 
+        // Repository window.
+        repositoriesWindow = repositories(menubar.getWindowSize(), menubar.getWindowPosition());
+        repositoriesWindow.setReposURI(repos);
+        repositoriesWindow.initializeWindow();
+
         ImGui.EndFrame();
     }
 
@@ -69,6 +79,10 @@ var WindowManager = (function(){
      *
      */
     function ImGuiRender(){
+        if (typeof ImGui_Impl === "undefined" || typeof ImGui === "undefined") {
+            return ;
+        }
+
         ImGui.Render();
         ImGui_Impl.RenderDrawData(ImGui.GetDrawData());
         renderer.state.reset();
@@ -115,6 +129,17 @@ var WindowManager = (function(){
         implementation = data;
     }
 
+    /**
+     * Sets the repositories.
+     *
+     * @param      {array}  data    The data is array of repository models.
+     */
+    function setRepositories(data){
+        data.forEach((repo, index) =>  {
+            repos[index] = repo.uri;
+        })
+    }
+
     return {
         ImGuiUpdate: ImGuiUpdate,
         ImGuiRender: ImGuiRender,
@@ -122,6 +147,7 @@ var WindowManager = (function(){
         setFunctionCount: setFunctionCount,
         setClassCount: setClassCount,
         setNamespaceCount: setNamespaceCount,
-        setDataStructureImplementation: setDataStructureImplementation
+        setDataStructureImplementation: setDataStructureImplementation,
+        setRepositories: setRepositories
     };
 });
