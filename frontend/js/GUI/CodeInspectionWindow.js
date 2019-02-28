@@ -19,7 +19,6 @@ let codeInspection = (function (previousWindowSize, previousWindowPos){
         this.wPos = ImGui.GetWindowPos();
 
         if(implementation != ""){
-            //console.log(implementation);
             ImGui.Text(implementation);
         }
 
