@@ -1,8 +1,8 @@
 /**
  * Function makes repositories imgui window.
  *
- * @param      {<type>}  rootWindowSize  The root(menubar) window size
- * @param      {<type>}  rootWindowPos   The root(menubar) window position
+ * @param      {ImGUI.ImVec2}  rootWindowSize  The root(menubar) window size
+ * @param      {ImGUI.ImVec2}  rootWindowPos   The root(menubar) window position
  * @return     {Object}  object contains repository window related functions.
  */
 let repositories = (function (rootWindowSize, rootWindowPos){
