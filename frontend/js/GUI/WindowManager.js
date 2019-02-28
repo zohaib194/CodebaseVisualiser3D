@@ -1,10 +1,11 @@
 // Vars.
-let ImGui;
-let ImGui_Impl;
+var ImGui;
+var ImGui_Impl;
 
 var WindowManager = (function(){
 
     var classCount = 0;
+    var implementation = "";
 
     Promise.resolve().then(() => {
         return System.import("imgui-js").then((module) => {
@@ -24,7 +25,7 @@ var WindowManager = (function(){
         ImGui.StyleColorsDark();
         //ImGui.StyleColorsClassic();
     }).catch((error) => {
-        console.log("Error: " + error);
+        console.log(error);
     });
 
     var functionCount = 0;
@@ -51,6 +52,7 @@ var WindowManager = (function(){
 
         // Code Inpection window.
         codeInspectionWindow = codeInspection(namespaceWindow.getWindowSize(), namespaceWindow.getWindowPosition());
+        codeInspectionWindow.setImplementation(implementation);
         codeInspectionWindow.initializeWindow();
         
         // Quality metrics window.
@@ -104,12 +106,22 @@ var WindowManager = (function(){
        classCount = count;
     }
 
+    /**
+     * Sets the implementation in code inspection.
+     *
+     * @param      {string}  data    The multiline string of implementation.
+     */
+    function setDataStructureImplementation(data){
+        implementation = data;
+    }
+
     return {
         ImGuiUpdate: ImGuiUpdate,
         ImGuiRender: ImGuiRender,
         ImGuiDestroy: ImGuiDestroy,
         setFunctionCount: setFunctionCount,
         setClassCount: setClassCount,
-        setNamespaceCount: setNamespaceCount
+        setNamespaceCount: setNamespaceCount,
+        setDataStructureImplementation: setDataStructureImplementation
     };
 });

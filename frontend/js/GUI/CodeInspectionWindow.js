@@ -6,7 +6,7 @@
  * @return     {Object}   object contains codeInspection functions.
  */
 let codeInspection = (function (previousWindowSize, previousWindowPos){
-
+    var implementation = "";
     /**
      * Initialize code inspection window.
      */
@@ -17,6 +17,10 @@ let codeInspection = (function (previousWindowSize, previousWindowPos){
         ImGui.Begin("Code Inspection");
         this.wSize = ImGui.GetWindowSize();
         this.wPos = ImGui.GetWindowPos();
+
+        if(implementation != ""){
+            ImGui.Text(implementation);
+        }
 
         ImGui.End();
     }
@@ -39,9 +43,19 @@ let codeInspection = (function (previousWindowSize, previousWindowPos){
         return this.wSize;
     }
 
+    /**
+     * Sets the implementation.
+     *
+     * @param      {String}  data    The data is the implementation.
+     */
+    function setImplementation(data){
+        implementation = data;
+    }  
+
     return {
         initializeWindow: init,
         getWindowPosition: getPosition,
         getWindowSize: getSize,
+        setImplementation: setImplementation
     };
 }); 

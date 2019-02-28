@@ -264,6 +264,7 @@ function onMouseClick( event ) {
                 return Promise.reject();
             }
 
+            windowMgr.setDataStructureImplementation(json.implementation);
         }).catch((error) => {
             console.log(error);
         });
