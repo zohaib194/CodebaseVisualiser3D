@@ -117,6 +117,71 @@ var LOCALE = (function() {
                         value: "Invalid stil navn"
                     }
                 ]
+            },
+            {
+                id: "quality_metric_funciton_count",
+                values: [
+                    {
+                        language: "english",
+                        value: "Nr of functions"
+                    },
+                    {
+                        language: "norwegian",
+                        value: "Antall funksjoner"
+                    }
+                ]
+            },
+            {
+                id: "quality_metric_class_count",
+                values: [
+                    {
+                        language: "english",
+                        value: "Number of classes"
+                    },
+                    {
+                        language: "norwegian",
+                        value: "Antall klasser"
+                    }
+                ]
+            },
+            {
+                id: "quality_metric_namespace_count",
+                values: [
+                    {
+                        language: "english",
+                        value: "Number of namespaces"
+                    },
+                    {
+                        language: "norwegian",
+                        value: "Antall \"namespace\"s"
+                    }
+                ]
+            },
+            {
+                id: "generic_undefined",
+                values: [
+                    {
+                        language: "english",
+                        value: "Variable can't be undefined"
+                    },
+                    {
+                        language: "norwegian",
+                        value: "Variabel can ikke være udefinert"
+                    }
+                ]
+            },
+            {
+                id: "generic_negative",
+                values: [
+                    {
+                        language: "english",
+                        value: "Variable can't be negative"
+                    },
+                    {
+                        language: "norwegian",
+                        value: "Variabel can ikke være negativ"
+                    }
+                ]
             }
         ]
     };
@@ -174,7 +239,6 @@ var LOCALE = (function() {
         if (result != "") {
             return result;
         }
-
         console.log(getSentence("language_not_found"));
     }
     
