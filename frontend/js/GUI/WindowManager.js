@@ -51,7 +51,7 @@ var WindowManager = (function(){
         namespaceWindow.initializeWindow();
 
         // Code Inpection window.
-        codeInspectionWindow = codeInspection(namespaceWindow.getWindowSize(), namespaceWindow.getWindowPosition())
+        codeInspectionWindow = codeInspection(namespaceWindow.getWindowSize(), namespaceWindow.getWindowPosition());
         codeInspectionWindow.setImplementation(implementation);
         codeInspectionWindow.initializeWindow();
         
