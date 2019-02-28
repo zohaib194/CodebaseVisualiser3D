@@ -237,7 +237,7 @@ func (repo RepoController) GetAllRepos(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(repos)
 
 	} else { // if not GET request
-		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)		
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
 
