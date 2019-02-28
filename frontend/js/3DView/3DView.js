@@ -242,61 +242,49 @@ function onMouseClick( event ) {
     if(intersects !== "undefined" && intersects.length > 0){
         var funcName = intersects[0].object.name.substr(0, intersects[0].object.name.indexOf(' |'));
 
-        fetch("http://" + config.serverInfo.api_ip + ":" + config.serverInfo.api_port + 
+        sendGetRequest("http://" + config.serverInfo.api_ip + ":" + config.serverInfo.api_port + 
             "/repo/" + id + "/file/read/?lineStart=" + functionModels.get(funcName).getStartLine() + 
             "&lineEnd=" + functionModels.get(funcName).getEndLine() +
             "&filePath=" + functionModels.get(funcName).getFileName())
-        .then((response) => {
-            // Once ready and everything went ok.
-            if (response.status == 200) {
-                return response.json();
-            }
-
-            // Something went wrong.
-            console.log(LOCALE.getSentence("backend_data_not_received"));
-            return Promise.reject();
-        }).then((json) => {
-            console.log(LOCALE.getSentence("backend_data_received"));
-            
-            // Didn't get data, abort.
-            if (typeof json === "undefined" || json == null) {
-                // Json missing or unparsable.
-                return Promise.reject();
-            }
-
-            windowMgr.setDataStructureImplementation(json.implementation);
-        }).catch((error) => {
-            console.log(error);
+        .then(json => {
+            windowMgr.setDataStructureImplementation(json.implementation); 
         });
     }
 }
 
 window.addEventListener( 'mousedown', onMouseClick);
 
+/**
+ * Sends a get request to given url.
+ *
+ * @param      {string}  url     The url
+ * @return     {Promise}  A promise containing json from the response.
+ */
+function sendGetRequest(url){
+    return fetch(url)
+            .then((response) => {
+                // Once ready and everything went ok.
+                if (response.status == 200) {
+                    return response.json();
+                }
 
-fetch("http://" + config.serverInfo.api_ip + ":" + config.serverInfo.api_port + "/repo/" + id + "/initial/")
-.then((response) => {
-    // Once ready and everything went ok.
-    if (response.status == 200) {
-        console.log("Got something, moving on!");
-        return response.json();
-    }
+                // Something went wrong.
+                console.log(LOCALE.getSentence("backend_data_not_received"));
+                return Promise.reject();
+            }).then((json) => {
+                console.log(LOCALE.getSentence("backend_data_received"));
 
-    console.log("Didn't receive anything!");
-    // Something went wrong.
-    return Promise.reject();
-}).then((json) => {
-    var sentence = LOCALE.getSentence("backend_data_received");
-    console.log(sentence);
-    
-    // Didn't get data, abort.
-    if (typeof json === "undefined" || json == null) {
-        // Json missing or unparsable.
-        return Promise.reject();
-    }
-    
-    console.log("Got valid data!");
+                // Didn't get data, abort.
+                if (typeof json === "undefined" || json == null) {
+                    // Json missing or unparsable.
+                    return Promise.reject();
+                }
+                return json;
+            }).catch(error => console.log(error));
+}
 
+sendGetRequest("http://" + config.serverInfo.api_ip + ":" + config.serverInfo.api_port + "/repo/" + id + "/initial/")
+.then((json) => {
     // Parse data and perform fdg.
     runFDGOnJSONData(json);
     
@@ -305,6 +293,9 @@ fetch("http://" + config.serverInfo.api_ip + ":" + config.serverInfo.api_port + 
     
     // Start program loop.
     requestAnimationFrame(mainloop);
-}).catch((error) => {
-    console.log(error);
+});
+
+sendGetRequest("http://" + config.serverInfo.api_ip + ":" + config.serverInfo.api_port + "/repo/list")
+.then(json => {
+   windowMgr.setRepositories(json); 
 });

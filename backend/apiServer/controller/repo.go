@@ -187,6 +187,38 @@ func (repo RepoController) ParseSimpleFunc(w http.ResponseWriter, r *http.Reques
 
 }
 
+/**
+* @api {Get} /repo/list Get all git repository stored in server.
+* @apiName Get Repositories List.
+* @apiGroup Repository
+* @apiPermission none
+*
+*
+* @apiSuccessExample {json} Success-Response:
+* 	HTTP/1.1 200 OK
+*	[
+*	    {
+*	        "_id": "5c768dae4122c7135145a1a3",
+*	        "uri": "https://github.com/<USER_NAME>/Game_InputHandlingSystem.git"
+*	    },
+*	    {
+*	        "_id": "5c768cf64122c7135145a1a2",
+*	        "uri": "https://github.com/<USER_NAME>/imgui.git"
+*	    },
+*	    {
+*	        "_id": "5c7684364122c703a493e292",
+*	        "uri": "https://github.com/<USER_NAME>/ECS.git"
+*	    }
+*	]
+*
+*
+* @apiErrorExample {text/plain} Invalid method.
+*	HTTP/1.1 405 Method Not Allowed
+*	{
+*		Method Not Allowed
+*	}
+ */
+
 // GetAllRepos gets all repositories stored.
 func (repo RepoController) GetAllRepos(w http.ResponseWriter, r *http.Request) {
 	http.Header.Add(w.Header(), "content-type", "application/json")
@@ -205,7 +237,7 @@ func (repo RepoController) GetAllRepos(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(repos)
 
 	} else { // if not GET request
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
 
