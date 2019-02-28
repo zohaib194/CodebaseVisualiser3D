@@ -133,12 +133,12 @@ func (repo RepoModel) ParseFunctionsFromFiles(files string) (projectModel Projec
 }
 
 // FetchAll fetches all the repositories.
-func (repo RepoModel) FetchAll() (repoModels []RepoModel, err error) {
-	reposModels, err := DB.FindAll()
+func (repo RepoModel) FetchAll() (repoModels []bson.M, err error) {
+	reposModels, err := DB.FindAllURI()
 
 	if err != nil {
 		log.Println("Could not find repositories error: ", err.Error())
-		return []RepoModel{}, err
+		return []bson.M{}, err
 	}
 
 	return reposModels, nil
