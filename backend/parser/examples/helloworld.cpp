@@ -18,9 +18,15 @@ public:
 };
 
 int main()
-{
+{	
+	lolasdasdasd();
     std::cout << "Hello World!";
     return 0;
+}
+
+
+int lol(){
+	return 0;
 }
 
 namespace hello{

@@ -92,6 +92,16 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	}
 
 	/**
+	 * Listener for parsing function calls.
+	 *
+	 * @param      ctx   The parsing context
+	 */
+	@Override 
+	public void enterExpressionstatement(CPP14Parser.ExpressionstatementContext ctx) { 
+	    System.out.println(ctx.getText() + "\n");
+	}
+
+	/**
 	 * Gets the parsed code as JSONObject.
 	 *
 	 * @return     The parsed code.

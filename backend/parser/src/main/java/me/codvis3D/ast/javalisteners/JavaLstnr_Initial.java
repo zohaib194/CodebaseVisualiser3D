@@ -86,6 +86,16 @@ public class JavaLstnr_Initial extends JavaExtendedListener {
 	}	
 
 	/**
+	 * Listener for parsing function calls.
+	 *
+	 * @param      ctx   The parsing context
+	 */
+	@Override 
+	public void enterMethodInvocation(Java9Parser.MethodInvocationContext ctx) { 
+		System.out.println(ctx.getText() + "\n");
+	}
+
+	/**
 	 * Gets the parsed code as JSONObject.
 	 * Adding the file content as part of the package being declared at start of file.
 	 *
