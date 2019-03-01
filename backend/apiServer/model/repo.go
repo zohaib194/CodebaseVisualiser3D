@@ -20,8 +20,8 @@ var JavaParserPath string
 
 // RepoModel represents metadata for a git repository.
 type RepoModel struct {
-	URI string        `json:"uri"`                    // Where the repository was found
-	ID  bson.ObjectId `json:"-" bson:"_id,omitempty"` // Folder name where repo is stored
+	URI string        `json:"uri"`                     // Where the repository was found
+	ID  bson.ObjectId `json:"id" bson:"_id,omitempty"` // Folder name where repo is stored
 }
 
 // SaveResponse is used by save function to update channel used by go rutine to indicate
@@ -39,7 +39,8 @@ func (repo RepoModel) Save(c chan SaveResponse) {
 
 	if err != nil {
 		log.Println("Could not add to database: ", err)
-		c <- SaveResponse{ID: "", StatusText: "Failde", Err: err}
+		// Send the existing repo id with status text failed.
+		c <- SaveResponse{ID: repo.ID.Hex(), StatusText: "Failed", Err: err}
 		return
 	}
 
@@ -141,4 +142,16 @@ func (repo RepoModel) ParseFunctionsFromFiles(files string) (projectModel Projec
 
 	}
 	return projectModel, nil
+}
+
+// FetchAll fetches all the repositories.
+func (repo RepoModel) FetchAll() (repoModels []bson.M, err error) {
+	reposModels, err := DB.FindAllURI()
+
+	if err != nil {
+		log.Println("Could not find repositories error: ", err.Error())
+		return []bson.M{}, err
+	}
+
+	return reposModels, nil
 }

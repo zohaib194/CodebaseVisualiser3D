@@ -148,11 +148,24 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 		if isValid, err := validateURI(postData["uri"],
 			func(url string) (isValid bool, err error) { return regexp.Match(`\.git$`, []byte(postData["uri"])) }); !isValid || (err != nil) {
 			log.Println("Not a valid URI to git repository.")
-			err := conn.WriteMessage(
+			reason := WebsocketResponse{
+						StatusText: http.StatusText(http.StatusBadRequest),
+						StatusCode: http.StatusBadRequest,
+						Body: map[string]string{
+							"id": 	"",	
+							"status": "Expected URI to git repository",
+						},
+					}
+			jsonResponse, err := json.Marshal(reason)
+			if err != nil {
+				log.Println("Could not encode json")
+				return
+			}
+			err = conn.WriteMessage(
 				websocket.CloseMessage,
 				websocket.FormatCloseMessage(
 					websocket.CloseNormalClosure,
-					"Expected URI to git repository",
+					string(jsonResponse),
 				),
 			)
 			if err != nil {
@@ -176,11 +189,24 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 			if saverResponse.Err != nil {
 				if saverResponse.Err.Error() == "Already exists" {
 					log.Println("Request conflict with existing repository")
-					err := conn.WriteMessage(
+					reason := WebsocketResponse{
+						StatusText: http.StatusText(http.StatusConflict),
+						StatusCode: http.StatusConflict,
+						Body: map[string]string{
+							"id":     saverResponse.ID,
+							"status": "Repository already exists",
+						},
+					}
+					jsonResponse, err := json.Marshal(reason)
+					if err != nil {
+						log.Println("Could not encode json")
+						return
+					}
+					err = conn.WriteMessage(
 						websocket.CloseMessage,
 						websocket.FormatCloseMessage(
 							websocket.CloseNormalClosure,
-							"Repository already exists",
+							string(jsonResponse),
 						),
 					)
 					if err != nil {
@@ -190,12 +216,24 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 					return
 
 				}
-
-				err := conn.WriteMessage(
+				reason := WebsocketResponse{
+						StatusText: http.StatusText(http.StatusConflict),
+						StatusCode: http.StatusConflict,
+						Body: map[string]string{
+							"id":     saverResponse.ID,
+							"status": "Database error",
+						},
+					}
+				jsonResponse, err := json.Marshal(reason)
+				if err != nil {
+					log.Println("Could not encode json")
+					return
+				}
+				err = conn.WriteMessage(
 					websocket.CloseMessage,
 					websocket.FormatCloseMessage(
-						websocket.CloseInternalServerErr,
-						"Database error",
+						websocket.CloseNormalClosure,
+						string(jsonResponse),
 					),
 				)
 				if err != nil {
@@ -344,8 +382,64 @@ func (repo RepoController) ParseSimpleFunc(w http.ResponseWriter, r *http.Reques
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(projectModel)
 
-	} else { // if not POST request
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+	} else { // if not GET request
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		return
+	}
+
+}
+
+/**
+* @api {Get} /repo/list Get all git repository stored in server.
+* @apiName Get Repositories List.
+* @apiGroup Repository
+* @apiPermission none
+*
+*
+* @apiSuccessExample {json} Success-Response:
+* 	HTTP/1.1 200 OK
+*	[
+*	    {
+*	        "_id": "5c768dae4122c7135145a1a3",
+*	        "uri": "https://github.com/<USER_NAME>/Game_InputHandlingSystem.git"
+*	    },
+*	    {
+*	        "_id": "5c768cf64122c7135145a1a2",
+*	        "uri": "https://github.com/<USER_NAME>/imgui.git"
+*	    },
+*	    {
+*	        "_id": "5c7684364122c703a493e292",
+*	        "uri": "https://github.com/<USER_NAME>/ECS.git"
+*	    }
+*	]
+*
+*
+* @apiErrorExample {text/plain} Invalid method.
+*	HTTP/1.1 405 Method Not Allowed
+*	{
+*		Method Not Allowed
+*	}
+ */
+
+// GetAllRepos gets all repositories stored.
+func (repo RepoController) GetAllRepos(w http.ResponseWriter, r *http.Request) {
+	http.Header.Add(w.Header(), "content-type", "application/json")
+	http.Header.Add(w.Header(), "Access-Control-Allow-Origin", "*")
+
+	if r.Method == "GET" {
+		repos, err := model.RepoModel{}.FetchAll()
+
+		if err != nil {
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			log.Println("Could not find repositories error: ", err.Error())
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(repos)
+
+	} else { // if not GET request
+		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
 
