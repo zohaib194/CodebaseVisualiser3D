@@ -329,6 +329,10 @@ function sendAddRequest(){
         if(reason.statuscode == 409){
             document.getElementById("status").innerHTML = reason.body.status;
             id = reason.body.id;
+        } else if (reason.statuscode == 400){
+            document.getElementById("status").innerHTML = reason.body.status;
+            location.assign("../index.html");
+            return ;
         }
 
         // Send the initial request to back-end.
