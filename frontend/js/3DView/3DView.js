@@ -104,6 +104,7 @@ function mainloop(time) {
 */
 function runFDGOnJSONData(data) {
     // Build fdg graph from parsed json data.
+    document.getElementById("status").innerHTML = "Getting data ready for FDG";
     handleProjectData(data);
 
     // Apply negative links on those who aren't related
@@ -114,9 +115,11 @@ function runFDGOnJSONData(data) {
     }
 
     // Run for 100 iterations shifting the position of nodes.
+    document.getElementById("status").innerHTML = "Running FDG";
     fdg.execute(100);
 
     // Draw nodes using display manager.
+    document.getElementById("status").innerHTML = "Assigning shapes to data structures";
     fdg.getNodes().forEach((node) => {
         /**
          * Function for selecting proper type from configuration.
@@ -183,6 +186,7 @@ function runFDGOnJSONData(data) {
         }
         
         // Found a supported type.
+        document.getElementById("status").innerHTML = "Ready to draw";
         if (supportedType) {
             // Add it for display.
             displayMgr.addObject(
@@ -216,8 +220,11 @@ function runFDGOnJSONData(data) {
     });
 }
 
-// Find id param form url
-var id = new URL(window.location.href).searchParams.get("id");
+// Find reponame param form url
+var repoName = new URL(window.location.href).searchParams.get("repo");
+
+// id of the repo sumbitted to back-end.
+var id = 0;
 
 // ########## Mouse events functions ##########
 
@@ -283,19 +290,68 @@ function sendGetRequest(url){
             }).catch(error => console.log(error));
 }
 
-sendGetRequest("http://" + config.serverInfo.api_ip + ":" + config.serverInfo.api_port + "/repo/" + id + "/initial/")
-.then((json) => {
-    // Parse data and perform fdg.
-    runFDGOnJSONData(json);
-    
-    // Disable the loader icon.
-    document.getElementById("loader").style.display = "none";
-    
-    // Start program loop.
-    requestAnimationFrame(mainloop);
-});
-
+// Request to get the list of repositories stored in DB.
 sendGetRequest("http://" + config.serverInfo.api_ip + ":" + config.serverInfo.api_port + "/repo/list")
 .then(json => {
    windowMgr.setRepositories(json); 
 });
+
+/**
+ * Sends an add request to submit the repository and update feedback status through websockets.
+ */
+function sendAddRequest(){ 
+    // Websocket connection for the api endpoint.
+    var websocket = new WebSocket("ws://" + config.serverInfo.api_ip + ":" + config.serverInfo.api_port + "/repo/add");
+
+    // Once websocket connection is open send the request to add repository.
+    websocket.onopen = function(){
+        websocket.send(JSON.stringify({"uri": repoName}));
+    }
+
+    // Message recieved from server.
+    websocket.onmessage = function (event) {
+        // Parse the server response.
+        var response = JSON.parse(event.data)
+
+        if (response.statuscode == 202) {
+            // set the id related to repository.
+            id = response.body.id;
+
+            // Update status.
+            document.getElementById("status").innerHTML = response.body.status;
+        }
+
+
+    }
+    websocket.onclose = function (event) {
+        var reason = JSON.parse(event.reason)
+        // if the repository already exist than set the id that relates to existing repo.
+        if(reason.statuscode == 409){
+            document.getElementById("status").innerHTML = reason.body.status;
+            id = reason.body.id;
+        } else if (reason.statuscode == 400){
+            document.getElementById("status").innerHTML = reason.body.status;
+            location.assign("../index.html");
+            return ;
+        }
+
+        // Send the initial request to back-end.
+        sendGetRequest("http://" + config.serverInfo.api_ip + ":" + config.serverInfo.api_port + "/repo/" + id + "/initial/")
+        .then((json) => {
+            // Parse data and perform fdg.
+            runFDGOnJSONData(json);
+            
+            // Disable the loader icon and status tag.
+            document.getElementById("loader").style.display = "none";
+            document.getElementById("status").style.display = "none";
+            
+            // Start program loop.
+            requestAnimationFrame(mainloop);
+        });
+
+        // Update status.
+        document.getElementById("status").innerHTML = reason.body.status;
+        websocket.close();
+    }
+};
+sendAddRequest();
