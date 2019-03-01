@@ -1,5 +1,7 @@
 package me.codvis.ast;
 
+import java.util.Stack;
+
 import org.json.JSONObject;
 
 /**
@@ -36,6 +38,22 @@ public class UsingNamespaceModel extends Model {
 	 */
 	public int getLineNr(){
 		return this.lineNr;
+	}
+
+	/**
+	 * Adds a model in current scope.
+	 *
+	 * @param      model       The model
+	 * @param      scopeStack  The scope stack identifying current scope position
+	 *
+	 * @return     index in list for its type where model was added for current scope. If not a list it will return 0.
+	 */
+	@Override
+	protected <T extends Model> int addModelInCurrentScope(T model, Stack<ModelIdentifier> scopeStack){
+
+		System.out.println("Error using namespace is currently not a scope as scopeStack indicated");
+		System.exit(1);		
+		return 0;	
 	}
 
 	/**
