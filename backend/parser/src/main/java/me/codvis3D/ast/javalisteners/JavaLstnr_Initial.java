@@ -1,6 +1,7 @@
 package me.codvis.ast;
 
 import java.util.List;
+import java.util.Stack;
 import java.util.ArrayList;
 
 import me.codvis.ast.parser.Java9BaseListener;
@@ -14,7 +15,6 @@ import org.json.JSONObject;
  */
 public class JavaLstnr_Initial extends JavaExtendedListener {
 	private FileModel fileModel;
-	private NamespaceModel namespace;
 
 	/**
 	 * Constructs the object, setting the filepath to file being parsed.
@@ -38,7 +38,18 @@ public class JavaLstnr_Initial extends JavaExtendedListener {
       	functionModel.setLineStart(ctx.methodBody().start.getLine());
       	functionModel.setLineEnd(ctx.methodBody().stop.getLine());
 	    
-	    fileModel.addFunction(functionModel);
+	    int index = fileModel.addModelInCurrentScope(functionModel, (Stack<ModelIdentifier>)this.scopeStack.clone());
+	    this.enterScope(new ModelIdentifier("functions", index));
+    }
+
+    /**
+     * Listener for exiting the current scope, expecting that scope to be one entered by enterMethodDeclaration.
+     *
+     * @param      ctx   The parsing context
+     */
+    @Override 
+    public void exitMethodDeclaration(Java9Parser.MethodDeclarationContext ctx) { 
+    	this.exitScope();
     }
 
     /**
@@ -48,7 +59,10 @@ public class JavaLstnr_Initial extends JavaExtendedListener {
      */
 	@Override
 	public void enterPackageDeclaration(Java9Parser.PackageDeclarationContext ctx){
-		this.namespace = new NamespaceModel(ctx.packageName().getText());
+		NamespaceModel namespace = new NamespaceModel(ctx.packageName().getText());
+		
+		int index = fileModel.addModelInCurrentScope(namespace, (Stack<ModelIdentifier>)this.scopeStack.clone());
+	    this.enterScope(new ModelIdentifier("namespaces", index));
 	}
 
 	/**
@@ -62,27 +76,26 @@ public class JavaLstnr_Initial extends JavaExtendedListener {
 		Java9Parser.StaticImportOnDemandDeclarationContext importOnDemand = ctx.staticImportOnDemandDeclaration();
 		Java9Parser.SingleTypeImportDeclarationContext importSingleType = ctx.singleTypeImportDeclaration();
 		Java9Parser.TypeImportOnDemandDeclarationContext importTypeOnDemand = ctx.typeImportOnDemandDeclaration();
+
+		UsingNamespaceModel usingNamespaceModel;
+
 		if ( importSingle != null) {
-			this.fileModel.addUsingNamespace(
-				new UsingNamespaceModel(importSingle.typeName().getText(), importSingle.typeName().getStart().getLine())
-			);
+			usingNamespaceModel = new UsingNamespaceModel(importSingle.typeName().getText(), importSingle.typeName().getStart().getLine());
 		} else if (importOnDemand != null) {
-			this.fileModel.addUsingNamespace(
-				new UsingNamespaceModel(importOnDemand.typeName().getText(), importOnDemand.typeName().getStart().getLine())
-			);				
+			usingNamespaceModel = new UsingNamespaceModel(importOnDemand.typeName().getText(), importOnDemand.typeName().getStart().getLine());				
 
 		} else if (importSingleType != null) {
-			this.fileModel.addUsingNamespace(
-				new UsingNamespaceModel(importSingleType.typeName().getText(), importSingleType.typeName().getStart().getLine())
-			);		
+			usingNamespaceModel = new UsingNamespaceModel(importSingleType.typeName().getText(), importSingleType.typeName().getStart().getLine());		
 
 		} else if (importTypeOnDemand != null) {
-			this.fileModel.addUsingNamespace(
-				new UsingNamespaceModel(importTypeOnDemand.packageOrTypeName().getText(), importTypeOnDemand.packageOrTypeName().getStart().getLine())
-			);
+			usingNamespaceModel = new UsingNamespaceModel(importTypeOnDemand.packageOrTypeName().getText(), importTypeOnDemand.packageOrTypeName().getStart().getLine());
 
+		}else{
+			System.out.println("Unhandeled using dirctive");
+			return;
 		}
-		
+
+	    fileModel.addModelInCurrentScope(usingNamespaceModel, (Stack<ModelIdentifier>)this.scopeStack.clone());
 	}	
 
 	/**
@@ -104,18 +117,6 @@ public class JavaLstnr_Initial extends JavaExtendedListener {
     public JSONObject getParsedCode() {
 		JSONObject parsedCode = new JSONObject();
 
-		if (this.namespace != null) {
-			
-        	this.namespace.setFunctions(this.fileModel.getFunctions());
-        	this.namespace.setNamespaces(this.fileModel.getNamespaces());
-        	this.namespace.setUsingNamespaces(this.fileModel.getUsingNamespaces());
-
-        	FileModel filemodel = new FileModel(this.fileModel.getFilename());
-
-        	filemodel.addNamespace(this.namespace);
-    		
-    		return parsedCode.put("file", filemodel.getParsedCode());
-		}
     	return parsedCode.put("file", this.fileModel.getParsedCode());
     }
  }

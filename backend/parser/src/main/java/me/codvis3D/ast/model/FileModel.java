@@ -3,6 +3,8 @@ package me.codvis.ast;
 import java.util.List;
 import java.util.ArrayList;
 
+import java.util.Stack;
+
 import org.json.JSONObject;
 
 /**
@@ -97,6 +99,60 @@ public class FileModel extends Model{
 	 */
 	public List<UsingNamespaceModel> getUsingNamespaces(){
 		return this.usingNamespaces;
+	}
+	
+	/**
+	 * Adds a model in current scope.
+	 *
+	 * @param      model       The model
+	 * @param      scopeStack  The scope stack identifying current scope position
+	 *
+	 * @return     index in list for its type where model was added for current scope. If not a list it will return 0.
+	 */
+	@Override
+	protected <T extends Model> int addModelInCurrentScope(T model, Stack<ModelIdentifier> scopeStack){
+		ModelIdentifier modelIdentifier;
+
+		int index = 0;
+
+		if (scopeStack.size() > 0) {				// should add model to current model
+			modelIdentifier = scopeStack.pop();
+
+			switch (modelIdentifier.modelType) {
+				case "functions":
+					index = this.functions.get(modelIdentifier.modelIndex).addModelInCurrentScope(model, scopeStack);
+					break;
+				case "namespaces":
+					index = this.namespaces.get(modelIdentifier.modelIndex).addModelInCurrentScope(model, scopeStack);
+					break;
+				case "usingNamespaces":
+					index = this.usingNamespaces.get(modelIdentifier.modelIndex).addModelInCurrentScope(model, scopeStack);
+					break;
+				default:
+					System.out.println("Error adding model in current scope");
+					System.exit(1);
+			}
+		} else {
+			if (model instanceof FunctionModel) {
+				this.addFunction((FunctionModel)model);
+				index = this.functions.size() -1;
+
+			}else if (model instanceof  NamespaceModel) {
+				this.addNamespace((NamespaceModel)model);
+				index = this.namespaces.size() -1;
+
+			}else if (model instanceof UsingNamespaceModel) {
+				this.addUsingNamespace((UsingNamespaceModel)model);
+				index = this.usingNamespaces.size() -1;
+
+			}else{
+				System.out.println("Error adding model in current scope");
+				System.exit(1);
+			}
+
+		}
+
+		return index;
 	}
 
 	/**

@@ -3,12 +3,28 @@ package me.codvis.ast;
 import java.util.List;
 import java.util.ArrayList;
 
+import java.util.Stack;
+
 import org.json.JSONObject;
 
 /**
  * Class for abstracting a code unit.
  */
 public class Model {
+
+	/**
+	 * Adds a model in current scope.
+	 *
+	 * @param      model       The model
+	 * @param      scopeStack  The scope stack identifying current scope position
+	 *
+	 * @return     index in list for its type where model was added for current scope. If not a list it will return 0.
+	 */
+	protected <T extends Model> int addModelInCurrentScope(T model, Stack<ModelIdentifier> scopeStack){
+		System.out.println("addModelInCurrentScope not implemented");
+		System.exit(1);
+		return 0;
+	}
 
 	/**
 	 * Converts a list of objects extending model, to a list of JSON objects giving same JSON id to each object.
