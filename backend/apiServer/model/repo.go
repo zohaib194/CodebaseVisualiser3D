@@ -39,7 +39,8 @@ func (repo RepoModel) Save(c chan SaveResponse) {
 
 	if err != nil {
 		log.Println("Could not add to database: ", err)
-		c <- SaveResponse{ID: "", StatusText: "Failde", Err: err}
+		// Send the existing repo id with status text failed.
+		c <- SaveResponse{ID: repo.ID.Hex(), StatusText: "Failed", Err: err}
 		return
 	}
 

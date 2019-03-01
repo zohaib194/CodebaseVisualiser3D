@@ -74,6 +74,8 @@ func (db *MongoDB) add(rm *RepoModel) error {
 	}
 
 	if exstRepo.ID.Valid() {
+		rm.ID = exstRepo.ID
+		rm.URI = exstRepo.URI
 		return errors.New("Already exists")
 	}
 

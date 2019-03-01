@@ -148,11 +148,24 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 		if isValid, err := validateURI(postData["uri"],
 			func(url string) (isValid bool, err error) { return regexp.Match(`\.git$`, []byte(postData["uri"])) }); !isValid || (err != nil) {
 			log.Println("Not a valid URI to git repository.")
-			err := conn.WriteMessage(
+			reason := WebsocketResponse{
+						StatusText: http.StatusText(http.StatusBadRequest),
+						StatusCode: http.StatusBadRequest,
+						Body: map[string]string{
+							"id": 	"",	
+							"status": "Expected URI to git repository",
+						},
+					}
+			jsonResponse, err := json.Marshal(reason)
+			if err != nil {
+				log.Println("Could not encode json")
+				return
+			}
+			err = conn.WriteMessage(
 				websocket.CloseMessage,
 				websocket.FormatCloseMessage(
 					websocket.CloseNormalClosure,
-					"Expected URI to git repository",
+					string(jsonResponse),
 				),
 			)
 			if err != nil {
@@ -176,11 +189,24 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 			if saverResponse.Err != nil {
 				if saverResponse.Err.Error() == "Already exists" {
 					log.Println("Request conflict with existing repository")
-					err := conn.WriteMessage(
+					reason := WebsocketResponse{
+						StatusText: http.StatusText(http.StatusConflict),
+						StatusCode: http.StatusConflict,
+						Body: map[string]string{
+							"id":     saverResponse.ID,
+							"status": "Repository already exists",
+						},
+					}
+					jsonResponse, err := json.Marshal(reason)
+					if err != nil {
+						log.Println("Could not encode json")
+						return
+					}
+					err = conn.WriteMessage(
 						websocket.CloseMessage,
 						websocket.FormatCloseMessage(
 							websocket.CloseNormalClosure,
-							"Repository already exists",
+							string(jsonResponse),
 						),
 					)
 					if err != nil {
@@ -190,12 +216,24 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 					return
 
 				}
-
-				err := conn.WriteMessage(
+				reason := WebsocketResponse{
+						StatusText: http.StatusText(http.StatusConflict),
+						StatusCode: http.StatusConflict,
+						Body: map[string]string{
+							"id":     saverResponse.ID,
+							"status": "Database error",
+						},
+					}
+				jsonResponse, err := json.Marshal(reason)
+				if err != nil {
+					log.Println("Could not encode json")
+					return
+				}
+				err = conn.WriteMessage(
 					websocket.CloseMessage,
 					websocket.FormatCloseMessage(
-						websocket.CloseInternalServerErr,
-						"Database error",
+						websocket.CloseNormalClosure,
+						string(jsonResponse),
 					),
 				)
 				if err != nil {
