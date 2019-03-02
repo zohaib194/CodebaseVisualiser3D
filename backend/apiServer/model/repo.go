@@ -5,11 +5,11 @@ package model
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"log"
 	"os/exec"
 	"strconv"
 	"strings"
+	"path"
 
 	"gopkg.in/mgo.v2/bson"
 )
@@ -47,7 +47,6 @@ func (repo RepoModel) Save() (string, error) {
 
 // Load loads java application to parse a specified file.
 func (repo RepoModel) Load(file string, target string) (data FilesModel, err error) {
-	fmt.Println("Parsed: ", file)
 	data.File.Parsed = false
 	data.File.FileName = file
 
@@ -86,7 +85,6 @@ func (repo RepoModel) Load(file string, target string) (data FilesModel, err err
 		log.Fatal("Could not decode json error: ", err.Error())
 		return data, err
 	}
-
 	data.File.LinesInFile = linesOfCode
 	data.File.Parsed = true
 
@@ -121,7 +119,7 @@ func (repo RepoModel) GetRepoFiles() (files string, err error) {
 }
 
 // SanitizeFilePath removes the repopath from the filepaths.
-func (repo RepoModel) SanitizeFilePath(projectModel ProjectModel) {
+func (repo RepoModel) SanitizeFilePaths(projectModel ProjectModel) {
 	for index, file := range projectModel.Files {
 		projectModel.Files[index].File.FileName = strings.Replace(file.File.FileName, RepoPath+"/", "", -1)
 	}
@@ -129,43 +127,33 @@ func (repo RepoModel) SanitizeFilePath(projectModel ProjectModel) {
 
 // ParseDataFromFiles fetch all functions from gives files set.
 func (repo RepoModel) ParseDataFromFiles(files string) (projectModel ProjectModel, err error) {
-	for _, sourceFiles := range strings.Split(strings.TrimSuffix(files, "\n"), "\n") {
+	for _, sourceFile := range strings.Split(strings.TrimSuffix(files, "\n"), "\n") {
 		// Search for cpp files
-		if strings.Contains(sourceFiles, ".cpp") {
-			// Fetch function names from the file.
-			data, err := repo.Load(sourceFiles, "cpp")
+		var err error
+		var data FilesModel
 
-			if err != nil {
-				log.Println("Could not parse error: ", err.Error())
-				//projectModelError := ProjectModel{}
-				projectModel.Files = append(projectModel.Files,
-					FilesModel{File: FileModel{Parsed: false, FileName: sourceFiles}})
-				//return projectModelError, err
-			}
+		switch fileExtention := path.Ext(sourceFile); fileExtention {
+			case ".cpp":
+				data, err = repo.Load(sourceFile, "cpp")		// Fetch function names from the file.
 
-			projectModel.Files = append(projectModel.Files, data)
+			case ".java":
+				data, err = repo.Load(sourceFile, "java")
 
-		} else if strings.Contains(sourceFiles, ".java") { // Search for java files
-
-			data, err := repo.Load(sourceFiles, "java")
-
-			if err != nil {
-				log.Println("Could not parse error: ", err.Error())
-				//projectModelError := ProjectModel{}
-				projectModel.Files = append(projectModel.Files,
-					FilesModel{File: FileModel{Parsed: false, FileName: sourceFiles}})
-				//return projectModelError, err
-			}
-
-			projectModel.Files = append(projectModel.Files, data)
-
-		} else { // File using unsupported language.
-			projectModel.Files = append(projectModel.Files,
-				FilesModel{File: FileModel{Parsed: false, FileName: sourceFiles}})
+			default:	
+				data = FilesModel{File: FileModel{Parsed: false, FileName: sourceFile}}
 		}
 
-		repo.SanitizeFilePath(projectModel)
+		if err != nil {
+			log.Println("Could not parse error: ", err.Error())
+			data = FilesModel{File: FileModel{Parsed: false, FileName: sourceFile}}
+		}
+
+		projectModel.Files = append(projectModel.Files, data)
+
 
 	}
+	
+	repo.SanitizeFilePaths(projectModel)
+	
 	return projectModel, nil
 }
