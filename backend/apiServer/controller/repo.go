@@ -20,9 +20,9 @@ type RepoController struct {
 
 // WebsocketResponse is the response format of a websocket
 type WebsocketResponse struct {
-	StatusCode int         `json:"statuscode"`		// StatusCode is http equivalent of websocket status.
-	StatusText string      `json:"statustext"`		// StatusText is http equivalent of websocket status.
-	Body       interface{} `json:"body"`			// Body is the content expected by the client.
+	StatusCode int         `json:"statuscode"` // StatusCode is http equivalent of websocket status.
+	StatusText string      `json:"statustext"` // StatusText is http equivalent of websocket status.
+	Body       interface{} `json:"body"`       // Body is the content expected by the client.
 }
 
 var upgrader = websocket.Upgrader{
@@ -32,7 +32,6 @@ var upgrader = websocket.Upgrader{
 		return true
 	},
 }
-
 
 /**
 * @api {GET} /repo/add Add new git repository to server.
@@ -149,13 +148,13 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 			func(url string) (isValid bool, err error) { return regexp.Match(`\.git$`, []byte(postData["uri"])) }); !isValid || (err != nil) {
 			log.Println("Not a valid URI to git repository.")
 			reason := WebsocketResponse{
-						StatusText: http.StatusText(http.StatusBadRequest),
-						StatusCode: http.StatusBadRequest,
-						Body: map[string]string{
-							"id": 	"",	
-							"status": "Expected URI to git repository",
-						},
-					}
+				StatusText: http.StatusText(http.StatusBadRequest),
+				StatusCode: http.StatusBadRequest,
+				Body: map[string]string{
+					"id":     "",
+					"status": "Expected URI to git repository",
+				},
+			}
 			jsonResponse, err := json.Marshal(reason)
 			if err != nil {
 				log.Println("Could not encode json")
@@ -180,7 +179,7 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 		saverChannel := make(chan model.SaveResponse)
 		go model.RepoModel{URI: repo.URI}.Save(saverChannel)
 
-		// Expecting response of save to contain save status and potential error. 
+		// Expecting response of save to contain save status and potential error.
 		saverResponse := <-saverChannel
 
 		// For each new message from save()
@@ -217,13 +216,13 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 
 				}
 				reason := WebsocketResponse{
-						StatusText: http.StatusText(http.StatusConflict),
-						StatusCode: http.StatusConflict,
-						Body: map[string]string{
-							"id":     saverResponse.ID,
-							"status": "Database error",
-						},
-					}
+					StatusText: http.StatusText(http.StatusConflict),
+					StatusCode: http.StatusConflict,
+					Body: map[string]string{
+						"id":     saverResponse.ID,
+						"status": "Database error",
+					},
+				}
 				jsonResponse, err := json.Marshal(reason)
 				if err != nil {
 					log.Println("Could not encode json")
@@ -297,8 +296,6 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 		log.Println("Unsuported method", r.Method)
 		return
 	}
-
-	return
 }
 
 /**
@@ -343,8 +340,8 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 *
  */
 
-// ParseSimpleFunc parse a repository for functions of a certain project in repos directory.
-func (repo RepoController) ParseSimpleFunc(w http.ResponseWriter, r *http.Request) {
+// ParseInitial parse a repository for functions of a certain project in repos directory.
+func (repo RepoController) ParseInitial(w http.ResponseWriter, r *http.Request) {
 	http.Header.Add(w.Header(), "content-type", "application/json")
 	http.Header.Add(w.Header(), "Access-Control-Allow-Origin", "*")
 
@@ -362,7 +359,7 @@ func (repo RepoController) ParseSimpleFunc(w http.ResponseWriter, r *http.Reques
 		}
 
 		// List all files in the repository directory.
-		files, err := exstRepo.GetRepoFile()
+		files, err := exstRepo.GetRepoFiles()
 
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
@@ -371,7 +368,7 @@ func (repo RepoController) ParseSimpleFunc(w http.ResponseWriter, r *http.Reques
 		}
 
 		// Fetch all fuctions given in files.
-		projectModel, err := exstRepo.ParseFunctionsFromFiles(files)
+		projectModel, err := exstRepo.ParseDataFromFiles(files)
 
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)

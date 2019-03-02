@@ -158,6 +158,19 @@ var LOCALE = (function() {
                 ]
             },
             {
+                id: "quality_metric_lines_count",
+                values: [
+                    {
+                        language: "english",
+                        value: "Number of code lines found"
+                    },
+                    {
+                        language: "norwegian",
+                        value: "Antall linjer med code funnet"
+                    }
+                ]
+            },
+            {
                 id: "generic_undefined",
                 values: [
                     {

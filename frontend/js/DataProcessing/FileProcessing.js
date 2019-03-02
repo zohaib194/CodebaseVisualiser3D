@@ -41,7 +41,7 @@ function linkElements() {
  * Function for handling class data in JSONObject.
  * @param {JSONObject} classData - Data about a class.
  */
-function handleClassData(classData) {
+function handleClassData(classData, filename) {
     classCount++;
     // Add node and save index.
     indexStack.push(
@@ -58,7 +58,7 @@ function handleClassData(classData) {
     linkElements();
 
     // Handle any children.
-    handleCodeData(classData.Class);
+    handleCodeData(classData.Class, filename);
 
     // We're done in this part of the tree.
     indexStack.pop();
@@ -68,7 +68,7 @@ function handleClassData(classData) {
  * Function for handling namespace data in JSONObject.
  * @param {JSONObject} namespaceData - Data about namespace.
  */
-function handleNamespaceData(namespaceData) {
+function handleNamespaceData(namespaceData, filename) {
     // Add node and save index to stack.
     indexStack.push(
         fdg.addNode(
@@ -86,7 +86,7 @@ function handleNamespaceData(namespaceData) {
     namespaceCount++;
 
     // Handle any children.
-    handleCodeData(namespaceData.namespace);
+    handleCodeData(namespaceData.namespace, filename);
 
     // We're done in this part of the tree.
     indexStack.pop();
@@ -96,7 +96,7 @@ function handleNamespaceData(namespaceData) {
  * Function for handling function data in JSONObject.
  * @param {JSONObject} functionData - Data about a function JSONObject.
  */
-function handleFunctionData(functionData, fileName) {
+function handleFunctionData(functionData, filename) {
     // Add node and save index to stack.
     indexStack.push(
         fdg.addNode(
@@ -107,12 +107,11 @@ function handleFunctionData(functionData, fileName) {
             )
         )
     );
-
     // Save the function data in function model.
     functionModels.set(
         functionData.function.name,
         new FunctionMetaData( 
-            fileName,
+            filename,
             functionData.function.start_line, 
             functionData.function.end_line
         )
@@ -124,7 +123,7 @@ function handleFunctionData(functionData, fileName) {
     functionCount++;
 
     // Handle any children.
-    handleCodeData(functionData.function);
+    handleCodeData(functionData.function, filename);
 
     // We're done in this part of the tree.
     indexStack.pop();
@@ -134,21 +133,21 @@ function handleFunctionData(functionData, fileName) {
  * Function for handling code data in JSONObject.
  * @param {JSONObject} codeData  - Data about general code.
  */
-function handleCodeData(codeData) {
+function handleCodeData(codeData, filename) {
     if (codeData.namespaces != null) {
         // Handle all namespaces
         codeData.namespaces.forEach((object) => {
-            handleNamespaceData(object);
+            handleNamespaceData(object, filename);
         });
     } else if (codeData.classes != null) {
         // Handle all classes
-        codeData.classes.forEach((object) => {
+        codeData.classes.forEach((object, filename) => {
             handleClassData(object);
         });
     } else if (codeData.functions != null) {
         // Handle all functions
         codeData.functions.forEach((object) => {
-            handleFunctionData(object, codeData.file_name);
+            handleFunctionData(object, filename);
         });
     }
 }
@@ -162,13 +161,23 @@ function handleProjectData(projectData) {
     classCount = 0;
     functionCount = 0;
     namespaceCount = 0;
-
+    lineCount = 0;
     // Handle every file given.
     projectData.files.forEach((file) => {
-        handleCodeData(file.file);        
+
+        // If file is not parsed, skip it 
+        // ("return" returns from lambda not forEach).
+        if (file.file.parsed != true) {
+            return;
+        }
+    
+        // File is parsed correctly, process it.
+        lineCount += file.file.linesInFile;
+        handleCodeData(file.file, file.file.file_name);
     });
 
     windowMgr.setFunctionCount(functionCount);
     windowMgr.setClassCount(classCount);
     windowMgr.setNamespaceCount(namespaceCount);
+    windowMgr.setLineCount(lineCount);
 }

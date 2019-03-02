@@ -130,7 +130,7 @@ func (db *MongoDB) FindRepoByID(id string) (repo RepoModel, err error) {
 
 }
 
-// FindAll finds and returns all the repos stored in DB.
+// FindAllURI finds and returns all the repos stored in DB.
 func (db *MongoDB) FindAllURI() (repos []bson.M, err error) {
 	session, err := mgo.Dial(db.DatabaseURL)
 	if err != nil {
