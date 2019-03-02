@@ -1,7 +1,5 @@
 var nameplate_container = document.getElementById("nameplate_container");
 
-var color_black = 0x000000;
-
 /**
  * Private function for placing nameplate on 3d objects.
  * @param {string} name - Name/Id of nameplate.
@@ -44,8 +42,9 @@ let placeNameplate = function (name, x_pos, y_pos) {
 let destroyNameplate = function(name) {
     // Try to find nameplate.
     var nameplate = document.getElementById(name);
-    if (nameplate != null)  // Delete if it exists.
-        nameplate_container.removeChild(nameplate);
+    if (nameplate != null) { // Delete if it exists.
+         nameplate_container.removeChild(nameplate);
+    }
 }
 
 /**
@@ -54,50 +53,61 @@ let destroyNameplate = function(name) {
  * 
  * @param {THREE.Vector3} position - Position the cube willl be placed at.
  * @param {Integer} color - The color of the cube, preferrably not black.
- * @param {string} name - Name of the obejct to be display on hover (not active).
+ * @param {string} name - Name of the object to be display on hover (not active).
+ * @param {THREE.Geometry} geometry - Mesh to display. Defualt white cube (0.1,0.1,0.1).
  */
-function DisplayObject(position, color, name) {
-    this.position = position;
-    this.color = color;
-    this.name = name;
+var Drawable = (function (
+        pos, 
+        color, 
+        name, 
+        geometry
+    ) {
 
-    // Cube setup.
-    this.geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
-    this.material = new THREE.MeshStandardMaterial({ color: this.color });
-    this.cube = new THREE.Mesh(this.geometry, this.material);
-    scene.add(this.cube);
-
-    // Cube's edge highlight setup.
-    this.edgeGeometry = new THREE.EdgesGeometry(this.cube.geometry);
-    this.edgeMaterial = new THREE.LineBasicMaterial({
-        color: color_black, 
+    if (typeof geometry === "undefined") {
+        console.log(
+            name + ": " + LOCALE.getSentence("geometry_missing_type")
+        );
+        return;
+    }
+    
+    // Drawable setup.
+    var mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ color: color }));
+    // Position THREE.js drawable.
+    mesh.position.set(pos.x, pos.y, pos.z);
+    mesh.name = name;
+    scene.add(mesh);
+    
+    // Drawable's edge highlight setup.
+    var edgeGeometry = new THREE.EdgesGeometry(mesh.geometry);
+    var edgeMaterial = new THREE.LineBasicMaterial({
+        color: STYLE.getDrawables().edge.color, 
         linewidth: 1
     });
-    this.wireframe = new THREE.LineSegments(this.edgeGeometry, this.edgeMaterial);
-    scene.add(this.wireframe);
+    var wireframe = new THREE.LineSegments(edgeGeometry, edgeMaterial);
+    wireframe.name = mesh.name + " | Wireframe";
+    // Position wireframe.
+    wireframe.position.set(pos.x, pos.y, pos.z);
+    scene.add(wireframe);
 
     /**
-     * Function for drawing object.
+     * Function for drawing drawable object.
      */
-    this.draw = function() {
-        // Position cube.
-        this.cube.position.set(this.position.x, this.position.y, this.position.z);
+    var draw = function() {
+        // Has no object to display, abort. 
+        if (typeof mesh === "undefined") {
+            console.log(LOCALE.getSentence("displayobject_undefined"));
+            return;
+        }
+        
+        // Calc camera forward.
+        var cameraForward = new THREE.Vector3(0, 0, 0);
+        cameraForward.subVectors(controls.target, camera.position);
 
-        // Position wireframe.
-        this.wireframe.position.set(this.position.x, this.position.y, this.position.z);
+        // Calc vector from camrea to object.
+        var cameraToObject = new THREE.Vector3(0, 0, 0);
+        cameraToObject.subVectors(mesh.position, camera.position);
         
-        var cameraForward = new THREE.Vector3(
-            controls.target.x - camera.position.x,
-            controls.target.y - camera.position.y,
-            controls.target.z - camera.position.z
-        );
-        var cameraToObject = new THREE.Vector3(
-            this.position.x - camera.position.x,
-            this.position.y - camera.position.y,
-            this.position.z - camera.position.z
-        );
-        
-        // If in-front of camera, display nameplate.
+        // If object is in-front of camera, display nameplate.
         if (cameraForward.dot(cameraToObject) > 0) {
             var widthHalf = window.innerWidth / 2;
             var heightHalf = window.innerHeight / 2;
@@ -110,19 +120,24 @@ function DisplayObject(position, color, name) {
             cameraRight.multiplyScalar(0.2);
 
             // Copy my position (+ offset) and convert to screen coords.
-            var pos = this.position.clone();
-            pos.add(cameraRight);
-            pos.add(worldUp);
-            pos.project(camera);
+            var posNameplate = mesh.position.clone();
+            posNameplate.add(cameraRight);
+            posNameplate.add(worldUp);
+            posNameplate.project(camera);
 
             // Pos' axies goes from 0-1 only.
             // This will place it based on center of screen.
-            pos.x = (pos.x * widthHalf) + widthHalf;
-            pos.y = -(pos.y * heightHalf) + heightHalf;
+            posNameplate.x = (posNameplate.x * widthHalf) + widthHalf;
+            posNameplate.y = -(posNameplate.y * heightHalf) + heightHalf;
 
-            placeNameplate(this.name, pos.x, pos.y);
+            placeNameplate(mesh.name, posNameplate.x, posNameplate.y);
         } else {        // Behind camera, remove nameplate.
-            destroyNameplate(this.name);
+            destroyNameplate(mesh.name);
         }
     };
-}
+
+    // Expose private functions for global use.
+    return {
+        draw: draw
+    }
+});

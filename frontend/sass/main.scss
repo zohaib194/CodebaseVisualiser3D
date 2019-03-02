@@ -36,33 +36,57 @@ body {
     display: inline;
 }
 
-// Reference for the loader css code:  https://www.w3schools.com/howto/howto_css_loader.asp
-#loader {
-border: 0.1em solid #f3f3f3;
-
-    border-top-color: rgb(243, 243, 243);
-    border-top-style: solid;
-    border-top-width: 0.1em;
-    border-radius: 50%;
-    border-top: 0.1em solid #3498db;
-    width: 5em;
-    height: 5em;
-    top: 45%;
-    left: 45%;
-    position: fixed;
-    display: none;
-    -webkit-animation: spin 2s linear infinite;
-    animation: spin 2s linear infinite;
+/* SMALL GRID */
+.container {
+    display: grid;
+    min-height: 100%;
+    margin: 5px auto 0px auto;
+    grid-gap: 5px;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 80px repeat(3, auto) 50px;
+    grid-template-areas:
+        "header header header"
+        "header header header"
+        "main main main"
+        "main main main"
+        "footer footer footer";
 }
 
-/* Safari */
-@-webkit-keyframes spin {
-  0% { -webkit-transform: rotate(0deg); }
-  100% { -webkit-transform: rotate(360deg); }
+
+/* MEDIUM GRID */
+@media (min-width: 480px) {
+    .container {
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-rows: 80px 1fr 1fr 1fr 50px;
+        grid-template-areas:
+            "header header header"
+            "header header header"
+            "main  main main"
+            "main  main main"
+            "footer footer  footer";
+    }
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+/* BIG GRID */
+@media (min-width: 800px) {
+    .container {
+        grid-template-columns: 120px 1fr 120px;
+        grid-template-rows: 80px 1fr 1fr 1fr 50px;
+        grid-template-areas:
+            "header header header"
+            "header header header"
+            "main  main main"
+            "main  main main"
+            "footer footer footer";
+    }
 }
 
+
+* { 
+    margin: 0;
+    padding: 0;
+}
+
+header  { background-color: lightgreen;  grid-area: header;}
+main { background-color: orange; grid-area: main;  }
+footer { background-color: hotpink; grid-area: footer;}

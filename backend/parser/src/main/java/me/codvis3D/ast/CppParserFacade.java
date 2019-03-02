@@ -16,6 +16,9 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 
+/**
+ * Class for for setting up cpp parsers.
+ */
 public class CppParserFacade {
     
     /**
@@ -52,7 +55,7 @@ public class CppParserFacade {
         CppExtendedListener listener = null;
         switch(context){
             case "Initial":
-                listener = new CppLstnr_Initial(file.getName());
+                listener = new CppLstnr_Initial(file.getPath());
                 break;
             case "BodyExtraction":
                 listener = new CppLstnr_BodyExtraction(file.getName());

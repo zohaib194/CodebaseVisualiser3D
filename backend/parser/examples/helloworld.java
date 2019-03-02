@@ -37,5 +37,13 @@ public class HelloWorld {
       private List<Foo> getFooList(){
       
       } 
+   public static final void boo (){
+   		if(true) {
+   			return;
+   		}
+   }
+
+   public Bool foo(){
+   		return true;
    }
 }

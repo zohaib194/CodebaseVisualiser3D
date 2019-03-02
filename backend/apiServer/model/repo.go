@@ -3,11 +3,11 @@
 package model
 
 import (
+	"bytes"
 	"encoding/json"
 	"log"
 	"os/exec"
 	"strings"
-	"bytes"
 
 	"gopkg.in/mgo.v2/bson"
 )
@@ -20,27 +20,39 @@ var JavaParserPath string
 
 // RepoModel represents metadata for a git repository.
 type RepoModel struct {
-	URI string        `json:"uri"`                    // Where the repository was found
-	ID  bson.ObjectId `json:"-" bson:"_id,omitempty"` // Folder name where repo is stored
+	URI string        `json:"uri"`                     // Where the repository was found
+	ID  bson.ObjectId `json:"id" bson:"_id,omitempty"` // Folder name where repo is stored
 }
 
-// Save saves repo to database and clones repository
-func (repo RepoModel) Save() (string, error) {
+// SaveResponse is used by save function to update channel used by go rutine to indicate
+// status of the save request.
+type SaveResponse struct {
+	ID         string
+	StatusText string
+	Err        error
+}
+
+// Save is expected to run as a go rutine writing to a c.
+func (repo RepoModel) Save(c chan SaveResponse) {
 
 	err := DB.add(&repo)
 
 	if err != nil {
 		log.Println("Could not add to database: ", err)
-		return "", err
+		// Send the existing repo id with status text failed.
+		c <- SaveResponse{ID: repo.ID.Hex(), StatusText: "Failed", Err: err}
+		return
 	}
 
-	log.Println(repo.ID)
+	c <- SaveResponse{ID: repo.ID.Hex(), StatusText: "Cloning", Err: nil}
 
 	// Clone repository into storage location with name given by database
 	cmd := exec.Command("git", "-C", RepoPath, "clone", repo.URI, repo.ID.Hex())
 	_, err = cmd.Output() // TODO: Validate that git clone went well and prevent request for rsa password
 
-	return repo.ID.Hex(), err
+	c <- SaveResponse{ID: repo.ID.Hex(), StatusText: "Done", Err: err}
+
+	return
 }
 
 // Load loads java application to parse a specified file.
@@ -62,7 +74,6 @@ func (repo RepoModel) Load(file string, target string) (data FilesModel, err err
 		log.Fatal("Could not decode json error: ", err.Error())
 		return FilesModel{}, err
 	}
-
 
 	return data, nil
 }
@@ -93,11 +104,18 @@ func (repo RepoModel) GetRepoFile() (files string, err error) {
 	return string(bytes), nil
 }
 
+// SanitizeFilePath removes the repopath from the filepaths.
+func (repo RepoModel) SanitizeFilePath(projectModel ProjectModel) {
+	for index, file := range projectModel.Files {
+		projectModel.Files[index].File.FileName = strings.Replace(file.File.FileName, RepoPath+"/", "", -1)
+	}
+}
+
 // ParseFunctionsFromFiles fetch all functions from gives files set.
 func (repo RepoModel) ParseFunctionsFromFiles(files string) (projectModel ProjectModel, err error) {
 	for _, sourceFiles := range strings.Split(strings.TrimSuffix(files, "\n"), "\n") {
 		// Search for cpp files
-		if strings.Contains(sourceFiles, ".cpp") {
+		if strings.Contains(sourceFiles, ".cpp") || strings.Contains(sourceFiles, ".hpp"){
 			// Fetch function names from the file.
 			data, err := repo.Load(sourceFiles, "cpp")
 
@@ -120,6 +138,20 @@ func (repo RepoModel) ParseFunctionsFromFiles(files string) (projectModel Projec
 			projectModel.Files = append(projectModel.Files, data)
 		}
 
+		repo.SanitizeFilePath(projectModel)
+
 	}
 	return projectModel, nil
+}
+
+// FetchAll fetches all the repositories.
+func (repo RepoModel) FetchAll() (repoModels []bson.M, err error) {
+	reposModels, err := DB.FindAllURI()
+
+	if err != nil {
+		log.Println("Could not find repositories error: ", err.Error())
+		return []bson.M{}, err
+	}
+
+	return reposModels, nil
 }

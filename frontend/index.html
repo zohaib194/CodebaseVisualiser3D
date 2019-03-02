@@ -9,10 +9,18 @@
         <title>Codebase Visualizer 3D</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+<<<<<<< HEAD
         <!--<meta http-equiv="Content-Security-Policy" content="default-src * https://flyover.github.io/imgui-js ; style-src 'self' 'unsafe-inline'; media-src https://threejs.org ; script-src * 'unsafe-inline' 'unsafe-eval' https://flyover.github.io/imgui-js http://localhost:5500/frontend/html/3DView.html">
         -->
+=======
+        
+>>>>>>> ff6fb0d5915657c48bf806f8650e45ff5ca262d4
         <link rel="stylesheet" href="./css/main.css">
         
+        <script src="./js/localization/locale.js"></script>
+        <script src="./js/config/config.js"></script>
+        <script src="./js/config/style.js"></script>
+
         <script src="./js/WebGLDetect.js"></script>
         <script src="./js/repository.js"></script>
 
@@ -23,16 +31,15 @@
         <script src="./js/treejs/controls/OrbitControls.js"></script>
     </head>
     <body>
-        <!--[if lt IE 7]>
-            <p class="browsehappy">
-                You are using an <strong>outdated</strong> browser. 
-                Please upgrade your browser to improve your experience.
-            </p>
-        <![endif]-->
-        
-        <header></header>
-        <main>
+        <div class="container">
+            <!--[if lt IE 7]>
+                <p class="browsehappy">
+                    You are using an <strong>outdated</strong> browser. 
+                    Please upgrade your browser to improve your experience.
+                </p>
+            <![endif]-->
             
+<<<<<<< HEAD
             <div id="loader"></div>
             <canvas id="output"></canvas>
             <form id="repositoryform">
@@ -42,8 +49,31 @@
                     <button type="button" onclick="submitRepoName()"> Submit </button>
                 </div>
             </form> 
+=======
+            <header>
+                <h3>Gain a better understanding of libraries by visualizing their code</h3>
+                <p>
+                    If you consider using an external library, but are unsure of the arcitecural quality
+                    or afraid of shortcommings, then perhaps it would help with a 3D representation of the codebase.
+                    That is the aim of Codebase Visualizer 3D.
+                </p>
+                <p>
+                    Submit a gir repository link in the field below to check it out.
+                </p>
+            </header>
+            <main>
 
-        </main>
-        <footer></footer>
+                <form id="repositoryform">
+                    <div class="repoform">
+                        <p id="gitrepotitle">Git Repository</p>
+                        <input type="text" name="reponame" id="reponame">
+                        <button type="button" onclick="submitRepoName()"> Submit </button>
+                    </div>
+                </form> 
+>>>>>>> ff6fb0d5915657c48bf806f8650e45ff5ca262d4
+
+            </main>
+            <footer></footer>
+        </div>
     </body>
 </html>

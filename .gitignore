@@ -5,14 +5,8 @@
 frontend/logs/
 frontend/docs/
 
-frontend/js/imgui-js/
-
-frontend/html/3DView_OLD.html
-frontend/js/3DView/3DView_OLD.js
-frontend/js/system.config.js
-
 backend/parser/.project
-
+backend/parser/.classpath
 ### Linux ###
 *~
 

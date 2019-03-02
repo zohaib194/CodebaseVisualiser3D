@@ -10,15 +10,29 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
-import org.json.JSONObject;
+import java.util.Stack;
 
+import org.json.JSONObject;
+/**
+ * Class for exstending listeners and parsing code requiered for initial 3D view for code abstraction.
+ */
 public class CppLstnr_Initial extends CppExtendedListener {
 	private FileModel fileModel;
 
+	/**
+	 * Constructs the object, setting the filepath for file being parsed.
+	 *
+	 * @param      filePath  The file path
+	 */
 	CppLstnr_Initial(String filePath) {
 		this.fileModel = new FileModel(filePath);
 	}
 
+	/**
+	 * Listener for parsing a method/function declaration. Adding function name to filemodel.
+	 *
+	 * @param      ctx   The parsing context
+	 */
     @Override 
     public void enterFunctiondefinition(CPP14Parser.FunctiondefinitionContext ctx) {
         
@@ -28,40 +42,64 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	    // Get the input stream of function definition rule.
 	    CharStream input = ctx.start.getInputStream();
 
-	    fileModel.addFunction(new FunctionModel(input.getText(interval)));
+	    // Set this function model with name, lineStart and lineEnd.
+	    FunctionModel functionModel = new FunctionModel(input.getText(interval));
+	    functionModel.setLineStart(ctx.functionbody().start.getLine());
+	    functionModel.setLineEnd(ctx.functionbody().stop.getLine());
+
+	    int index = fileModel.addModelInCurrentScope(functionModel, (Stack<ModelIdentifier>)this.scopeStack.clone());
+	    this.enterScope(new ModelIdentifier("functions", index));
     }
 
+    /**
+     * Listener for exiting the current scope, expecting that scope to be one entered by enterFunctiondefinition.
+     *
+     * @param      ctx   The parsing context
+     */
+    @Override 
+    public void exitFunctiondefinition(CPP14Parser.FunctiondefinitionContext ctx) {
+    	this.exitScope();
+    }
+
+    /**
+	 * Listener for parsing a namespace declaration. Adding namespace to filemodel.
+     *
+     * @param      ctx   The parsing context
+     */
     @Override
 	public void enterOriginalnamespacedefinition(CPP14Parser.OriginalnamespacedefinitionContext ctx) { 
 		NamespaceModel namespace = new NamespaceModel(ctx.Identifier().getText());
-		// Create a new parser and listener
-		CppLstnr_Initial listnr = new CppLstnr_Initial(this.fileModel.getFilename());
-        CPP14Lexer lexer = new CPP14Lexer(new ANTLRInputStream(ctx.namespacebody().getText()));
-        CommonTokenStream tokens = new CommonTokenStream(lexer);
-        CPP14Parser parser = new CPP14Parser(tokens);
-        ParseTree tree = parser.translationunit();
-        ParseTreeWalker walker =  new ParseTreeWalker();
 
-        walker.walk(listnr, tree);
-
-        FileModel fileModel = listnr.getFileModel();
-
-        namespace.setFunctions(fileModel.getFunctions());
-        namespace.setNamespaces(fileModel.getNamespaces());
-        namespace.setUsingNamespaces(fileModel.getUsingNamespaces());
-
-		this.fileModel.addNamespace(namespace);
-		ctx.exitRule(this);
+	    int index = fileModel.addModelInCurrentScope(namespace, (Stack<ModelIdentifier>)this.scopeStack.clone());
+	    this.enterScope(new ModelIdentifier("namespaces", index));
 	}
 
+    /**
+     * Listener for exiting the current scope, expecting that scope to be one entered by enterOriginalnamespacedefinition.
+     *
+     * @param      ctx   The parsing context
+     */
 	@Override
-	public void enterUsingdirective(CPP14Parser.UsingdirectiveContext ctx) { 
+	public void exitOriginalnamespacedefinition(CPP14Parser.OriginalnamespacedefinitionContext ctx) {
+		this.exitScope();
+	}
+
+	/**
+	 * Listener for parsing a using namespace declaration. Adding namespace to filemodel.
+	 *
+	 * @param      ctx   The parsing context
+	 */
+	@Override
+	public void enterUsingdirective(CPP14Parser.UsingdirectiveContext ctx) {
+		UsingNamespaceModel usingNamespaceModel;
 		if (ctx.nestednamespecifier() != null) {
-			fileModel.addUsingNamespace(new UsingNamespaceModel(ctx.nestednamespecifier().getText() + ctx.namespacename().getText(), ctx.getStart().getLine()));	
+			usingNamespaceModel = new UsingNamespaceModel(ctx.nestednamespecifier().getText() + ctx.namespacename().getText(), ctx.getStart().getLine());	
 		
 		}else{
-			fileModel.addUsingNamespace(new UsingNamespaceModel(ctx.namespacename().getText(), ctx.getStart().getLine()));
+			usingNamespaceModel = new UsingNamespaceModel(ctx.namespacename().getText(), ctx.getStart().getLine());
 		}
+
+		fileModel.addModelInCurrentScope(usingNamespaceModel, (Stack<ModelIdentifier>)this.scopeStack.clone());
 	}
 
     @Override 
@@ -137,12 +175,22 @@ public class CppLstnr_Initial extends CppExtendedListener {
     	fileModel.addClass(classModel);
     }
 
+	/**
+	 * Gets the parsed code as JSONObject.
+	 *
+	 * @return     The parsed code.
+	 */
     public JSONObject getParsedCode() {  
 		JSONObject parsedCode = new JSONObject();
 
     	return parsedCode.put("file", this.fileModel.getParsedCode());
     }
 
+    /**
+     * Gets the file model.
+     *
+     * @return     The file model.
+     */
     public FileModel getFileModel(){
     	return this.fileModel;
     }

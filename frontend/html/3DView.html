@@ -5,23 +5,52 @@
 <!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
     <head>
         <meta charset="utf-8">
-       <!-- <meta http-equiv="X-UA-Compatible" content="IE=edge">-->
+        <!-- <meta http-equiv="X-UA-Compatible" content="IE=edge">-->
         <title></title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval' http://127.0.0.1:5500/frontend/">
 
         <link rel="stylesheet" href="../css/3DView.css">
 
-        <!--THREE.js + (soon to come) ImGUI imports-->
+        <!-- Module loader -->
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/systemjs/0.21.4/system.js"></script>
+
+        <script src="../js/localization/locale.js"></script>
+        <script src="../js/config/SystemJsConfig.js"></script>
+        <script src="../js/config/config.js"></script>
+        <script src="../js/config/style.js"></script>
+
+        <!-- THREE.js + (soon to come) ImGUI imports -->
         <script src="../js/treejs/three.js"></script>
         <script src="../js/treejs/controls/OrbitControls.js"></script>
+
+        <script src="../js/GUI/Menubar.js"></script>
+        <script src="../js/GUI/FiletreeWindow.js"></script>
+        <script src="../js/GUI/CodeInspectionWindow.js"></script>
+        <script src="../js/GUI/NamespaceWindow.js"></script>
+        <script src="../js/GUI/QualityMetricsWindow.js"></script>
+        <script src="../js/GUI/RepositoriesWindow.js"></script>
+        <script src="../js/GUI/WindowManager.js"></script>
+
     </head>
-    <body>        
+    <body>
+        <div id="statusDiv">
+            <div id="loader"></div>
+            <p id="status"></p>
+        </div>
+        
         <canvas id="output"></canvas>
         <div id="nameplate_container"></div>
+        <!-- 3DView.js imports-->
         <script src="../js/3DView/DisplayObject.js"></script>
         <script src="../js/3DView/DisplayManager.js"></script>
+        <script src="../js/FDG/LinkProperties.js"></script>
+        <script src="../js/FDG/Node.js"></script>
+        <script src="../js/FDG/FDG.js"></script>
+
+        <script src="../js/DataProcessing/FunctionModel.js"></script>
+        <script src="../js/DataProcessing/FileProcessing.js"></script>
+
         <script src="../js/3DView/3DView.js"></script>
     </body>
 </html>

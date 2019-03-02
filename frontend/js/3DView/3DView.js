@@ -1,22 +1,21 @@
-var data;
-
-var color_lightgray = 0x808080;
-var color_white = 0xffffff;
-var color_green = 0x00ff00;
-
 // Find canvas.
 var canvas = document.getElementById("output");
 
 // Make as setup renderer for rendering on canvas. 
 var renderer = new THREE.WebGLRenderer({ canvas: canvas });
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setClearColor( 0xffffff, 1);
+renderer.setClearColor(STYLE.getColors().background, 1);
 
 // Make scene to render.
 const scene = new THREE.Scene();
 
 // Setup camera.
-var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+var camera = new THREE.PerspectiveCamera(
+    STYLE.getGraphics().camera.fov, 
+    window.innerWidth / window.innerHeight, 
+    STYLE.getGraphics().camera.nearPlane,
+    STYLE.getGraphics().camera.farPlane,
+);
 camera.position.set(0, 0, 5);
 
 // Add controls on camera and update to apply camera position change.
@@ -24,29 +23,44 @@ var controls = new THREE.OrbitControls(camera, renderer.domElement);
 controls.update();
 
 // Make lights.
-var light = new THREE.AmbientLight(color_lightgray); // Soft white light
+var light = new THREE.AmbientLight(
+    STYLE.getColors().ambient
+);
 scene.add(light);
 
-var light = new THREE.PointLight(color_white, 1, 100);
-light.position.set(10, 10, 10);
-scene.add(light);
+var directionalLight = new THREE.DirectionalLight(
+    STYLE.getColors().light, 
+    0.5
+);
+directionalLight.position.set(1, 1, 1);
+scene.add(directionalLight);
 
 // Add resize listener to resize renderer and camera.
-window.addEventListener("resize", function() {
-    renderer.setSize(window.innerWidth,window.innerHeight);
+window.addEventListener("resize", function () {
+    renderer.setSize(window.innerWidth, window.innerHeight);
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
 });
 
+// Cube marking origin of world.
+var originGeometry = new THREE.CubeGeometry(0.05, 0.05, 0.05);
+var originMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+var originCube = new THREE.Mesh(originGeometry, originMaterial);
+originCube.position.set(0, 0, 0);
+scene.add(originCube);
+
 // Add displaymanager for managing objects to draw.
 var displayMgr = new DisplayManager();
 
-// Cube marking origin of world.
-var geometry = new THREE.CubeGeometry(0.05, 0.05, 0.05);
-var material = new THREE.MeshBasicMaterial({color: 0x00ff00});
-var cube = new THREE.Mesh(geometry, material);
-cube.position.set(0, 0, 0);
-scene.add(cube);
+// Force-Directed-Graph for managing object grouping.
+var fdg = new FDG(1, 1, 0.1, new THREE.Vector3(0, 0, 0));
+
+// Window manager
+var windowMgr = new WindowManager();
+
+// Mouse event variables
+var raycaster = new THREE.Raycaster();
+var mouse = new THREE.Vector2();
 
 /**
  * Program lifecycle function reponsible for updating the program state.
@@ -70,70 +84,274 @@ function render() {
 /**
  * Main loop of program.
  */
-function mainloop() {
-    // Schedule the next frame.
-    requestAnimationFrame(mainloop);
+function mainloop(time) {
 
     update();
+    windowMgr.ImGuiUpdate(time);
+
     render();
+    windowMgr.ImGuiRender();
+    
+    // Schedule the next frame.
+    requestAnimationFrame(mainloop);
 }
 
 // ########## DATA PROCESSING FUNCITONS ##########
 
 /**
- * Function for displaying function data fron json object.
- * @param {object} data - Object made from Json.parse().
- */
-function displayFunctions(data) {
-    if (typeof data.functions === "undefined" || data.functions.lenght <= 0)
-        return;
-    
-    // For every functions entry
-    data.functions.forEach(element => {
-        // For each function object
-        element.function_names.forEach((func) => {
+* Function for processing json data and building FDG.
+* @param {object} data - Object made from Json.parse().
+*/
+function runFDGOnJSONData(data) {
+    // Build fdg graph from parsed json data.
+    document.getElementById("status").innerHTML = "Getting data ready for FDG";
+    handleProjectData(data);
+
+    // Apply negative links on those who aren't related
+    for (i = 0; i < fdg.getNodes().length; i++) {
+        for (j = 0; j < fdg.getNodes().length; j++) {
+            fdg.addLink(i, j, new LinkProperties(-1));
+        }
+    }
+
+    // Run for 100 iterations shifting the position of nodes.
+    document.getElementById("status").innerHTML = "Running FDG";
+    fdg.execute(100);
+
+    // Draw nodes using display manager.
+    document.getElementById("status").innerHTML = "Assigning shapes to data structures";
+    fdg.getNodes().forEach((node) => {
+        /**
+         * Function for selecting proper type from configuration.
+         * @param {string} type - The type of node.
+         */
+        let getDrawableGeometry = (function(type) {
+            switch(type) {
+                case "cube":
+                    return new THREE.BoxGeometry(0.1, 0.1, 0.1);
+                case "sphere":
+                    return new THREE.SphereGeometry(0.1, 32, 16);
+                case "cylinder":
+                    return new THREE.CylinderGeometry(0.05, 0.05, 0.1, 16);
+                case "cone":
+                    return new THREE.ConeGeometry(0.05, 0.1, 16);
+                case "dodecahedron":
+                    return new THREE.DodecahedronGeometry(0.05);
+                case "icosahedron":
+                    return new THREE.IcosahedronGeometry(0.05);
+                case "octahedron":
+                    return new THREE.OctahedronGeometry(0.05);
+                case "tetrahedron":
+                    return new THREE.TetrahedronGeometry(0.05);
+            }
+        });
+
+        var nodeType = node.getType();
+        var supportedType = false;
+        var drawableGeometry;
+        var drawableColor;
+
+        // Select shape and color based on node type.
+        switch (nodeType) {
+            case "function": {
+                drawableColor = STYLE.getDrawables().function.color;
+                drawableGeometry = getDrawableGeometry(
+                    STYLE.getDrawables().function.shape
+                );
+                supportedType = true;
+                break;
+            }
+            case "class": {
+                drawableGeometry = getDrawableGeometry(
+                    STYLE.getDrawables().class.shape
+                );
+                drawableColor = STYLE.getDrawables().class.color;
+                supportedType = true;
+                break;
+            }
+            case "namespace": {
+                drawableGeometry = getDrawableGeometry(
+                    STYLE.getDrawables().namespace.shape
+                );
+                drawableColor = STYLE.getDrawables().namespace.color;
+                supportedType = true;
+                break;
+            }
+            default: {   // Unsupported node type, mention this!
+                console.log(
+                    LOCALE.getSentence("geometry_invalid_type") + ": " + node.getType()
+                );
+                break;
+            }
+        }
+        
+        // Found a supported type.
+        document.getElementById("status").innerHTML = "Ready to draw";
+        if (supportedType) {
             // Add it for display.
             displayMgr.addObject(
-                "function", 
-                new DisplayObject(
-                    new THREE.Vector3(
-                        // Random nr [0-9].
-                        Math.floor(Math.random() * 10), 
-                        Math.floor(Math.random() * 10), 
-                        Math.floor(Math.random() * 10)
-                    ), 
-                    color_green, 
-                    func.name
+                node.getType(),
+                new Drawable(
+                    node.getPosition(),
+                    drawableColor,
+                    node.getName(),
+                    drawableGeometry
                 )
             );
-        });
+
+            // Draw nodes links with three.js
+            node.getLinks().forEach((link, otherIndex) => {
+                if (link.attraction > 0) {
+                    var material = new THREE.LineBasicMaterial({
+                        color: STYLE.getDrawables().link.color
+                    });
+                    
+                    var geometry = new THREE.Geometry();
+                    geometry.vertices.push(
+                        node.getPosition(),
+                        fdg.getNodes()[otherIndex].getPosition()
+                    );
+                    
+                    var line = new THREE.Line(geometry, material);
+                    scene.add(line);
+                }
+            });
+        }
     });
 }
 
-// Find id param form url
-var id = new URL(window.location.href).searchParams.get("id");
+// Find reponame param form url
+var repoName = new URL(window.location.href).searchParams.get("repo");
 
-// Create a http request
-var xhr = new XMLHttpRequest();
+// id of the repo sumbitted to back-end.
+var id = 0;
 
-// Open the connection
-xhr.open("get", "http://localhost:8080/repo/" + id, true);
+// ########## Mouse events functions ##########
 
-// Once ready, receive data and populate displaymanager.
-xhr.onreadystatechange = function() {
-    // Once ready and everything went ok.
-    if(xhr.readyState == 4 && xhr.status == 200) {
-        data = JSON.parse(xhr.responseText);
+/**
+ * On click mouse event function.
+ *
+ * @param      {Event}  event   The event.
+ */
+function onMouseClick( event ) {
 
-        // Didn't get data.
-        if (typeof data === "undefined") {
-            return;
-        }
+    // calculate mouse position in normalized device coordinates
+    // (-1 to +1) for both components
+    mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+    mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
-        displayFunctions(data);
+    // update the picking ray with the camera and mouse position
+    raycaster.setFromCamera( mouse, camera );
+
+    // calculate objects intersecting the picking ray
+    var intersects = raycaster.intersectObjects( scene.children , true);
+
+    if(intersects !== "undefined" && intersects.length > 0){
+        var funcName = intersects[0].object.name.substr(0, intersects[0].object.name.indexOf(' |'));
+
+        sendGetRequest("http://" + config.serverInfo.api_ip + ":" + config.serverInfo.api_port + 
+            "/repo/" + id + "/file/read/?lineStart=" + functionModels.get(funcName).getStartLine() + 
+            "&lineEnd=" + functionModels.get(funcName).getEndLine() +
+            "&filePath=" + functionModels.get(funcName).getFileName())
+        .then(json => {
+            windowMgr.setDataStructureImplementation(json.implementation); 
+        });
     }
 }
-xhr.send();
 
-// Start program loop.
-mainloop();
+window.addEventListener( 'mousedown', onMouseClick);
+
+/**
+ * Sends a get request to given url.
+ *
+ * @param      {string}  url     The url
+ * @return     {Promise}  A promise containing json from the response.
+ */
+function sendGetRequest(url){
+    return fetch(url)
+            .then((response) => {
+                // Once ready and everything went ok.
+                if (response.status == 200) {
+                    return response.json();
+                }
+
+                // Something went wrong.
+                console.log(LOCALE.getSentence("backend_data_not_received"));
+                return Promise.reject();
+            }).then((json) => {
+                console.log(LOCALE.getSentence("backend_data_received"));
+
+                // Didn't get data, abort.
+                if (typeof json === "undefined" || json == null) {
+                    // Json missing or unparsable.
+                    return Promise.reject();
+                }
+                return json;
+            }).catch(error => console.log(error));
+}
+
+// Request to get the list of repositories stored in DB.
+sendGetRequest("http://" + config.serverInfo.api_ip + ":" + config.serverInfo.api_port + "/repo/list")
+.then(json => {
+   windowMgr.setRepositories(json); 
+});
+
+/**
+ * Sends an add request to submit the repository and update feedback status through websockets.
+ */
+function sendAddRequest(){ 
+    // Websocket connection for the api endpoint.
+    var websocket = new WebSocket("ws://" + config.serverInfo.api_ip + ":" + config.serverInfo.api_port + "/repo/add");
+
+    // Once websocket connection is open send the request to add repository.
+    websocket.onopen = function(){
+        websocket.send(JSON.stringify({"uri": repoName}));
+    }
+
+    // Message recieved from server.
+    websocket.onmessage = function (event) {
+        // Parse the server response.
+        var response = JSON.parse(event.data)
+
+        if (response.statuscode == 202) {
+            // set the id related to repository.
+            id = response.body.id;
+
+            // Update status.
+            document.getElementById("status").innerHTML = response.body.status;
+        }
+
+
+    }
+    websocket.onclose = function (event) {
+        var reason = JSON.parse(event.reason)
+        // if the repository already exist than set the id that relates to existing repo.
+        if(reason.statuscode == 409){
+            document.getElementById("status").innerHTML = reason.body.status;
+            id = reason.body.id;
+        } else if (reason.statuscode == 400){
+            document.getElementById("status").innerHTML = reason.body.status;
+            location.assign("../index.html");
+            return ;
+        }
+
+        // Send the initial request to back-end.
+        sendGetRequest("http://" + config.serverInfo.api_ip + ":" + config.serverInfo.api_port + "/repo/" + id + "/initial/")
+        .then((json) => {
+            // Parse data and perform fdg.
+            runFDGOnJSONData(json);
+            
+            // Disable the loader icon and status tag.
+            document.getElementById("loader").style.display = "none";
+            document.getElementById("status").style.display = "none";
+            
+            // Start program loop.
+            requestAnimationFrame(mainloop);
+        });
+
+        // Update status.
+        document.getElementById("status").innerHTML = reason.body.status;
+        websocket.close();
+    }
+};
+sendAddRequest();
