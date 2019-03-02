@@ -4,8 +4,9 @@ public class HelloWorld {
    public static void main(String[] args) { 
    		if (TRUE) {
    			System.out.println("Hello, World");	
+            boo();
    		}else{
-   			
+   			foo(1);
    		}
 
    }
@@ -16,7 +17,7 @@ public class HelloWorld {
    		}
    }
 
-   public Bool foo(){
+   public Bool foo(int a){
    		return true;
    }
 }

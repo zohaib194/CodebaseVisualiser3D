@@ -41,19 +41,15 @@ public class UsingNamespaceModel extends Model {
 	}
 
 	/**
-	 * Adds a model in current scope.
+	 * Adds the data in model.
 	 *
-	 * @param      model       The model
-	 * @param      scopeStack  The scope stack identifying current scope position
-	 *
-	 * @return     index in list for its type where model was added for current scope. If not a list it will return 0.
+	 * @param      data  The data
 	 */
 	@Override
-	protected <T extends Model> int addModelInCurrentScope(T model, Stack<ModelIdentifier> scopeStack){
+	protected <T> void addDataInModel(T data){
 
 		System.out.println("Error using namespace is currently not a scope as scopeStack indicated");
 		System.exit(1);		
-		return 0;	
 	}
 
 	/**

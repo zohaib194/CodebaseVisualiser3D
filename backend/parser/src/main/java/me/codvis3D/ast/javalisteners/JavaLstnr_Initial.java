@@ -23,6 +23,7 @@ public class JavaLstnr_Initial extends JavaExtendedListener {
 	 */
 	JavaLstnr_Initial(String filePath) {
 		this.fileModel = new FileModel(filePath);
+		this.enterScope(this.fileModel);
 	}
 
 	/**
@@ -38,8 +39,9 @@ public class JavaLstnr_Initial extends JavaExtendedListener {
       	functionModel.setLineStart(ctx.methodBody().start.getLine());
       	functionModel.setLineEnd(ctx.methodBody().stop.getLine());
 	    
-	    int index = fileModel.addModelInCurrentScope(functionModel, (Stack<ModelIdentifier>)this.scopeStack.clone());
-	    this.enterScope(new ModelIdentifier("functions", index));
+
+	   	this.scopeStack.peek().addDataInModel(functionModel);
+	    this.enterScope(functionModel);
     }
 
     /**
@@ -61,8 +63,8 @@ public class JavaLstnr_Initial extends JavaExtendedListener {
 	public void enterPackageDeclaration(Java9Parser.PackageDeclarationContext ctx){
 		NamespaceModel namespace = new NamespaceModel(ctx.packageName().getText());
 		
-		int index = fileModel.addModelInCurrentScope(namespace, (Stack<ModelIdentifier>)this.scopeStack.clone());
-	    this.enterScope(new ModelIdentifier("namespaces", index));
+		this.scopeStack.peek().addDataInModel(namespace);
+	    this.enterScope(namespace);
 	}
 
 	/**
@@ -95,8 +97,19 @@ public class JavaLstnr_Initial extends JavaExtendedListener {
 			return;
 		}
 
-	    fileModel.addModelInCurrentScope(usingNamespaceModel, (Stack<ModelIdentifier>)this.scopeStack.clone());
+	   	this.scopeStack.peek().addDataInModel(usingNamespaceModel);
 	}	
+
+	/**
+	 * Listener for parsing function calls.
+	 *
+	 * @param      ctx   The parsing context
+	 */
+	@Override 
+	public void enterMethodInvocation(Java9Parser.MethodInvocationContext ctx) { 
+	    this.scopeStack.peek().addDataInModel(ctx.getText());
+
+	}
 
 	/**
 	 * Gets the parsed code as JSONObject.
