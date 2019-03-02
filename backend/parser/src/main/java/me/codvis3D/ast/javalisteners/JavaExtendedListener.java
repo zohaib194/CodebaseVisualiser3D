@@ -12,13 +12,13 @@ import org.json.JSONObject;
  */
 public class JavaExtendedListener extends Java9BaseListener implements JavaResultInterface{
 
-	protected Stack<ModelIdentifier> scopeStack;
+	protected Stack<Model> scopeStack;
 
 	/**
 	 * Constructs the object.
 	 */
 	public JavaExtendedListener(){
-		scopeStack = new Stack<ModelIdentifier>();
+		scopeStack = new Stack<Model>();
 	}
 
 	/**
@@ -26,7 +26,7 @@ public class JavaExtendedListener extends Java9BaseListener implements JavaResul
 	 *
 	 * @param      scope  The scope
 	 */
-	protected void enterScope(ModelIdentifier scope){
+	protected void enterScope(Model scope){
 		this.scopeStack.push(scope);
 	}
 
@@ -35,7 +35,7 @@ public class JavaExtendedListener extends Java9BaseListener implements JavaResul
 	 *
 	 * @return     the scope being exited
 	 */
-	protected ModelIdentifier exitScope(){
+	protected Model exitScope(){
 		return this.scopeStack.pop();
 	}
 

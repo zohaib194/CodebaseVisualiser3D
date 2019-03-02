@@ -20,10 +20,9 @@ public class Model {
 	 *
 	 * @return     index in list for its type where model was added for current scope. If not a list it will return 0.
 	 */
-	protected <T extends Model> int addModelInCurrentScope(T model, Stack<ModelIdentifier> scopeStack){
-		System.out.println("addModelInCurrentScope not implemented");
+	protected <T> void addDataInModel(T model){
+		System.out.println("addDataInModel not implemented");
 		System.exit(1);
-		return 0;
 	}
 
 	/**

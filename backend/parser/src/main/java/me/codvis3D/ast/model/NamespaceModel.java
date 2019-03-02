@@ -14,6 +14,8 @@ public class NamespaceModel extends Model {
 	private List<FunctionModel> functions;
 	private List<NamespaceModel> namespaces;
 	private List<UsingNamespaceModel> usingNamespaces;
+	private List<String> calls;
+
 
 	/**
 	 * Constructs the namespace, setting the name.
@@ -25,6 +27,7 @@ public class NamespaceModel extends Model {
 		this.functions = new ArrayList<>();
 		this.namespaces = new ArrayList<>();
 		this.usingNamespaces = new ArrayList<>();
+		this.calls = new ArrayList<>();
 	}
 
 	/**
@@ -91,6 +94,15 @@ public class NamespaceModel extends Model {
 	}
 
 	/**
+	 * Adds a call.
+	 *
+	 * @param      functionCall  The function call
+	 */
+	public void addCall(String functionCall){
+		this.calls.add(functionCall);
+	}
+
+	/**
 	 * Adds a model in current scope.
 	 *
 	 * @param      model       The model
@@ -99,50 +111,24 @@ public class NamespaceModel extends Model {
 	 * @return     index in list for its type where model was added for current scope. If not a list it will return 0.
 	 */
 	@Override
-	protected <T extends Model> int addModelInCurrentScope(T model, Stack<ModelIdentifier> scopeStack){
-		ModelIdentifier modelIdentifier;
+	protected <T> void addDataInModel(T model){
 
-		int index = 0;
+		if (model instanceof FunctionModel) {
+			this.addFunction((FunctionModel)model);
 
-		if (scopeStack.size() > 0) {
-			modelIdentifier = scopeStack.pop();
+		}else if (model instanceof  NamespaceModel) {
+			this.addNamespace((NamespaceModel)model);
 
-			switch (modelIdentifier.modelType) {
-				case "functions":
-					index = this.functions.get(modelIdentifier.modelIndex).addModelInCurrentScope(model, scopeStack);
-					break;
-				case "namespaces":
-					index = this.namespaces.get(modelIdentifier.modelIndex).addModelInCurrentScope(model, scopeStack);
-					break;
-				case "usingNamespaces":
-					index = this.usingNamespaces.get(modelIdentifier.modelIndex).addModelInCurrentScope(model, scopeStack);
-					break;
-				default:
-					System.out.println("Error adding model in current scope");
-					System.exit(1);
+		}else if (model instanceof UsingNamespaceModel) {
+			this.addUsingNamespace((UsingNamespaceModel)model);
 
-			}
-		} else {
-			if (model instanceof FunctionModel) {
-				this.addFunction((FunctionModel)model);
-				index = this.usingNamespaces.size() -1;
+		}else if (model instanceof String) {
+			this.addCall((String)model);
 
-			}else if (model instanceof  NamespaceModel) {
-				this.addNamespace((NamespaceModel)model);
-				index = this.usingNamespaces.size() -1;
-
-			}else if (model instanceof UsingNamespaceModel) {
-				this.addUsingNamespace((UsingNamespaceModel)model);
-				index = this.usingNamespaces.size() -1;
-
-			}else{
-				System.out.println("Error adding model in current scope");
-				System.exit(1);
-			}
-
+		}else{
+			System.out.println("Error adding data in model");
+			System.exit(1);
 		}
-
-		return index;
 	}
 
 	/**
@@ -170,6 +156,8 @@ public class NamespaceModel extends Model {
 		if (parsedUsingNamespaces != null) {
 			parsedCode.put("using_namespaces", parsedUsingNamespaces);
 		}
+
+		parsedCode.put("calls", this.calls);
 
 		return parsedCode;
 	}
