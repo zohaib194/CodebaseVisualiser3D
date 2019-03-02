@@ -100,7 +100,7 @@ public class FunctionModel extends Model{
 	/**
 	 * Adds the data in model.
 	 *
-	 * @param      model  The model
+	 * @param      data  The data
 	 */
 	@Override
 	protected <T> void addDataInModel(T data){
