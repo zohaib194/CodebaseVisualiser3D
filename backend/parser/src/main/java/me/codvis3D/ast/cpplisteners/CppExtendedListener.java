@@ -12,13 +12,13 @@ import org.json.JSONObject;
  */
 public class CppExtendedListener extends CPP14BaseListener implements CppResultInterface{
 
-	protected Stack<ModelIdentifier> scopeStack;
+	protected Stack<Model> scopeStack;
 
 	/**
 	 * Constructs the object.
 	 */
 	public CppExtendedListener(){
-		scopeStack = new Stack<ModelIdentifier>();
+		scopeStack = new Stack<Model>();
 	}
 
 	/**
@@ -26,7 +26,7 @@ public class CppExtendedListener extends CPP14BaseListener implements CppResultI
 	 *
 	 * @param      scope  The scope
 	 */
-	protected void enterScope(ModelIdentifier scope){
+	protected void enterScope(Model scope){
 		this.scopeStack.push(scope);
 	}
 
@@ -35,7 +35,7 @@ public class CppExtendedListener extends CPP14BaseListener implements CppResultI
 	 *
 	 * @return     The scope being exited
 	 */
-	protected ModelIdentifier exitScope(){
+	protected Model exitScope(){
 		return this.scopeStack.pop();
 	}
 

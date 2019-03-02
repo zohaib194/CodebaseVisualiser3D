@@ -26,6 +26,7 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 */
 	CppLstnr_Initial(String filePath) {
 		this.fileModel = new FileModel(filePath);
+		this.enterScope(this.fileModel);
 	}
 
 	/**
@@ -47,8 +48,8 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	    functionModel.setLineStart(ctx.functionbody().start.getLine());
 	    functionModel.setLineEnd(ctx.functionbody().stop.getLine());
 
-	    int index = fileModel.addModelInCurrentScope(functionModel, (Stack<ModelIdentifier>)this.scopeStack.clone());
-	    this.enterScope(new ModelIdentifier("functions", index));
+	    this.scopeStack.peek().addDataInModel(functionModel);
+	    this.enterScope(functionModel);
     }
 
     /**
@@ -70,8 +71,8 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	public void enterOriginalnamespacedefinition(CPP14Parser.OriginalnamespacedefinitionContext ctx) { 
 		NamespaceModel namespace = new NamespaceModel(ctx.Identifier().getText());
 
-	    int index = fileModel.addModelInCurrentScope(namespace, (Stack<ModelIdentifier>)this.scopeStack.clone());
-	    this.enterScope(new ModelIdentifier("namespaces", index));
+	    this.scopeStack.peek().addDataInModel(namespace);
+	    this.enterScope(namespace);
 	}
 
     /**
@@ -99,7 +100,17 @@ public class CppLstnr_Initial extends CppExtendedListener {
 			usingNamespaceModel = new UsingNamespaceModel(ctx.namespacename().getText(), ctx.getStart().getLine());
 		}
 
-		fileModel.addModelInCurrentScope(usingNamespaceModel, (Stack<ModelIdentifier>)this.scopeStack.clone());
+		this.scopeStack.peek().addDataInModel(usingNamespaceModel);
+	}
+
+	/**
+	 * Listener for parsing function calls.
+	 *
+	 * @param      ctx   The parsing context
+	 */
+	@Override 
+	public void enterExpressionstatement(CPP14Parser.ExpressionstatementContext ctx) { 
+	    this.scopeStack.peek().addDataInModel(ctx.getText());
 	}
 
 	/**
