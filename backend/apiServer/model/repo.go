@@ -7,9 +7,9 @@ import (
 	"encoding/json"
 	"log"
 	"os/exec"
+	"path"
 	"strconv"
 	"strings"
-	"path"
 
 	"gopkg.in/mgo.v2/bson"
 )
@@ -130,7 +130,7 @@ func (repo RepoModel) GetRepoFiles() (files string, err error) {
 	return string(bytes), nil
 }
 
-// SanitizeFilePath removes the repopath from the filepaths.
+// SanitizeFilePaths removes the repopath from the filepaths.
 func (repo RepoModel) SanitizeFilePaths(projectModel ProjectModel) {
 	for index, file := range projectModel.Files {
 		projectModel.Files[index].File.FileName = strings.Replace(file.File.FileName, RepoPath+"/", "", -1)
@@ -145,14 +145,17 @@ func (repo RepoModel) ParseDataFromFiles(files string) (projectModel ProjectMode
 		var data FilesModel
 
 		switch fileExtention := path.Ext(sourceFile); fileExtention {
-			case ".cpp":
-				data, err = repo.Load(sourceFile, "cpp")		// Fetch function names from the file.
+		case ".cpp":
+			data, err = repo.Load(sourceFile, "cpp") // Fetch function names from the file.
 
-			case ".java":
-				data, err = repo.Load(sourceFile, "java")
+		case ".hpp":
+			data, err = repo.Load(sourceFile, "cpp")
 
-			default:	
-				data = FilesModel{File: FileModel{Parsed: false, FileName: sourceFile}}
+		case ".java":
+			data, err = repo.Load(sourceFile, "java")
+
+		default:
+			data = FilesModel{File: FileModel{Parsed: false, FileName: sourceFile}}
 		}
 
 		if err != nil {
@@ -162,11 +165,10 @@ func (repo RepoModel) ParseDataFromFiles(files string) (projectModel ProjectMode
 
 		projectModel.Files = append(projectModel.Files, data)
 
-
 	}
-	
+
 	repo.SanitizeFilePaths(projectModel)
-	
+
 	return projectModel, nil
 }
 
