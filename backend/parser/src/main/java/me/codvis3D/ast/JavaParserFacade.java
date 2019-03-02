@@ -53,7 +53,7 @@ public class JavaParserFacade {
         JavaExtendedListener listener = null;
         switch(context){
             case "Initial":
-                listener = new JavaLstnr_Initial(file.getName());
+                listener = new JavaLstnr_Initial(file.getPath());
                 break;
             case "Hover":
                 break;
