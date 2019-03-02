@@ -103,27 +103,24 @@ public class NamespaceModel extends Model {
 	}
 
 	/**
-	 * Adds a model in current scope.
+	 * Adds the data in model.
 	 *
-	 * @param      model       The model
-	 * @param      scopeStack  The scope stack identifying current scope position
-	 *
-	 * @return     index in list for its type where model was added for current scope. If not a list it will return 0.
+	 * @param      data  The data
 	 */
 	@Override
-	protected <T> void addDataInModel(T model){
+	protected <T> void addDataInModel(T data){
 
-		if (model instanceof FunctionModel) {
-			this.addFunction((FunctionModel)model);
+		if (data instanceof FunctionModel) {
+			this.addFunction((FunctionModel)data);
 
-		}else if (model instanceof  NamespaceModel) {
-			this.addNamespace((NamespaceModel)model);
+		}else if (data instanceof  NamespaceModel) {
+			this.addNamespace((NamespaceModel)data);
 
-		}else if (model instanceof UsingNamespaceModel) {
-			this.addUsingNamespace((UsingNamespaceModel)model);
+		}else if (data instanceof UsingNamespaceModel) {
+			this.addUsingNamespace((UsingNamespaceModel)data);
 
-		}else if (model instanceof String) {
-			this.addCall((String)model);
+		}else if (data instanceof String) {
+			this.addCall((String)data);
 
 		}else{
 			System.out.println("Error adding data in model");

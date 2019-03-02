@@ -98,18 +98,15 @@ public class FunctionModel extends Model{
 	}
 
 	/**
-	 * Adds a model in current scope.
+	 * Adds the data in model.
 	 *
-	 * @param      model       The model
-	 * @param      scopeStack  The scope stack identifying current scope position
-	 *
-	 * @return     index in list for its type where model was added for current scope. If not a list it will return 0.
+	 * @param      model  The model
 	 */
 	@Override
-	protected <T> void addDataInModel(T model){
+	protected <T> void addDataInModel(T data){
 
-		if (model instanceof String){
-			this.addCall((String) model);
+		if (data instanceof String){
+			this.addCall((String) data);
 		} else {
 			System.out.println("Error adding data in model");
 			System.exit(1);
