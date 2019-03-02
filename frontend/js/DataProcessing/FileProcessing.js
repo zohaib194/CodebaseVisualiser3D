@@ -161,6 +161,7 @@ function handleProjectData(projectData) {
     classCount = 0;
     functionCount = 0;
     namespaceCount = 0;
+    lineCount = 0;
     // Handle every file given.
     projectData.files.forEach((file) => {
 
@@ -171,10 +172,12 @@ function handleProjectData(projectData) {
         }
     
         // File is parsed correctly, process it.
+        lineCount += file.file.linesInFile;
         handleCodeData(file.file, file.file.file_name);
     });
 
     windowMgr.setFunctionCount(functionCount);
     windowMgr.setClassCount(classCount);
     windowMgr.setNamespaceCount(namespaceCount);
+    windowMgr.setLineCount(lineCount);
 }

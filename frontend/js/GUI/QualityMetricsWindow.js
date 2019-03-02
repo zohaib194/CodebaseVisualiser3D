@@ -11,6 +11,7 @@ let qualityMetrics = (function (previousWindowSize, previousWindowPos){
     var functionCount = 0;
     var classCount = 0;
     var namespaceCount = 0;
+    var lineCount
 
     /**
      * Initialize quality metrics window.
@@ -31,6 +32,9 @@ let qualityMetrics = (function (previousWindowSize, previousWindowPos){
         );
         ImGui.Text(
             LOCALE.getSentence("quality_metric_funciton_count") + ": " + functionCount
+        );
+        ImGui.Text(
+            LOCALE.getSentence("quality_metric_lines_count") + ": " + lineCount
         );
 
         ImGui.End();
@@ -102,12 +106,29 @@ let qualityMetrics = (function (previousWindowSize, previousWindowPos){
         namespaceCount = count;
     }
 
+    /**
+     * Setter of the lines of code.
+     * @param {int} count - Lines of code.
+     */
+    function setLineCount(count){
+        if (count === "undefined") {
+            console.log(LOCALE.getSentence("generic_undefined"));
+            return;
+        } else if (count < 0) {
+            console.log(LOCALE.getSentence("generic_negative"));
+            return;
+        }
+
+        lineCount = count;
+    }
+
     return {
         initializeWindow: init,
         getWindowPosition: getPosition,
         getWindowSize: getSize,
         setFunctionCount: setFunctionCount,
         setClassCount: setClassCount,
-        setNamespaceCount: setNamespaceCount    
+        setNamespaceCount: setNamespaceCount,    
+        setLineCount: setLineCount,
     };
 });

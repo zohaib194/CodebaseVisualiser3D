@@ -5,6 +5,8 @@ let ImGui_Impl;
 var WindowManager = (function(){
 
     var classCount = 0;
+    var functionCount = 0;
+    var lineCount = 0;
     var implementation = "";
     var repos = new Array();
 
@@ -29,7 +31,6 @@ var WindowManager = (function(){
         console.log(error);
     });
 
-    var functionCount = 0;
 
     /**
      * Loop for rendering imgui components.
@@ -64,6 +65,7 @@ var WindowManager = (function(){
         qualityMetricsWindow = qualityMetrics(codeInspectionWindow.getWindowSize(), codeInspectionWindow.getWindowPosition());
         qualityMetricsWindow.setFunctionCount(functionCount);
         qualityMetricsWindow.setClassCount(classCount);
+        qualityMetricsWindow.setLineCount(lineCount);
         qualityMetricsWindow.initializeWindow();
 
         // Repository window.
@@ -140,6 +142,15 @@ var WindowManager = (function(){
         })
     }
 
+    /**
+     * Sets the number of lines in project.
+     *
+     * @param      {int}  count   Number of lines found
+     */
+    function setLineCount(count){
+        lineCount = count
+    }
+
     return {
         ImGuiUpdate: ImGuiUpdate,
         ImGuiRender: ImGuiRender,
@@ -148,6 +159,7 @@ var WindowManager = (function(){
         setClassCount: setClassCount,
         setNamespaceCount: setNamespaceCount,
         setDataStructureImplementation: setDataStructureImplementation,
-        setRepositories: setRepositories
+        setRepositories: setRepositories,
+        setLineCount: setLineCount,
     };
 });
