@@ -1,5 +1,6 @@
 package me.codvis.ast;
 
+import java.util.Stack;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -19,8 +20,38 @@ public class NamespaceModel extends Model {
 	 *
 	 * @param      name  The name
 	 */
-	NamespaceModel(String name){
+	public NamespaceModel(String name){
 		this.name = name;
+		this.functions = new ArrayList<>();
+		this.namespaces = new ArrayList<>();
+		this.usingNamespaces = new ArrayList<>();
+	}
+
+	/**
+	 * Adds a function.
+	 *
+	 * @param      function  The function
+	 */
+	public void addFunction(FunctionModel function){
+		this.functions.add(function);
+	}
+
+	/**
+	 * Adds a namespace.
+	 *
+	 * @param      namespace  The namespace
+	 */
+	public void addNamespace(NamespaceModel namespace){
+		this.namespaces.add(namespace);
+	}
+
+	/**
+	 * Adds an using namespace.
+	 *
+	 * @param      namespace  The namespace
+	 */
+	public void addUsingNamespace(UsingNamespaceModel namespace){
+		this.usingNamespaces.add(namespace);
 	}
 
 	/**
@@ -57,6 +88,61 @@ public class NamespaceModel extends Model {
 	 */
 	public void setUsingNamespaces(List<UsingNamespaceModel> namespaces){
 		this.usingNamespaces = namespaces;
+	}
+
+	/**
+	 * Adds a model in current scope.
+	 *
+	 * @param      model       The model
+	 * @param      scopeStack  The scope stack identifying current scope position
+	 *
+	 * @return     index in list for its type where model was added for current scope. If not a list it will return 0.
+	 */
+	@Override
+	protected <T extends Model> int addModelInCurrentScope(T model, Stack<ModelIdentifier> scopeStack){
+		ModelIdentifier modelIdentifier;
+
+		int index = 0;
+
+		if (scopeStack.size() > 0) {
+			modelIdentifier = scopeStack.pop();
+
+			switch (modelIdentifier.modelType) {
+				case "functions":
+					index = this.functions.get(modelIdentifier.modelIndex).addModelInCurrentScope(model, scopeStack);
+					break;
+				case "namespaces":
+					index = this.namespaces.get(modelIdentifier.modelIndex).addModelInCurrentScope(model, scopeStack);
+					break;
+				case "usingNamespaces":
+					index = this.usingNamespaces.get(modelIdentifier.modelIndex).addModelInCurrentScope(model, scopeStack);
+					break;
+				default:
+					System.out.println("Error adding model in current scope");
+					System.exit(1);
+
+			}
+		} else {
+			if (model instanceof FunctionModel) {
+				this.addFunction((FunctionModel)model);
+				index = this.usingNamespaces.size() -1;
+
+			}else if (model instanceof  NamespaceModel) {
+				this.addNamespace((NamespaceModel)model);
+				index = this.usingNamespaces.size() -1;
+
+			}else if (model instanceof UsingNamespaceModel) {
+				this.addUsingNamespace((UsingNamespaceModel)model);
+				index = this.usingNamespaces.size() -1;
+
+			}else{
+				System.out.println("Error adding model in current scope");
+				System.exit(1);
+			}
+
+		}
+
+		return index;
 	}
 
 	/**

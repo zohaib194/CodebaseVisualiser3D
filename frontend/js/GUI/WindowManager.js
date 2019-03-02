@@ -5,6 +5,8 @@ let ImGui_Impl;
 var WindowManager = (function(){
 
     var classCount = 0;
+    var implementation = "";
+    var repos = new Array();
 
     Promise.resolve().then(() => {
         return System.import("imgui-js").then((module) => {
@@ -12,7 +14,7 @@ var WindowManager = (function(){
             return ImGui.default();
         });
     }).then(() => {
-        return System.import("imgui-js/example/imgui_impl").then((module) => {
+        return System.import("imgui-js/example/imgui_impl.js").then((module) => {
             ImGui_Impl = module;
         });
     }).then(() => {
@@ -24,7 +26,7 @@ var WindowManager = (function(){
         ImGui.StyleColorsDark();
         //ImGui.StyleColorsClassic();
     }).catch((error) => {
-        console.log("Error: " + error);
+        console.log(error);
     });
 
     var functionCount = 0;
@@ -35,6 +37,10 @@ var WindowManager = (function(){
      * @param      {float}  time    The time
      */
     function ImGuiUpdate(time) {
+        if (typeof ImGui_Impl === "undefined" || typeof ImGui === "undefined") {
+            return ;
+        }
+
         ImGui_Impl.NewFrame(time);
         ImGui.NewFrame();
         
@@ -51,6 +57,7 @@ var WindowManager = (function(){
 
         // Code Inpection window.
         codeInspectionWindow = codeInspection(namespaceWindow.getWindowSize(), namespaceWindow.getWindowPosition());
+        codeInspectionWindow.setImplementation(implementation);
         codeInspectionWindow.initializeWindow();
         
         // Quality metrics window.
@@ -58,6 +65,11 @@ var WindowManager = (function(){
         qualityMetricsWindow.setFunctionCount(functionCount);
         qualityMetricsWindow.setClassCount(classCount);
         qualityMetricsWindow.initializeWindow();
+
+        // Repository window.
+        repositoriesWindow = repositories(menubar.getWindowSize(), menubar.getWindowPosition());
+        repositoriesWindow.setReposURI(repos);
+        repositoriesWindow.initializeWindow();
 
         ImGui.EndFrame();
     }
@@ -67,6 +79,10 @@ var WindowManager = (function(){
      *
      */
     function ImGuiRender(){
+        if (typeof ImGui_Impl === "undefined" || typeof ImGui === "undefined") {
+            return ;
+        }
+
         ImGui.Render();
         ImGui_Impl.RenderDrawData(ImGui.GetDrawData());
         renderer.state.reset();
@@ -104,12 +120,34 @@ var WindowManager = (function(){
        classCount = count;
     }
 
+    /**
+     * Sets the implementation in code inspection.
+     *
+     * @param      {string}  data    The multiline string of implementation.
+     */
+    function setDataStructureImplementation(data){
+        implementation = data;
+    }
+
+    /**
+     * Sets the repositories.
+     *
+     * @param      {array}  data    The data is array of repository models.
+     */
+    function setRepositories(data){
+        data.forEach((repo, index) =>  {
+            repos[index] = repo.uri;
+        })
+    }
+
     return {
         ImGuiUpdate: ImGuiUpdate,
         ImGuiRender: ImGuiRender,
         ImGuiDestroy: ImGuiDestroy,
         setFunctionCount: setFunctionCount,
         setClassCount: setClassCount,
-        setNamespaceCount: setNamespaceCount
+        setNamespaceCount: setNamespaceCount,
+        setDataStructureImplementation: setDataStructureImplementation,
+        setRepositories: setRepositories
     };
 });
