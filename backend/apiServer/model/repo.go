@@ -34,6 +34,18 @@ type SaveResponse struct {
 	Err        error
 }
 
+// ParseResponse is used by ParseDataFromFiles to update channel used by go routine to indicate
+// status of request and result
+type ParseResponse struct {
+	StatusText       string
+	Err              error
+	CurrentFile      string
+	ParsedFileCount  int
+	SkippedFileCount int
+	FileCount        int
+	Result           ProjectModel
+}
+
 // Save is expected to run as a go rutine writing to a c.
 func (repo RepoModel) Save(c chan SaveResponse) {
 
@@ -138,38 +150,61 @@ func (repo RepoModel) SanitizeFilePaths(projectModel ProjectModel) {
 }
 
 // ParseDataFromFiles fetch all functions from gives files set.
-func (repo RepoModel) ParseDataFromFiles(files string) (projectModel ProjectModel, err error) {
-	for _, sourceFile := range strings.Split(strings.TrimSuffix(files, "\n"), "\n") {
+func (repo RepoModel) ParseDataFromFiles(files string, responsePerNFiles int, c chan ParseResponse) {
+	response := ParseResponse{StatusText: "Parsing"}
+	var projectModel ProjectModel
+
+	filesList := strings.Split(strings.TrimSuffix(files, "\n"), "\n")
+
+	response.FileCount = len(filesList)
+
+	for n, sourceFile := range filesList {
 		// Search for cpp files
 		var err error
 		var data FilesModel
 
+		response.CurrentFile = path.Base(sourceFile)
+
 		switch fileExtention := path.Ext(sourceFile); fileExtention {
 		case ".cpp":
 			data, err = repo.Load(sourceFile, "cpp") // Fetch function names from the file.
+			response.ParsedFileCount++
 
 		case ".hpp":
 			data, err = repo.Load(sourceFile, "cpp")
+			response.ParsedFileCount++
 
 		case ".java":
 			data, err = repo.Load(sourceFile, "java")
+			response.ParsedFileCount++
 
 		default:
 			data = FilesModel{File: FileModel{Parsed: false, FileName: sourceFile}}
+			response.SkippedFileCount++
 		}
 
 		if err != nil {
 			log.Println("Could not parse error: ", err.Error())
 			data = FilesModel{File: FileModel{Parsed: false, FileName: sourceFile}}
+
+		} else {
 		}
 
 		projectModel.Files = append(projectModel.Files, data)
+		if n%responsePerNFiles == 0 {
+			c <- response
+		}
 
 	}
 
 	repo.SanitizeFilePaths(projectModel)
 
-	return projectModel, nil
+	response.StatusText = "Done"
+	response.Result = projectModel
+
+	c <- response
+
+	return
 }
 
 // FetchAll fetches all the repositories.
