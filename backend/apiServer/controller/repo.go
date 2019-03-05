@@ -85,7 +85,7 @@ var upgrader = websocket.Upgrader{
 *
 *		Invalid json
 *
- */
+*/
 
 // NewRepoFromURI upgrades a getrequest to a websocket expecting the client to
 // send a json with uri field and saves the git repository it refers to.
@@ -307,40 +307,137 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 *
 * @apiParam {String} Id Id of submitted git repository.
 *
+* @apiDescription Expects a get request requesting a websocket upgrade.
+* The following assumes a websocket has been established. On success
+* the content will conatin a statuscode and statustext based on http status
+* codes and a body.
+* The body can contains:
+*	  	CurrentFile - file last parsed
+*		ParsedFileCount - How many files have been parsed at current time
+*		SkippedFileCount - How many files considered but not parsed, usualy if language is not supported
+*		FileCount - How many files in the repository being considered
+*		Result - The final result of the completed parsing, only for last message
+*						
 * @apiParamExample {url} Parse repository:
 *     {
 *       "id": 5c62d1904122c760dafe9341
 *     }
 *
-* @apiSuccessExample {json} Success-Response:
-* 	HTTP/1.1 200 OK
+* @apiSuccessExample {json} Final message:
+* 	WebSocket 1 TextMessage
 *	{
-*	    "functions": [
-*	        {
-*	            "file": "main.cpp",
-*	            "function_names": [
-*	                {
-*	                    "name": "int main()"
-*	                }
-*	            ]
-*	        }
-*	    ]
+*		{
+*			"statuscode": 200,
+*			"statustext": "OK",
+*			"body": {
+*			  "FileCount": 5,
+*			  "id": "5c7ea320b7fa7003137f003e",
+*			  "parsedFileCount": 1,
+*			  "result": {
+*			    "files": [
+*			      {
+*			        "file": {
+*			          "parsed": false,
+*			          "file_name": "5c7ea320b7fa7003137f003e/.gitignore",
+*			          "functions": null,
+*			          "namespaces": null,
+*			          "classes": null,
+*			          "linesInFile": 0
+*			        }
+*			      },
+*			      {
+*			        "file": {
+*			          "parsed": true,
+*			          "file_name": "5c7ea320b7fa7003137f003e/HelloWorld/Main.java",
+*			          "functions": null,
+*			          "namespaces": [
+*			            {
+*			              "namespace": {
+*			                "functions": [
+*			                  {
+*			                    "function": {
+*			                      "name": "main(String[]args)",
+*			                      "start_line": 6,
+*			                      "end_line": 8
+*			                    }
+*			                  }
+*			                ],
+*			                "name": "HelloWorld",
+*			                "namespaces": null,
+*			                "classes": null
+*			              },
+*			              "line_nr": 0
+*			            }
+*			          ],
+*			          "classes": null,
+*			          "linesInFile": 8
+*			        }
+*			      },
+*			      {
+*			        "file": {
+*			          "parsed": false,
+*			          "file_name": "5c7ea320b7fa7003137f003e/LICENSE",
+*			          "functions": null,
+*			          "namespaces": null,
+*			          "classes": null,
+*			          "linesInFile": 0
+*			        }
+*			      },
+*			      {
+*			        "file": {
+*			          "parsed": false,
+*			          "file_name": "5c7ea320b7fa7003137f003e/Manifest.txt",
+*			          "functions": null,
+*			          "namespaces": null,
+*			          "classes": null,
+*			          "linesInFile": 0
+*			        }
+*			      },
+*			      {
+*			        "file": {
+*			          "parsed": false,
+*			          "file_name": "5c7ea320b7fa7003137f003e/README.rst",
+*			          "functions": null,
+*			          "namespaces": null,
+*			          "classes": null,
+*			          "linesInFile": 0
+*			        }
+*			      }
+*			    ]
+*			  },
+*			  "skippedFileCount": 4,
+*			  "status": "Done"
+*		}
 *	}
 *
-* @apiErrorExample {json} Post invalid id.
-*	HTTP/1.1 400 Bad Request
+* @apiErrorExample {json} Invalid id.
+* 	WebSocket 1 TextMessage
 *	{
-*		Invalid parameters
+*		{
+*			"statuscode": 404,
+*			"statustext": "Not Found",
+*			"body": {
+*			  "id": "5cea320b7fa7003137f003e",
+*			  "status": "Failed"
+*			}
+*		}
+*	}
+*	
+* @apiSuccessExample {json} Status update.
+* 	WebSocket 1 TextMessage
+*	{
+*		{
+*			"statuscode": 404,
+*			"statustext": "Not Found",
+*			"body": {
+*			  "id": "5cea320b7fa7003137f003e",
+*			  "status": "Failed"
+*			}
+*		}
 *	}
 *
-* @apiErrorExample {json} Internal error.
-*	HTTP/1.1 500 Internal Server Error
-*	{
-*		Internal Server Error
-*	}
 *
- */
-
+*/
 // ParseInitial parse a repository for functions of a certain project in repos directory.
 func (repo RepoController) ParseInitial(w http.ResponseWriter, r *http.Request) {
 	http.Header.Add(w.Header(), "content-type", "application/json")
