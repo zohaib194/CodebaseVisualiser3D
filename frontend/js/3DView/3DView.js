@@ -320,12 +320,11 @@ function sendAddRequest(){
             // Update status.
             document.getElementById("status").innerHTML = response.body.status;
         }
-
-
     }
+    
     websocket.onclose = function (event) {
         var reason = JSON.parse(event.reason)
-        // if the repository already exist than set the id that relates to existing repo.
+        // if the repository already exist, set the id to existing repo.
         if(reason.statuscode == 409){
             document.getElementById("status").innerHTML = reason.body.status;
             id = reason.body.id;
