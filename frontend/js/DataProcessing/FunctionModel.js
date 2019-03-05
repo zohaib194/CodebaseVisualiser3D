@@ -4,10 +4,11 @@
  * @param      {String}  file           The file
  * @param      {String}  funcStartLine  The function start line
  * @param      {String}  funcEndLine    The function end line
- * @return     {Object}  { description_of_the_return_value }
+ * @return     {Object}  object containing get functions.
  */
-var FunctionMetaData = (function(file, funcStartLine, funcEndLine) {
-	var fileName = file
+var FunctionMetaData = (function(file, calls, funcStartLine, funcEndLine) {
+	var fileName = file;
+	var calls = calls;
 	var startLine = funcStartLine;
 	var endLine = funcEndLine;
 
@@ -23,9 +24,14 @@ var FunctionMetaData = (function(file, funcStartLine, funcEndLine) {
 		return endLine;
 	}
 
+	function getCalls(){
+		return calls;
+	}
+
 	return {
 		getFileName: getFileName,
 		getStartLine: getStartLine,
-		getEndLine: getEndLine
+		getEndLine: getEndLine,
+		getCalls: getCalls
 	}
 });

@@ -1,5 +1,6 @@
 var indexStack = new Array();
 var functionModels = new Map();
+var indexToFunctionMap = new Map();
 
 // Number of classes found in the project
 var classCount = 0;
@@ -35,6 +36,39 @@ function linkElements() {
     } else {    // Missing parrent, state so.
         console.log(LOCALE.getSentence("fdg_link_missing_parent"));
     }
+}
+
+/**
+ * Links function calls.
+ */
+function linkFunctionCalls(){
+    indexToFunctionMap.forEach( function(callerIndex, funcName) {
+
+        // Get the function caller.
+        funcModel = functionModels.get(funcName);
+        // Check the calls length.
+        if(funcModel.getCalls().length == 0){
+            return;
+        }
+
+        // Loop through calls
+        funcModel.getCalls().forEach( function(funcName, index) {
+
+            if(functionModels.has(funcName)){
+                console.log(element, index);
+                
+                calleeIndex = indexToFunctionMap.get(funcName)
+
+                fdg.addLink(
+                    indexStack[callerIndex], 
+                    indexStack[calleeIndex], 
+                    new LinkProperties(1)
+                );
+            }
+            
+        });
+
+    });
 }
 
 /**
@@ -98,20 +132,26 @@ function handleNamespaceData(namespaceData, filename) {
  */
 function handleFunctionData(functionData, filename) {
     // Add node and save index to stack.
-    indexStack.push(
-        fdg.addNode(
+    index = fdg.addNode(
             new Node(
                 randomPosition(), 
                 functionData.function.name, 
                 "function"
             )
-        )
-    );
+        );
+
+    // Push current node to index stack.
+    indexStack.push(index);
+
+    // Map current node to the index.
+    indexToFunctionMap.set(functionData.function.name, index);
+
     // Save the function data in function model.
     functionModels.set(
         functionData.function.name,
         new FunctionMetaData( 
-            filename,
+            fileName,
+            functionData.function.calls,
             functionData.function.start_line, 
             functionData.function.end_line
         )
@@ -180,4 +220,6 @@ function handleProjectData(projectData) {
     windowMgr.setClassCount(classCount);
     windowMgr.setNamespaceCount(namespaceCount);
     windowMgr.setLineCount(lineCount);
+
+    linkFunctionCalls();
 }
