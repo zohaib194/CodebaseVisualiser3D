@@ -1,8 +1,5 @@
 $color_notification: #ffd800;
-
-body {
-    margin: 0%;
-}
+$color_background: #6adce8;
 
 .notificationbar {
     position: absolute;
@@ -18,13 +15,29 @@ body {
 }
 
 .repoform {
-    height: 2em;
-    width: 35em;
-    position: fixed;
-    top: 50%;
-    left: 45%;
-    margin-top: -1em;
-    margin-left: -10em;
+    position: relative;
+    border-radius: 4px;
+    padding: 0.2em 1em 0.2em 1em;
+    border: 2px solid black;
+    background-color: mix($color_background, black, 65%);
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr repeat(4, auto) 1fr;
+    grid-template-areas:
+        "guide input send";
+    p{
+        grid-area: guide;
+        font-weight: bold;
+        text-decoration: underline;
+        grid-area: text;
+    }
+    input[type="uri"]{
+        grid-area: input;
+        width: 100%;
+    }
+    button{
+        float: right;
+        grid-area: send;
+    }
 }
 
 #reponame {
@@ -38,8 +51,7 @@ body {
 
 // Reference for the loader css code:  https://www.w3schools.com/howto/howto_css_loader.asp
 #loader {
-border: 0.1em solid #f3f3f3;
-
+    border: 0.1em solid #f3f3f3;
     border-top-color: rgb(243, 243, 243);
     border-top-style: solid;
     border-top-width: 0.1em;
@@ -54,6 +66,7 @@ border: 0.1em solid #f3f3f3;
     -webkit-animation: spin 2s linear infinite;
     animation: spin 2s linear infinite;
 }
+
 
 /* Safari */
 @-webkit-keyframes spin {
@@ -72,51 +85,119 @@ border: 0.1em solid #f3f3f3;
     min-height: 100%;
     margin: 5px auto 0px auto;
     grid-gap: 5px;
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: 80px repeat(3, auto) 50px;
+    grid-template-columns: 100%;
+    grid-template-rows: auto auto auto auto auto;
     grid-template-areas:
-        "header header header"
-        "header header header"
-        "main main main"
-        "main main main"
-        "footer footer footer";
+        "logo"
+        "header"
+        "main"
+        "support"
+        "footer";
 }
 
 
 /* MEDIUM GRID */
-@media (min-width: 480px) {
+@media (min-width: 700px) {
     .container {
-        grid-template-columns: 1fr 1fr 1fr;
-        grid-template-rows: 80px 1fr 1fr 1fr 50px;
+        grid-template-columns: auto auto;
+        grid-template-rows: auto auto auto auto;
         grid-template-areas:
-            "header header header"
-            "header header header"
-            "main  main main"
-            "main  main main"
-            "footer footer  footer";
+            "logo logo"
+            "support header"
+            "support main"
+            "support main"
+            "footer footer";
     }
 }
 
 /* BIG GRID */
-@media (min-width: 800px) {
+@media (min-width: 1400px) {
     .container {
-        grid-template-columns: 120px 1fr 120px;
-        grid-template-rows: 80px 1fr 1fr 1fr 50px;
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+        grid-template-rows: 1fr 1fr auto auto;
         grid-template-areas:
-            "header header header"
-            "header header header"
-            "main  main main"
-            "main  main main"
-            "footer footer footer";
+            "logo empty empty empty"
+            "logo header header header"
+            "support main main main"
+            "footer footer footer footer";
     }
 }
 
-
-* { 
-    margin: 0;
-    padding: 0;
+#browse_support{
+    grid-area: support;
 }
 
-header  { background-color: lightgreen;  grid-area: header;}
-main { background-color: orange; grid-area: main;  }
-footer { background-color: hotpink; grid-area: footer;}
+#logo{
+    grid-area: logo;
+}
+
+body{
+    background-color: $color_background;
+    padding: 0em 1em 0em 1em;
+}
+
+header{ 
+    grid-area: header;
+    background-color: mix($color_background, black, 65%);
+    box-shadow: 0 0 50px #333;
+    padding: 1em;
+    border: 1px solid black;
+}
+
+main { 
+    grid-area: main;
+    padding-top: 2em;
+
+    article{
+        margin-left: auto;
+        margin-right: auto;
+        opacity: 10%;
+        margin-bottom: 1em;
+    }
+    
+}
+
+footer { 
+    border-top: 1px solid black;
+    margin-top: 1em;
+    padding-top: 1em;
+    padding-bottom: 1em;
+    text-align: center;
+    grid-area: footer;
+}
+
+table{
+    border: 2px solid black;
+    margin: 0px;
+    padding: 0px;
+    font-weight: bold;
+    border-spacing: 1em;
+    background-color: mix($color_background, black, 65%);
+    box-shadow: 0 0 50px #333;
+
+    th{
+        border-bottom: 1px solid black;
+    }
+    .complete{
+        text-align: center;
+        border: 1px solid black;
+        background-color: limegreen;
+    }
+    .partial{
+        text-align: center;
+        border: 1px solid black;
+        background: repeating-linear-gradient(45deg, limegreen, mix(limegreen, crimson, 50%) 10px, crimson 10px, mix(crimson, limegreen, 50%) 20px);
+        background-color: purple;
+    }
+    .non{
+        text-align: center;
+        border: 1px solid black;
+        background-color: crimson;
+    }
+
+}
+
+h3{
+    font-style: italic;
+
+}
