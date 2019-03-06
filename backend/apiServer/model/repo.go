@@ -187,7 +187,6 @@ func (repo RepoModel) ParseDataFromFiles(files string, responsePerNFiles int, c 
 			log.Println("Could not parse error: ", err.Error())
 			data = FilesModel{File: FileModel{Parsed: false, FileName: sourceFile}}
 
-		} else {
 		}
 
 		projectModel.Files = append(projectModel.Files, data)

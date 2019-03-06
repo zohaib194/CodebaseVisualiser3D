@@ -85,7 +85,7 @@ var upgrader = websocket.Upgrader{
 *
 *		Invalid json
 *
-*/
+ */
 
 // NewRepoFromURI upgrades a getrequest to a websocket expecting the client to
 // send a json with uri field and saves the git repository it refers to.
@@ -317,7 +317,7 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 *		SkippedFileCount - How many files considered but not parsed, usualy if language is not supported
 *		FileCount - How many files in the repository being considered
 *		Result - The final result of the completed parsing, only for last message
-*						
+*
 * @apiParamExample {url} Parse repository:
 *     {
 *       "id": 5c62d1904122c760dafe9341
@@ -422,7 +422,7 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 *			}
 *		}
 *	}
-*	
+*
 * @apiSuccessExample {json} Status update.
 * 	WebSocket 1 TextMessage
 *	{
@@ -437,7 +437,8 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 *	}
 *
 *
-*/
+ */
+
 // ParseInitial parse a repository for functions of a certain project in repos directory.
 func (repo RepoController) ParseInitial(w http.ResponseWriter, r *http.Request) {
 	http.Header.Add(w.Header(), "content-type", "application/json")
