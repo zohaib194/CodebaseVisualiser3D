@@ -353,9 +353,11 @@ function sendInitialRequest() {
             case "Done": {
 
                 // Display finished message and final file count.
-                document.getElementById("status").innerHTML = 
+                if (typeof response.body.currentFile !== "undefined") {
+                    document.getElementById("status").innerHTML = 
                     LOCALE.getSentence("userinfo_websocket_initial_message_status_finished") + 
                     ": " + response.body.currentFile;
+                }
 
                 if (typeof response.body.parsedFileCount !== "undefined") {
                     document.getElementById("status_parsedcount").innerHTML = 
