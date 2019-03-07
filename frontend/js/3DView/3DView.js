@@ -329,48 +329,59 @@ function sendInitialRequest() {
             return;
         }
 
+        var currentFileExists = typeof response.body.currentFile !== "undefined";
+        var parsedCountExists = typeof response.body.parsedFileCount !== "undefined";
+        var skipCountExists = typeof response.body.skippedFileCount !== "undefined";
+        var fileCountExists = typeof response.body.fileCount !== "undefined";
+
+        // Updating variables
+        if (parsedCountExists && 
+            skipCountExists && 
+            currentFileExists
+        ) {
+            parsedFileCount = response.body.parsedFileCount;
+            skippedFileCount = response.body.skippedFileCount;
+            fileCount = response.body.fileCount;
+        }
+
+        // Display file counts and loading bar.
+        if (parsedCountExists) {
+            document.getElementById("status_parsedcount").innerHTML = 
+                LOCALE.getSentence("userinfo_websocket_initial_message_parsed") + 
+                ": " + parsedFileCount;
+        }
+        if (skipCountExists) {
+            document.getElementById("status_skippedcount").innerHTML = 
+                LOCALE.getSentence("userinfo_websocket_initial_message_skipped") + 
+                ": " + skippedFileCount;
+        }
+
+        if (parsedCountExists &&
+            skipCountExists &&
+            fileCountExists
+        ) {
+            var progressbar = document.getElementById("status_progressbar");
+            progressbar.max = fileCount
+            progressbar.value = parsedFileCount + skippedFileCount;
+        }
+
         switch (response.body.status) {
             // Still parsing. 
             case "Parsing": {
-                // Display current file and file counts.
-                document.getElementById("status").innerHTML = 
-                    LOCALE.getSentence("userinfo_websocket_initial_message_status_parsing") + 
-                    ": " + response.body.currentFile;
-                if (typeof response.body.parsedFileCount !== "undefined") {
-                    document.getElementById("status_parsedcount").innerHTML = 
-                        LOCALE.getSentence("userinfo_websocket_initial_message_parsed") + 
-                        ": " + response.body.parsedFileCount;
-                }
-                if (typeof response.body.skippedFileCount !== "undefined") {
-                    document.getElementById("status_skippedcount").innerHTML = 
-                        LOCALE.getSentence("userinfo_websocket_initial_message_skipped") + 
-                        ": " + response.body.skippedFileCount;
+                // Display parsing text.
+                if (currentFileExists) {
+                    document.getElementById("status").innerHTML = 
+                        LOCALE.getSentence("userinfo_websocket_initial_message_status_parsing") + 
+                        ": " + response.body.currentFile;
                 }
 
                 break;
             }
             // Finished parsing.
             case "Done": {
-
                 // Display finished message and final file count.
-                if (typeof response.body.currentFile !== "undefined") {
-                    document.getElementById("status").innerHTML = 
-                    LOCALE.getSentence("userinfo_websocket_initial_message_status_finished") + 
-                    ": " + response.body.currentFile;
-                }
-
-                if (typeof response.body.parsedFileCount !== "undefined") {
-                    document.getElementById("status_parsedcount").innerHTML = 
-                        LOCALE.getSentence("userinfo_websocket_initial_message_parsed") + 
-                        ": " + response.body.parsedFileCount;
-                }
-                if (typeof response.body.skippedFileCount !== "undefined") {
-                    document.getElementById("status_skippedcount").innerHTML = 
-                        LOCALE.getSentence("userinfo_websocket_initial_message_skipped") + 
-                        ": " + response.body.skippedFileCount;
-                }
-                parsedFileCount = response.body.parsedFileCount;
-                skippedFileCount = response.body.skippedFileCount;
+                document.getElementById("status").innerHTML = 
+                    LOCALE.getSentence("userinfo_websocket_initial_message_status_finished");
 
                 // Continue with parsing.
                 runFDGOnJSONData(response.body.result);
@@ -385,6 +396,7 @@ function sendInitialRequest() {
         document.getElementById("status").style.display = "none";
         document.getElementById("status_parsedcount").style.display = "none";
         document.getElementById("status_skippedcount").style.display = "none";
+        document.getElementById("status_progressbar").style.display = "none";
 
         // Start three.js loop
         requestAnimationFrame(mainloop);

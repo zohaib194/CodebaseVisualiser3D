@@ -1,6 +1,7 @@
 var indexStack = new Array();
 var functionModels = new Map();
 
+var fileCount = 0;
 var parsedFileCount = 0;
 var skippedFileCount = 0;
 
