@@ -540,7 +540,7 @@ func (repo RepoController) ParseInitial(w http.ResponseWriter, r *http.Request) 
 						"currentFile":      parserResponse.CurrentFile,
 						"parsedFileCount":  parserResponse.ParsedFileCount,
 						"skippedFileCount": parserResponse.SkippedFileCount,
-						"FileCount":        parserResponse.FileCount,
+						"fileCount":        parserResponse.FileCount,
 					},
 				}
 
@@ -558,7 +558,7 @@ func (repo RepoController) ParseInitial(w http.ResponseWriter, r *http.Request) 
 						"status":           "Done",
 						"parsedFileCount":  parserResponse.ParsedFileCount,
 						"skippedFileCount": parserResponse.SkippedFileCount,
-						"FileCount":        parserResponse.FileCount,
+						"fileCount":        parserResponse.FileCount,
 						"result":           parserResponse.Result,
 					},
 				}
