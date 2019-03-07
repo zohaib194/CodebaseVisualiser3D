@@ -27,7 +27,9 @@
                     Please upgrade your browser to improve your experience.
                 </p>
             <![endif]-->
-            
+            <div id=logo>
+                <img src="/img/CodeVis3D_Large.png">
+            </div> 
             <header>
                 <h3>Gain a better understanding of libraries by visualizing their code</h3>
                 <p>
@@ -39,18 +41,83 @@
                     Submit a git repository link in the field below to check it out.
                 </p>
             </header>
+            <div id="browse_support">
+                <h3>Supported browsers</h3> 
+                <table>
+                    <tr>    <th>Browser</th>                <th>Version</th>                </tr>
+                    <tr>    <td>explorer</td>               <td class="non">Non</td>        </tr>
+                    <tr>    <td>Edge</td>                   <td class="complete">16</td>    </tr>
+                    <tr>    <td>Firefox</td>                <td class="complete">52</td>    </tr>
+                    <tr>    <td>Chrome</td>                 <td class="complete">57</td>    </tr>
+                    <tr>    <td>Opera</td>                  <td class="complete">44</td>    </tr>
+                    <tr>    <td>iOS Safari</td>             <td class="complete">11</td>    </tr>
+                    <tr>    <td>Opera Mini</td>             <td class="non">Non</td>        </tr>
+                    <tr>    <td>Android Browser</td>        <td class="complete">67</td>    </tr>
+                    <tr>    <td>Blackberry browser</td>     <td class="non">Non</td>        </tr>
+                    <tr>    <td>Opera Mobile</td>           <td class="complete">46</td>    </tr>
+                    <tr>    <td>Chrome for Android</td>     <td class="complete">71</td>    </tr>
+                    <tr>    <td>Firefox for Android</td>    <td class="complete">64</td>    </tr>
+                    <tr>    <td>IE Mobile</td>              <td class="non">Non</td>        </tr>
+                    <tr>    <td>UC Browser for Android</td> <td class="non">Non</td>        </tr>
+                    <tr>    <td>Samsung Internet</td>       <td class="complete">7.4</td>   </tr>
+                    <tr>    <td>QQ Browser</td>             <td class="non">Non</td>        </tr>
+                    <tr>    <td>Baidu Browser</td>          <td class="non">Non</td>        </tr>
+                </table>
+            </div>
             <main>
-
+                <div id="loader"></div>
                 <form id="repositoryform">
                     <div class="repoform">
-                        <p id="gitrepotitle">Git Repository</p>
-                        <input type="text" name="reponame" id="reponame">
+                        <p id="gitrepotitle">Git Repository:</p>
+                        <input type="uri" name="reponame" id="reponame" 
+                            placeholder="https://github.com/zohaib194/CodebaseVisualizer3D.git">
                         <button type="button" onclick="submitRepoName()"> Submit </button>
                     </div>
                 </form> 
+                <article>
+                    <h3>Currently supported language features</h3>
 
+                    <table>
+                        <tr>
+                            <th>Language</th>
+                            <th>namespace</th>
+                            <th>functions</th>
+                            <th>classes</th>
+                            <th>templates</th>
+                            <th>if/elsee/switch</th>
+                            <th>primitives</th>
+                            <th>objects</th>
+                            <th>comments</th>
+                        </tr>
+                        <tr>
+                            <td>C++</td>
+                            <td class="partial">Partial</td>
+                            <td class="partial">Partial</td>
+                            <td class="non">Non</td>
+                            <td class="non">Non</td>
+                            <td class="non">Non</td>
+                            <td class="non">Non</td>
+                            <td class="non">Non</td>
+                            <td class="non">Non</td>
+                        </tr>
+                        <tr>
+                            <td >Java</td>
+                            <td class="partial">partial</td>
+                            <td class="partial">partial</td>
+                            <td class="non">Non</td>
+                            <td class="non">Non</td>
+                            <td class="non">Non</td>
+                            <td class="non">Non</td>
+                            <td class="non">Non</td>
+                            <td class="non">Non</td> 
+                        </tr>
+                            
+                    </table>
+                </article>
             </main>
-            <footer></footer>
+            <footer>
+                Github: <a href="https://github.com/zohaib194/CodebaseVisualizer3D">github.com/zohaib194/CodebaseVisualizer3D</a>  Feedback: <a href="https://github.com/zohaib194/CodebaseVisualizer3D/issues"> Issue tracker</a> 
+            </footer>
         </div>
     </body>
 </html>
