@@ -1,6 +1,7 @@
 package me.codvis.ast;
 
 import java.util.List;
+import java.util.Stack;
 import java.util.ArrayList;
 
 import me.codvis.ast.parser.Java9BaseListener;
@@ -14,7 +15,6 @@ import org.json.JSONObject;
  */
 public class JavaLstnr_Initial extends JavaExtendedListener {
 	private FileModel fileModel;
-	private NamespaceModel namespace;
 
 	/**
 	 * Constructs the object, setting the filepath to file being parsed.
@@ -23,6 +23,7 @@ public class JavaLstnr_Initial extends JavaExtendedListener {
 	 */
 	JavaLstnr_Initial(String filePath) {
 		this.fileModel = new FileModel(filePath);
+		this.enterScope(this.fileModel);
 	}
 
 	/**
@@ -38,7 +39,19 @@ public class JavaLstnr_Initial extends JavaExtendedListener {
       	functionModel.setLineStart(ctx.methodBody().start.getLine());
       	functionModel.setLineEnd(ctx.methodBody().stop.getLine());
 	    
-	    fileModel.addFunction(functionModel);
+
+	   	this.scopeStack.peek().addDataInModel(functionModel);
+	    this.enterScope(functionModel);
+    }
+
+    /**
+     * Listener for exiting the current scope, expecting that scope to be one entered by enterMethodDeclaration.
+     *
+     * @param      ctx   The parsing context
+     */
+    @Override 
+    public void exitMethodDeclaration(Java9Parser.MethodDeclarationContext ctx) { 
+    	this.exitScope();
     }
 
     /**
@@ -48,7 +61,10 @@ public class JavaLstnr_Initial extends JavaExtendedListener {
      */
 	@Override
 	public void enterPackageDeclaration(Java9Parser.PackageDeclarationContext ctx){
-		this.namespace = new NamespaceModel(ctx.packageName().getText());
+		NamespaceModel namespace = new NamespaceModel(ctx.packageName().getText());
+		
+		this.scopeStack.peek().addDataInModel(namespace);
+	    this.enterScope(namespace);
 	}
 
 	/**
@@ -62,28 +78,38 @@ public class JavaLstnr_Initial extends JavaExtendedListener {
 		Java9Parser.StaticImportOnDemandDeclarationContext importOnDemand = ctx.staticImportOnDemandDeclaration();
 		Java9Parser.SingleTypeImportDeclarationContext importSingleType = ctx.singleTypeImportDeclaration();
 		Java9Parser.TypeImportOnDemandDeclarationContext importTypeOnDemand = ctx.typeImportOnDemandDeclaration();
+
+		UsingNamespaceModel usingNamespaceModel;
+
 		if ( importSingle != null) {
-			this.fileModel.addUsingNamespace(
-				new UsingNamespaceModel(importSingle.typeName().getText(), importSingle.typeName().getStart().getLine())
-			);
+			usingNamespaceModel = new UsingNamespaceModel(importSingle.typeName().getText(), importSingle.typeName().getStart().getLine());
 		} else if (importOnDemand != null) {
-			this.fileModel.addUsingNamespace(
-				new UsingNamespaceModel(importOnDemand.typeName().getText(), importOnDemand.typeName().getStart().getLine())
-			);				
+			usingNamespaceModel = new UsingNamespaceModel(importOnDemand.typeName().getText(), importOnDemand.typeName().getStart().getLine());				
 
 		} else if (importSingleType != null) {
-			this.fileModel.addUsingNamespace(
-				new UsingNamespaceModel(importSingleType.typeName().getText(), importSingleType.typeName().getStart().getLine())
-			);		
+			usingNamespaceModel = new UsingNamespaceModel(importSingleType.typeName().getText(), importSingleType.typeName().getStart().getLine());		
 
 		} else if (importTypeOnDemand != null) {
-			this.fileModel.addUsingNamespace(
-				new UsingNamespaceModel(importTypeOnDemand.packageOrTypeName().getText(), importTypeOnDemand.packageOrTypeName().getStart().getLine())
-			);
+			usingNamespaceModel = new UsingNamespaceModel(importTypeOnDemand.packageOrTypeName().getText(), importTypeOnDemand.packageOrTypeName().getStart().getLine());
 
+		}else{
+			System.out.println("Unhandeled using dirctive");
+			return;
 		}
-		
+
+	   	this.scopeStack.peek().addDataInModel(usingNamespaceModel);
 	}	
+
+	/**
+	 * Listener for parsing function calls.
+	 *
+	 * @param      ctx   The parsing context
+	 */
+	@Override 
+	public void enterMethodInvocation(Java9Parser.MethodInvocationContext ctx) { 
+	    this.scopeStack.peek().addDataInModel(ctx.getText());
+
+	}
 
 	/**
 	 * Gets the parsed code as JSONObject.
@@ -94,18 +120,6 @@ public class JavaLstnr_Initial extends JavaExtendedListener {
     public JSONObject getParsedCode() {
 		JSONObject parsedCode = new JSONObject();
 
-		if (this.namespace != null) {
-			
-        	this.namespace.setFunctions(this.fileModel.getFunctions());
-        	this.namespace.setNamespaces(this.fileModel.getNamespaces());
-        	this.namespace.setUsingNamespaces(this.fileModel.getUsingNamespaces());
-
-        	FileModel filemodel = new FileModel(this.fileModel.getFilename());
-
-        	filemodel.addNamespace(this.namespace);
-    		
-    		return parsedCode.put("file", filemodel.getParsedCode());
-		}
     	return parsedCode.put("file", this.fileModel.getParsedCode());
     }
  }
