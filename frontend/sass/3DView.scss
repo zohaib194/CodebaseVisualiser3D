@@ -1,3 +1,7 @@
+$status_primary_color: #3498db;
+$status_primary_background_color: #ffffff;
+$status_loader_secondary_color: #b0b0b0;
+
 body {
     margin: 0%;
     overflow: hidden;
@@ -14,33 +18,70 @@ body {
 }
 
 #statusDiv{
-    z-index: 2;
-    top: 45%;
-    left: 45%;
     position: absolute;
-    width: 7em;
+    top: 35%;
+    left: 45%;
+    vertical-align: middle;
+    width: 10em;
+    z-index: 2;
 }
 
-#status {
-    background: white;
+%status_textstyling {
     color: black;
     text-align: center;
+    touch-action: none;
+} 
+
+#status, #status_parsedcount, #status_skippedcount {
+    @extend %status_textstyling;
+    margin-top: 0.5em;
+    margin-bottom: 0em;
+    text-overflow: ellipsis;
+    z-index: 3;
+}
+
+/*{
+    @extend %status_textstyling;
+    z-index: 3;
+}*/
+
+#status_progressbar {
+    display: block;
+    width: 100%;
+    height: 1.5em;
+    margin-top: 0.5em;
+    margin-bottom: 0em;
+    margin-left: auto;
+    margin-right: auto;
+    background: $status_primary_background_color;
+    color: $status_primary_color;
+    border: 1px solid $status_primary_color;
+    touch-action: none;
+    z-index: 3;
+
+    // Coloring of the value/inner-bar
+    // Firefox
+    -moz-progress-bar { background: $status_primary_color; }
+    // Chrome + Safari
+    -webkit-progress-bar { background: $status_primary_background_color; }
+    -webkit-progress-value { background: $status_primary_color; }
 }
 
 // Reference for the loader css code:  https://www.w3schools.com/howto/howto_css_loader.asp
 #loader {
-    border: 0.1em solid #f3f3f3;
-    border-top-color: rgb(243, 243, 243);
+    border: 0.1em solid $status_loader_secondary_color;
+    border-top-color: $status_primary_background_color;
     border-top-style: solid;
     border-top-width: 0.1em;
     border-radius: 50%;
-    border-top: 0.1em solid #3498db;
+    border-top: 0.1em solid $status_primary_color;
     width: 5em;
     height: 5em;
     -webkit-animation: spin 2s linear infinite;
     animation: spin 2s linear infinite;
     z-index: 9999;
-    margin: auto;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 /* Safari */

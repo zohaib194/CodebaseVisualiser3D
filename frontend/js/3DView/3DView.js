@@ -42,6 +42,9 @@ window.addEventListener("resize", function () {
     camera.updateProjectionMatrix();
 });
 
+// Draw to remove black screen.
+renderer.render(scene, camera);
+
 // Cube marking origin of world.
 var originGeometry = new THREE.CubeGeometry(0.05, 0.05, 0.05);
 var originMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
@@ -104,7 +107,8 @@ function mainloop(time) {
 */
 function runFDGOnJSONData(data) {
     // Build fdg graph from parsed json data.
-    document.getElementById("status").innerHTML = "Getting data ready for FDG";
+    document.getElementById("status").innerHTML = 
+        LOCALE.getSentence("userinfo_read");
     handleProjectData(data);
 
     // Apply negative links on those who aren't related
@@ -115,11 +119,13 @@ function runFDGOnJSONData(data) {
     }
 
     // Run for 100 iterations shifting the position of nodes.
-    document.getElementById("status").innerHTML = "Running FDG";
+    document.getElementById("status").innerHTML = 
+        LOCALE.getSentence("userinfo_organization");
     fdg.execute(100);
 
     // Draw nodes using display manager.
-    document.getElementById("status").innerHTML = "Assigning shapes to data structures";
+    document.getElementById("status").innerHTML = 
+        LOCALE.getSentence("userinfo_structure_visualization_assigment");
     fdg.getNodes().forEach((node) => {
         /**
          * Function for selecting proper type from configuration.
@@ -186,7 +192,8 @@ function runFDGOnJSONData(data) {
         }
         
         // Found a supported type.
-        document.getElementById("status").innerHTML = "Ready to draw";
+        document.getElementById("status").innerHTML = 
+            LOCALE.getSentence("userinfo_ready_display");
         if (supportedType) {
             // Add it for display.
             displayMgr.addObject(
@@ -220,12 +227,6 @@ function runFDGOnJSONData(data) {
     });
 }
 
-// Find reponame param form url
-var repoName = new URL(window.location.href).searchParams.get("repo");
-
-// id of the repo sumbitted to back-end.
-var id = 0;
-
 // ########## Mouse events functions ##########
 
 /**
@@ -233,20 +234,20 @@ var id = 0;
  *
  * @param      {Event}  event   The event.
  */
-function onMouseClick( event ) {
+function onMouseClick(event) {
 
     // calculate mouse position in normalized device coordinates
     // (-1 to +1) for both components
-    mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-    mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
 
     // update the picking ray with the camera and mouse position
-    raycaster.setFromCamera( mouse, camera );
+    raycaster.setFromCamera(mouse, camera);
 
     // calculate objects intersecting the picking ray
-    var intersects = raycaster.intersectObjects( scene.children , true);
+    var intersects = raycaster.intersectObjects(scene.children ,true);
 
-    if(intersects !== "undefined" && intersects.length > 0){
+    if(intersects !== "undefined" && intersects.length > 0) {
         var funcName = intersects[0].object.name.substr(0, intersects[0].object.name.indexOf(' |'));
 
         sendGetRequest("http://" + config.serverInfo.api_ip + ":" + config.serverInfo.api_port + 
@@ -259,7 +260,13 @@ function onMouseClick( event ) {
     }
 }
 
-window.addEventListener( 'mousedown', onMouseClick);
+window.addEventListener('mousedown', onMouseClick);
+
+// Find reponame param form url
+var repoName = new URL(window.location.href).searchParams.get("repo");
+
+// id of the repo sumbitted to back-end.
+var id = 0;
 
 /**
  * Sends a get request to given url.
@@ -297,6 +304,109 @@ sendGetRequest("http://" + config.serverInfo.api_ip + ":" + config.serverInfo.ap
 });
 
 /**
+ * Sends an get request for the repository data and update feedback status through websocket.
+ */
+function sendInitialRequest() {
+    // Websocket connection for the api endpoint.
+    var websocket = new WebSocket("ws://" + config.serverInfo.api_ip + ":" + config.serverInfo.api_port + "/repo/"+id+"/initial/");
+
+    // Message recieved from server.
+    websocket.onmessage = function (event) {
+        console.log(LOCALE.getSentence("userinfo_websocket_initial_message"));
+
+        // Parse the server response.
+        var response = JSON.parse(event.data)
+
+        // set the id related to repository.
+        id = response.body.id;
+
+        // Everything went ok, display data.
+        if (response.statuscode >= 400) {
+            // Update status and exit.
+            document.getElementById("status").innerHTML = 
+                LOCALE.getSentence("userinfo_websocket_initial_message_failed") + 
+                ": " + response.body.id;
+            return;
+        }
+
+        var currentFileExists = typeof response.body.currentFile !== "undefined";
+        var parsedCountExists = typeof response.body.parsedFileCount !== "undefined";
+        var skipCountExists = typeof response.body.skippedFileCount !== "undefined";
+        var fileCountExists = typeof response.body.fileCount !== "undefined";
+
+        // Updating variables
+        if (parsedCountExists && 
+            skipCountExists && 
+            currentFileExists
+        ) {
+            parsedFileCount = response.body.parsedFileCount;
+            skippedFileCount = response.body.skippedFileCount;
+            fileCount = response.body.fileCount;
+        }
+
+        // Display file counts and loading bar.
+        if (parsedCountExists) {
+            document.getElementById("status_parsedcount").innerHTML = 
+                LOCALE.getSentence("userinfo_websocket_initial_message_parsed") + 
+                ": " + parsedFileCount;
+        }
+        if (skipCountExists) {
+            document.getElementById("status_skippedcount").innerHTML = 
+                LOCALE.getSentence("userinfo_websocket_initial_message_skipped") + 
+                ": " + skippedFileCount;
+        }
+
+        if (parsedCountExists &&
+            skipCountExists &&
+            fileCountExists
+        ) {
+            var progressbar = document.getElementById("status_progressbar");
+            progressbar.max = fileCount
+            progressbar.value = parsedFileCount + skippedFileCount;
+        }
+
+        switch (response.body.status) {
+            // Still parsing. 
+            case "Parsing": {
+                // Display parsing text.
+                if (currentFileExists) {
+                    document.getElementById("status").innerHTML = 
+                        LOCALE.getSentence("userinfo_websocket_initial_message_status_parsing") + 
+                        ": " + response.body.currentFile;
+                }
+
+                break;
+            }
+            // Finished parsing.
+            case "Done": {
+                // Display finished message and final file count.
+                document.getElementById("status").innerHTML = 
+                    LOCALE.getSentence("userinfo_websocket_initial_message_status_finished");
+
+                // Continue with parsing.
+                runFDGOnJSONData(response.body.result);
+                break;
+            }
+        }
+    };
+    
+    websocket.onclose = function (event) {
+        // Disable the loader icon and status tags.
+        document.getElementById("loader").style.display = "none";
+        document.getElementById("status").style.display = "none";
+        document.getElementById("status_parsedcount").style.display = "none";
+        document.getElementById("status_skippedcount").style.display = "none";
+        document.getElementById("status_progressbar").style.display = "none";
+
+        // Start three.js loop
+        requestAnimationFrame(mainloop);
+        
+        // Closed websocket.
+        websocket.close();
+    }
+};
+
+/**
  * Sends an add request to submit the repository and update feedback status through websockets.
  */
 function sendAddRequest(){ 
@@ -313,44 +423,30 @@ function sendAddRequest(){
         // Parse the server response.
         var response = JSON.parse(event.data)
 
+        
         if (response.statuscode == 202) {
             // set the id related to repository.
             id = response.body.id;
-
+            
             // Update status.
             document.getElementById("status").innerHTML = response.body.status;
         }
-
-
     }
+
     websocket.onclose = function (event) {
         var reason = JSON.parse(event.reason)
-        // if the repository already exist than set the id that relates to existing repo.
+        // if the repository already exist, set the id to existing repo.
         if(reason.statuscode == 409){
             document.getElementById("status").innerHTML = reason.body.status;
             id = reason.body.id;
         } else if (reason.statuscode == 400){
             document.getElementById("status").innerHTML = reason.body.status;
             location.assign("../index.html");
-            return ;
+            return;
         }
-
-        // Send the initial request to back-end.
-        sendGetRequest("http://" + config.serverInfo.api_ip + ":" + config.serverInfo.api_port + "/repo/" + id + "/initial/")
-        .then((json) => {
-            // Parse data and perform fdg.
-            runFDGOnJSONData(json);
-            
-            // Disable the loader icon and status tag.
-            document.getElementById("loader").style.display = "none";
-            document.getElementById("status").style.display = "none";
-            
-            // Start program loop.
-            requestAnimationFrame(mainloop);
-        });
-
-        // Update status.
-        document.getElementById("status").innerHTML = reason.body.status;
+        
+        // Open websocket for initial request status data.
+        sendInitialRequest();
         websocket.close();
     }
 };

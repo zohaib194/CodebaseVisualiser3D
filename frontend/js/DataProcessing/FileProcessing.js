@@ -1,6 +1,10 @@
 var indexStack = new Array();
 var functionModels = new Map();
 
+var fileCount = 0;
+var parsedFileCount = 0;
+var skippedFileCount = 0;
+
 // Number of classes found in the project
 var classCount = 0;
 
