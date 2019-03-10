@@ -508,7 +508,7 @@ func (repo RepoController) ParseInitial(w http.ResponseWriter, r *http.Request) 
 		}
 		// Setting up channel and go routine to parse all files in repository
 		parseChannel := make(chan model.ParseResponse)
-		go exstRepo.ParseDataFromFiles(files, 10, parseChannel)
+		go exstRepo.ParseDataFromFiles(files, 1, parseChannel)
 
 		// Expecting response of parser to contain save status, potential error and potential result.
 		parserResponse := <-parseChannel
@@ -540,7 +540,7 @@ func (repo RepoController) ParseInitial(w http.ResponseWriter, r *http.Request) 
 						"currentFile":      parserResponse.CurrentFile,
 						"parsedFileCount":  parserResponse.ParsedFileCount,
 						"skippedFileCount": parserResponse.SkippedFileCount,
-						"FileCount":        parserResponse.FileCount,
+						"fileCount":        parserResponse.FileCount,
 					},
 				}
 
@@ -558,7 +558,7 @@ func (repo RepoController) ParseInitial(w http.ResponseWriter, r *http.Request) 
 						"status":           "Done",
 						"parsedFileCount":  parserResponse.ParsedFileCount,
 						"skippedFileCount": parserResponse.SkippedFileCount,
-						"FileCount":        parserResponse.FileCount,
+						"fileCount":        parserResponse.FileCount,
 						"result":           parserResponse.Result,
 					},
 				}
