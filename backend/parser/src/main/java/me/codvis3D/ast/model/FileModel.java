@@ -119,7 +119,8 @@ public class FileModel extends Model{
 			this.addUsingNamespace((UsingNamespaceModel)data);
 
 		}else{
-			System.out.println("Error adding data in model");
+			System.out.println(data);
+			System.out.println("Error adding data in file model");
 			System.exit(1);
 		}
 
