@@ -15,6 +15,136 @@ var LOCALE = (function() {
                 ]
             },
             {
+                id: "userinfo_ready_display",
+                values: [
+                    {
+                        language: "english",
+                        value: "Ready to display"
+                    },
+                    {
+                        language: "norwegian",
+                        value: "Klar for display"
+                    }
+                ]
+            },
+            {
+                id: "userinfo_read",
+                values: [
+                    {
+                        language: "english",
+                        value: "Reading data for organization"
+                    },
+                    {
+                        language: "norwegian",
+                        value: "Leser data til organisering"
+                    }
+                ]
+            },
+            {
+                id: "userinfo_organization",
+                values: [
+                    {
+                        language: "english",
+                        value: "Organizing data structures"
+                    },
+                    {
+                        language: "norwegian",
+                        value: "Organiserer data strukturer"
+                    }
+                ]
+            },
+            {
+                id: "userinfo_structure_visualization_assigment",
+                values: [
+                    {
+                        language: "english",
+                        value: "Assigning shapes to data structures"
+                    },
+                    {
+                        language: "norwegian",
+                        value: "Velger former for data strukturer"
+                    }
+                ]
+            },
+            {
+                id: "userinfo_websocket_initial_message",
+                values: [
+                    {
+                        language: "english",
+                        value: "Received initial request message"
+                    },
+                    {
+                        language: "norwegian",
+                        value: "Mottok initial request melding"
+                    }
+                ]
+            },
+            {
+                id: "userinfo_websocket_initial_message_parsed",
+                values: [
+                    {
+                        language: "english",
+                        value: "Parsed"
+                    },
+                    {
+                        language: "norwegian",
+                        value: "Lest"
+                    }
+                ]
+            },
+            {
+                id: "userinfo_websocket_initial_message_skipped",
+                values: [
+                    {
+                        language: "english",
+                        value: "Skipped"
+                    },
+                    {
+                        language: "norwegian",
+                        value: "Ignorert"
+                    }
+                ]
+            },
+            {
+                id: "userinfo_websocket_initial_message_failed",
+                values: [
+                    {
+                        language: "english",
+                        value: "Failed for repo"
+                    },
+                    {
+                        language: "norwegian",
+                        value: "Feilet for brønn"
+                    }
+                ]
+            },
+            {
+                id: "userinfo_websocket_initial_message_status_finished",
+                values: [
+                    {
+                        language: "english",
+                        value: "Done"
+                    },
+                    {
+                        language: "norwegian",
+                        value: "Ferdig"
+                    }
+                ]
+            },
+            {
+                id: "userinfo_websocket_initial_message_status_parsing",
+                values: [
+                    {
+                        language: "english",
+                        value: "Parsing"
+                    },
+                    {
+                        language: "norwegian",
+                        value: "Leser"
+                    }
+                ]
+            },
+            {
                 id: "geometry_invalid_type",
                 values: [
                     {
@@ -50,6 +180,19 @@ var LOCALE = (function() {
                     {
                         language: "norwegian",
                         value: "Mottat data fra API server"
+                    }
+                ]
+            },  
+            {
+                id: "backend_data_not_received",
+                values: [
+                    {
+                        language: "english",
+                        value: "Didn't receive data from backend"
+                    },
+                    {
+                        language: "norwegian",
+                        value: "Mottok ikke data fra API server"
                     }
                 ]
             },
@@ -102,6 +245,84 @@ var LOCALE = (function() {
                     {
                         language: "norwegian",
                         value: "Invalid stil navn"
+                    }
+                ]
+            },
+            {
+                id: "quality_metric_funciton_count",
+                values: [
+                    {
+                        language: "english",
+                        value: "Nr of functions"
+                    },
+                    {
+                        language: "norwegian",
+                        value: "Antall funksjoner"
+                    }
+                ]
+            },
+            {
+                id: "quality_metric_class_count",
+                values: [
+                    {
+                        language: "english",
+                        value: "Number of classes"
+                    },
+                    {
+                        language: "norwegian",
+                        value: "Antall klasser"
+                    }
+                ]
+            },
+            {
+                id: "quality_metric_namespace_count",
+                values: [
+                    {
+                        language: "english",
+                        value: "Number of namespaces"
+                    },
+                    {
+                        language: "norwegian",
+                        value: "Antall \"namespace\"s"
+                    }
+                ]
+            },
+            {
+                id: "quality_metric_lines_count",
+                values: [
+                    {
+                        language: "english",
+                        value: "Number of code lines found"
+                    },
+                    {
+                        language: "norwegian",
+                        value: "Antall linjer med kode funnet"
+                    }
+                ]
+            },
+            {
+                id: "generic_undefined",
+                values: [
+                    {
+                        language: "english",
+                        value: "Variable can't be undefined"
+                    },
+                    {
+                        language: "norwegian",
+                        value: "Variabel kan ikke være udefinert"
+                    }
+                ]
+            },
+            {
+                id: "generic_negative",
+                values: [
+                    {
+                        language: "english",
+                        value: "Variable can't be negative"
+                    },
+                    {
+                        language: "norwegian",
+                        value: "Variabel kan ikke være negativ"
                     }
                 ]
             }
@@ -161,7 +382,6 @@ var LOCALE = (function() {
         if (result != "") {
             return result;
         }
-
         console.log(getSentence("language_not_found"));
     }
     

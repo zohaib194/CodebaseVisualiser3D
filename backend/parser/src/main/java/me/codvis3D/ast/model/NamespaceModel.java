@@ -1,5 +1,6 @@
 package me.codvis.ast;
 
+import java.util.Stack;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -13,14 +14,47 @@ public class NamespaceModel extends Model {
 	private List<FunctionModel> functions;
 	private List<NamespaceModel> namespaces;
 	private List<UsingNamespaceModel> usingNamespaces;
+	private List<String> calls;
+
 
 	/**
 	 * Constructs the namespace, setting the name.
 	 *
 	 * @param      name  The name
 	 */
-	NamespaceModel(String name){
+	public NamespaceModel(String name){
 		this.name = name;
+		this.functions = new ArrayList<>();
+		this.namespaces = new ArrayList<>();
+		this.usingNamespaces = new ArrayList<>();
+		this.calls = new ArrayList<>();
+	}
+
+	/**
+	 * Adds a function.
+	 *
+	 * @param      function  The function
+	 */
+	public void addFunction(FunctionModel function){
+		this.functions.add(function);
+	}
+
+	/**
+	 * Adds a namespace.
+	 *
+	 * @param      namespace  The namespace
+	 */
+	public void addNamespace(NamespaceModel namespace){
+		this.namespaces.add(namespace);
+	}
+
+	/**
+	 * Adds an using namespace.
+	 *
+	 * @param      namespace  The namespace
+	 */
+	public void addUsingNamespace(UsingNamespaceModel namespace){
+		this.usingNamespaces.add(namespace);
 	}
 
 	/**
@@ -60,6 +94,41 @@ public class NamespaceModel extends Model {
 	}
 
 	/**
+	 * Adds a call.
+	 *
+	 * @param      functionCall  The function call
+	 */
+	public void addCall(String functionCall){
+		this.calls.add(functionCall);
+	}
+
+	/**
+	 * Adds the data in model.
+	 *
+	 * @param      data  The data
+	 */
+	@Override
+	protected <T> void addDataInModel(T data){
+
+		if (data instanceof FunctionModel) {
+			this.addFunction((FunctionModel)data);
+
+		}else if (data instanceof  NamespaceModel) {
+			this.addNamespace((NamespaceModel)data);
+
+		}else if (data instanceof UsingNamespaceModel) {
+			this.addUsingNamespace((UsingNamespaceModel)data);
+
+		}else if (data instanceof String) {
+			this.addCall((String)data);
+
+		}else{
+			System.out.println("Error adding data in model");
+			System.exit(1);
+		}
+	}
+
+	/**
 	 * Gets the parsed code as JSONObject.
 	 *
 	 * @return     The parsed code.
@@ -84,6 +153,8 @@ public class NamespaceModel extends Model {
 		if (parsedUsingNamespaces != null) {
 			parsedCode.put("using_namespaces", parsedUsingNamespaces);
 		}
+
+		parsedCode.put("calls", this.calls);
 
 		return parsedCode;
 	}

@@ -29,10 +29,19 @@
         <script src="../js/GUI/CodeInspectionWindow.js"></script>
         <script src="../js/GUI/NamespaceWindow.js"></script>
         <script src="../js/GUI/QualityMetricsWindow.js"></script>
+        <script src="../js/GUI/RepositoriesWindow.js"></script>
         <script src="../js/GUI/WindowManager.js"></script>
+
     </head>
     <body>
-        <div id="loader"></div>
+        <div id="statusDiv">
+            <div id="loader"></div>
+            <progress id="status_progressbar" value="0" max="1"></progress>
+            <p id="status"></p>
+            <p id="status_parsedcount"></p>
+            <p id="status_skippedcount"></p>
+        </div>
+        
         <canvas id="output"></canvas>
         <div id="nameplate_container"></div>
         <!-- 3DView.js imports-->
@@ -42,6 +51,7 @@
         <script src="../js/FDG/Node.js"></script>
         <script src="../js/FDG/FDG.js"></script>
 
+        <script src="../js/DataProcessing/FunctionModel.js"></script>
         <script src="../js/DataProcessing/FileProcessing.js"></script>
 
         <script src="../js/3DView/3DView.js"></script>

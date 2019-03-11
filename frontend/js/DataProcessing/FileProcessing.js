@@ -1,4 +1,18 @@
 var indexStack = new Array();
+var functionModels = new Map();
+
+var fileCount = 0;
+var parsedFileCount = 0;
+var skippedFileCount = 0;
+
+// Number of classes found in the project
+var classCount = 0;
+
+// Number of functions found in the project.
+var functionCount = 0;
+
+// Number of namespaces found in the project.
+var namespaceCount = 0;
 
 /**
  * Function to get new random position.
@@ -31,7 +45,8 @@ function linkElements() {
  * Function for handling class data in JSONObject.
  * @param {JSONObject} classData - Data about a class.
  */
-function handleClassData(classData) {
+function handleClassData(classData, filename) {
+    classCount++;
     // Add node and save index.
     indexStack.push(
         fdg.addNode(
@@ -47,7 +62,7 @@ function handleClassData(classData) {
     linkElements();
 
     // Handle any children.
-    handleCodeData(classData.Class);
+    handleCodeData(classData.Class, filename);
 
     // We're done in this part of the tree.
     indexStack.pop();
@@ -57,7 +72,7 @@ function handleClassData(classData) {
  * Function for handling namespace data in JSONObject.
  * @param {JSONObject} namespaceData - Data about namespace.
  */
-function handleNamespaceData(namespaceData) {
+function handleNamespaceData(namespaceData, filename) {
     // Add node and save index to stack.
     indexStack.push(
         fdg.addNode(
@@ -72,8 +87,10 @@ function handleNamespaceData(namespaceData) {
     // If I have a parent, add link between us.
     linkElements();
 
+    namespaceCount++;
+
     // Handle any children.
-    handleCodeData(namespaceData.namespace);
+    handleCodeData(namespaceData.namespace, filename);
 
     // We're done in this part of the tree.
     indexStack.pop();
@@ -83,7 +100,7 @@ function handleNamespaceData(namespaceData) {
  * Function for handling function data in JSONObject.
  * @param {JSONObject} functionData - Data about a function JSONObject.
  */
-function handleFunctionData(functionData) {
+function handleFunctionData(functionData, filename) {
     // Add node and save index to stack.
     indexStack.push(
         fdg.addNode(
@@ -94,12 +111,23 @@ function handleFunctionData(functionData) {
             )
         )
     );
+    // Save the function data in function model.
+    functionModels.set(
+        functionData.function.name,
+        new FunctionMetaData( 
+            filename,
+            functionData.function.start_line, 
+            functionData.function.end_line
+        )
+    );
 
     // If I have a parent, add link between us.
     linkElements();
 
+    functionCount++;
+
     // Handle any children.
-    handleCodeData(functionData.function);
+    handleCodeData(functionData.function, filename);
 
     // We're done in this part of the tree.
     indexStack.pop();
@@ -109,21 +137,21 @@ function handleFunctionData(functionData) {
  * Function for handling code data in JSONObject.
  * @param {JSONObject} codeData  - Data about general code.
  */
-function handleCodeData(codeData) {
+function handleCodeData(codeData, filename) {
     if (codeData.namespaces != null) {
-        // Handle all namepspaces
+        // Handle all namespaces
         codeData.namespaces.forEach((object) => {
-            handleNamespaceData(object);
+            handleNamespaceData(object, filename);
         });
     } else if (codeData.classes != null) {
         // Handle all classes
-        codeData.classes.forEach((object) => {
+        codeData.classes.forEach((object, filename) => {
             handleClassData(object);
         });
     } else if (codeData.functions != null) {
         // Handle all functions
         codeData.functions.forEach((object) => {
-            handleFunctionData(object);
+            handleFunctionData(object, filename);
         });
     }
 }
@@ -133,9 +161,27 @@ function handleCodeData(codeData) {
  * @param {JSONObject} projectData - Data about project files as JSONObject.
  */
 function handleProjectData(projectData) {
-
+    // Reset metadata for current project
+    classCount = 0;
+    functionCount = 0;
+    namespaceCount = 0;
+    lineCount = 0;
     // Handle every file given.
     projectData.files.forEach((file) => {
-        handleCodeData(file.file);        
+
+        // If file is not parsed, skip it 
+        // ("return" returns from lambda not forEach).
+        if (file.file.parsed != true) {
+            return;
+        }
+    
+        // File is parsed correctly, process it.
+        lineCount += file.file.linesInFile;
+        handleCodeData(file.file, file.file.file_name);
     });
+
+    windowMgr.setFunctionCount(functionCount);
+    windowMgr.setClassCount(classCount);
+    windowMgr.setNamespaceCount(namespaceCount);
+    windowMgr.setLineCount(lineCount);
 }

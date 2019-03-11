@@ -3,6 +3,8 @@ package me.codvis.ast;
 import java.util.List;
 import java.util.ArrayList;
 
+import java.util.Stack;
+
 import org.json.JSONObject;
 
 /**
@@ -97,6 +99,30 @@ public class FileModel extends Model{
 	 */
 	public List<UsingNamespaceModel> getUsingNamespaces(){
 		return this.usingNamespaces;
+	}
+	
+	/**
+	 * Adds the data in model.
+	 *
+	 * @param      data  The data
+	 */
+	@Override
+	protected <T> void addDataInModel(T data){
+
+		if (data instanceof FunctionModel) {
+			this.addFunction((FunctionModel)data);
+
+		}else if (data instanceof  NamespaceModel) {
+			this.addNamespace((NamespaceModel)data);
+
+		}else if (data instanceof UsingNamespaceModel) {
+			this.addUsingNamespace((UsingNamespaceModel)data);
+
+		}else{
+			System.out.println("Error adding data in model");
+			System.exit(1);
+		}
+
 	}
 
 	/**

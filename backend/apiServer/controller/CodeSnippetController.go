@@ -13,7 +13,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-// FileController represents metadata for a file from a git project.
+// CodeSnippetController represents a section of code in a given file.
 type CodeSnippetController struct {
 }
 
@@ -94,12 +94,14 @@ func (codeSnippet CodeSnippetController) GetImplementation(w http.ResponseWriter
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			log.Println("Could not convert startLine to integer", err.Error())
+			return
 		}
 
 		endLine, err := strconv.Atoi(lineEnd[0])
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			log.Println("Could not convert endLine to integer", err.Error())
+			return
 		}
 
 		// Fetch the content of file.
@@ -113,6 +115,7 @@ func (codeSnippet CodeSnippetController) GetImplementation(w http.ResponseWriter
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			log.Println("Error occurred during FetchLinesOfCode", err.Error())
+			return
 		}
 
 		codeMap := make(map[string]string)

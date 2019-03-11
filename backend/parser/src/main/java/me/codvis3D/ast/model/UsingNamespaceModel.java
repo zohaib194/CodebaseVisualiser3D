@@ -1,5 +1,7 @@
 package me.codvis.ast;
 
+import java.util.Stack;
+
 import org.json.JSONObject;
 
 /**
@@ -36,6 +38,18 @@ public class UsingNamespaceModel extends Model {
 	 */
 	public int getLineNr(){
 		return this.lineNr;
+	}
+
+	/**
+	 * Adds the data in model.
+	 *
+	 * @param      data  The data
+	 */
+	@Override
+	protected <T> void addDataInModel(T data){
+
+		System.out.println("Error using namespace is currently not a scope as scopeStack indicated");
+		System.exit(1);		
 	}
 
 	/**
