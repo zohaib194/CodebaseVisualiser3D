@@ -38,7 +38,8 @@ var upgrader = websocket.Upgrader{
 * @apiName Add repository.
 * @apiGroup Repository
 * @apiPermission none
-*
+**
+
 * @apiDescription Expects a get request requesting a websocket upgrade.
 * The following assumes a websocket has been established. On success
 * the content will conatin a statuscode and statustext based on http status
@@ -96,7 +97,7 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 	if r.Method == "GET" {
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
-			http.Error(w, "Expecte to established WebSocket", http.StatusBadRequest)
+			http.Error(w, "Expected to established WebSocket", http.StatusBadRequest)
 			log.Println("Could not upgrade:", err)
 			return
 		}
@@ -306,37 +307,135 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 *
 * @apiParam {String} Id Id of submitted git repository.
 *
+* @apiDescription Expects a get request requesting a websocket upgrade.
+* The following assumes a websocket has been established. On success
+* the content will conatin a statuscode and statustext based on http status
+* codes and a body.
+* The body can contains:
+*	  	CurrentFile - file last parsed
+*		ParsedFileCount - How many files have been parsed at current time
+*		SkippedFileCount - How many files considered but not parsed, usualy if language is not supported
+*		FileCount - How many files in the repository being considered
+*		Result - The final result of the completed parsing, only for last message
+*
 * @apiParamExample {url} Parse repository:
 *     {
 *       "id": 5c62d1904122c760dafe9341
 *     }
 *
-* @apiSuccessExample {json} Success-Response:
-* 	HTTP/1.1 200 OK
+* @apiSuccessExample {json} Final message:
+* 	WebSocket 1 TextMessage
 *	{
-*	    "functions": [
-*	        {
-*	            "file": "main.cpp",
-*	            "function_names": [
-*	                {
-*	                    "name": "int main()"
-*	                }
-*	            ]
-*	        }
-*	    ]
+*		{
+*			"statuscode": 200,
+*			"statustext": "OK",
+*			"body": {
+*			  "FileCount": 5,
+*			  "id": "5c7ea320b7fa7003137f003e",
+*			  "parsedFileCount": 1,
+*			  "result": {
+*			    "files": [
+*			      {
+*			        "file": {
+*			          "parsed": false,
+*			          "file_name": "5c7ea320b7fa7003137f003e/.gitignore",
+*			          "functions": null,
+*			          "namespaces": null,
+*			          "classes": null,
+*			          "linesInFile": 0
+*			        }
+*			      },
+*			      {
+*			        "file": {
+*			          "parsed": true,
+*			          "file_name": "5c7ea320b7fa7003137f003e/HelloWorld/Main.java",
+*			          "functions": null,
+*			          "namespaces": [
+*			            {
+*			              "namespace": {
+*			                "functions": [
+*			                  {
+*			                    "function": {
+*			                      "name": "main(String[]args)",
+*			                      "start_line": 6,
+*			                      "end_line": 8
+*			                    }
+*			                  }
+*			                ],
+*			                "name": "HelloWorld",
+*			                "namespaces": null,
+*			                "classes": null
+*			              },
+*			              "line_nr": 0
+*			            }
+*			          ],
+*			          "classes": null,
+*			          "linesInFile": 8
+*			        }
+*			      },
+*			      {
+*			        "file": {
+*			          "parsed": false,
+*			          "file_name": "5c7ea320b7fa7003137f003e/LICENSE",
+*			          "functions": null,
+*			          "namespaces": null,
+*			          "classes": null,
+*			          "linesInFile": 0
+*			        }
+*			      },
+*			      {
+*			        "file": {
+*			          "parsed": false,
+*			          "file_name": "5c7ea320b7fa7003137f003e/Manifest.txt",
+*			          "functions": null,
+*			          "namespaces": null,
+*			          "classes": null,
+*			          "linesInFile": 0
+*			        }
+*			      },
+*			      {
+*			        "file": {
+*			          "parsed": false,
+*			          "file_name": "5c7ea320b7fa7003137f003e/README.rst",
+*			          "functions": null,
+*			          "namespaces": null,
+*			          "classes": null,
+*			          "linesInFile": 0
+*			        }
+*			      }
+*			    ]
+*			  },
+*			  "skippedFileCount": 4,
+*			  "status": "Done"
+*		}
 *	}
 *
-* @apiErrorExample {json} Post invalid id.
-*	HTTP/1.1 400 Bad Request
+* @apiErrorExample {json} Invalid id.
+* 	WebSocket 1 TextMessage
 *	{
-*		Invalid parameters
+*		{
+*			"statuscode": 404,
+*			"statustext": "Not Found",
+*			"body": {
+*			  "id": "5cea320b7fa7003137f003e",
+*			  "status": "Failed"
+*			}
+*		}
 *	}
 *
-* @apiErrorExample {json} Internal error.
-*	HTTP/1.1 500 Internal Server Error
+* @apiSuccessExample {json} Status update.
+* 	WebSocket 1 TextMessage
 *	{
-*		Internal Server Error
+*		{
+*			"statuscode": 404,
+*			"statustext": "Not Found",
+*			"body": {
+*			  "id": "5cea320b7fa7003137f003e",
+*			  "status": "Failed"
+*			}
+*		}
 *	}
+*
 *
  */
 
@@ -347,14 +446,30 @@ func (repo RepoController) ParseInitial(w http.ResponseWriter, r *http.Request) 
 
 	if r.Method == "GET" {
 
+		conn, err := upgrader.Upgrade(w, r, nil)
+		if err != nil {
+			http.Error(w, "Expected to established WebSocket", http.StatusBadRequest)
+			log.Println("Could not upgrade:", err)
+			return
+		}
 		vars := mux.Vars(r)
 
 		// Validate that the project exist in DB.
 		exstRepo, err := model.RepoModel{}.GetRepoByID(vars["repoId"])
 
 		if err != nil {
-			http.Error(w, "Invalid parameters", http.StatusBadRequest)
 			log.Println("Could not find repo in db: ", err.Error())
+			reason := WebsocketResponse{
+				StatusText: http.StatusText(http.StatusNotFound),
+				StatusCode: http.StatusNotFound,
+				Body: map[string]string{
+					"id":     vars["repoId"],
+					"status": "Failed",
+				},
+			}
+			if err := socketCloseWithResponse(conn, reason); err != nil {
+				log.Println("Could not close websocket")
+			}
 			return
 		}
 
@@ -362,22 +477,110 @@ func (repo RepoController) ParseInitial(w http.ResponseWriter, r *http.Request) 
 		files, err := exstRepo.GetRepoFiles()
 
 		if err != nil {
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			log.Println("Could not find files error: ", err.Error())
+			reason := WebsocketResponse{
+				StatusText: http.StatusText(http.StatusInternalServerError),
+				StatusCode: http.StatusInternalServerError,
+				Body: map[string]string{
+					"id":     vars["repoId"],
+					"status": "Failed",
+				},
+			}
+			if err := socketCloseWithResponse(conn, reason); err != nil {
+				log.Println("Could not close websocket", err)
+			}
 			return
 		}
 
-		// Fetch all fuctions given in files.
-		projectModel, err := exstRepo.ParseDataFromFiles(files)
-
-		if err != nil {
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-			log.Println("Could not parse error: ", err.Error())
-			return
+		// Tell the client that the request was accepted
+		response := WebsocketResponse{
+			StatusText: http.StatusText(http.StatusAccepted),
+			StatusCode: http.StatusAccepted,
+			Body: map[string]string{
+				"id":     vars["repoId"],
+				"status": "Parsing",
+			},
 		}
 
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(projectModel)
+		if err := conn.WriteJSON(response); err != nil {
+			log.Println("Could not send message over websocket", err)
+			return
+		}
+		// Setting up channel and go routine to parse all files in repository
+		parseChannel := make(chan model.ParseResponse)
+		go exstRepo.ParseDataFromFiles(files, 1, parseChannel)
+
+		// Expecting response of parser to contain save status, potential error and potential result.
+		parserResponse := <-parseChannel
+		for {
+			if parserResponse.Err != nil {
+				log.Println("Error while parsing: ", err.Error())
+				reason := WebsocketResponse{
+					StatusText: http.StatusText(http.StatusInternalServerError),
+					StatusCode: http.StatusInternalServerError,
+					Body: map[string]string{
+						"id":     vars["repoId"],
+						"status": "Failed",
+					},
+				}
+				if err := socketCloseWithResponse(conn, reason); err != nil {
+					log.Println("Could not close websocket", err)
+				}
+				return
+			}
+
+			if parserResponse.StatusText != "Done" { // should update user on status
+
+				response := WebsocketResponse{
+					StatusText: http.StatusText(http.StatusOK),
+					StatusCode: http.StatusOK,
+					Body: map[string]interface{}{
+						"id":               vars["repoId"],
+						"status":           "Parsing",
+						"currentFile":      parserResponse.CurrentFile,
+						"parsedFileCount":  parserResponse.ParsedFileCount,
+						"skippedFileCount": parserResponse.SkippedFileCount,
+						"fileCount":        parserResponse.FileCount,
+					},
+				}
+
+				if err = conn.WriteJSON(response); err != nil {
+					log.Println("Could not send update message")
+				}
+
+			} else { // if done
+				// Respond with message
+				reason := WebsocketResponse{
+					StatusText: http.StatusText(http.StatusOK),
+					StatusCode: http.StatusOK,
+					Body: map[string]interface{}{
+						"id":               vars["repoId"],
+						"status":           "Done",
+						"parsedFileCount":  parserResponse.ParsedFileCount,
+						"skippedFileCount": parserResponse.SkippedFileCount,
+						"fileCount":        parserResponse.FileCount,
+						"result":           parserResponse.Result,
+					},
+				}
+				if err := conn.WriteJSON(reason); err != nil {
+					log.Println("Could not send final message", err)
+					return
+				}
+				// close after response
+				err = conn.WriteMessage(
+					websocket.CloseMessage,
+					websocket.FormatCloseMessage(
+						websocket.CloseNormalClosure,
+						"Done",
+					),
+				)
+				if err != nil {
+					log.Println("Could not send closer for websocket")
+				}
+				return
+			}
+			parserResponse = <-parseChannel
+		}
 
 	} else { // if not GET request
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
@@ -440,4 +643,20 @@ func (repo RepoController) GetAllRepos(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+}
+
+func socketCloseWithResponse(conn *websocket.Conn, reason WebsocketResponse) error {
+	jsonResponse, err := json.Marshal(reason)
+	if err != nil {
+		return err
+	}
+
+	err = conn.WriteMessage(
+		websocket.CloseMessage,
+		websocket.FormatCloseMessage(
+			websocket.CloseNormalClosure,
+			string(jsonResponse),
+		),
+	)
+	return err
 }

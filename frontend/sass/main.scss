@@ -1,8 +1,6 @@
 $color_notification: #ffd800;
-
-body {
-    margin: 0%;
-}
+$color_background_primary: #dfd8c5;
+$color_background_secondary: #f58025;
 
 .notificationbar {
     position: absolute;
@@ -18,22 +16,62 @@ body {
 }
 
 .repoform {
-    height: 2em;
-    width: 35em;
-    position: fixed;
-    top: 50%;
+    position:relative;
+    border-radius: 4px;
+    padding: 0.2em 1em 0.2em 1em;
+    border: 2px solid black;
+    display: flex;
+    background-color: mix($color_background_primary, white, 65%);
+    grid-template-columns: 1fr 2fr 1fr;
+    grid-template-rows: auto;
+    grid-template-areas:
+        "guide input send";
+    p{
+        grid-area: guide;
+        width: 10%;
+        margin: auto;
+        font-weight: bold;
+        text-decoration: underline;
+    }
+    input{
+        grid-area: input;
+        width: 100%;
+    }
+    button{
+        float: right;
+        grid-area: send;
+    }
+    box-shadow: 3px 5px #333;
+}
+
+// Reference for the loader css code:  https://www.w3schools.com/howto/howto_css_loader.asp
+#loader {
+    border: 0.1em solid #f3f3f3;
+    border-top-color: rgb(243, 243, 243);
+    border-top-style: solid;
+    border-top-width: 0.1em;
+    border-radius: 50%;
+    border-top: 0.1em solid #3498db;
+    width: 5em;
+    height: 5em;
+    top: 45%;
     left: 45%;
-    margin-top: -1em;
-    margin-left: -10em;
+    position: fixed;
+    display: none;
+    -webkit-animation: spin 2s linear infinite;
+    animation: spin 2s linear infinite;
 }
 
-#reponame {
-    width: 25em;
+
+/* Safari */
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
 }
 
-#gitrepotitle {
-    margin: 0em;
-    display: inline;
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 /* SMALL GRID */
@@ -42,51 +80,120 @@ body {
     min-height: 100%;
     margin: 5px auto 0px auto;
     grid-gap: 5px;
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: 80px repeat(3, auto) 50px;
+    grid-template-columns: 100%;
+    grid-template-rows: auto auto auto auto auto;
     grid-template-areas:
-        "header header header"
-        "header header header"
-        "main main main"
-        "main main main"
-        "footer footer footer";
+        "logo"
+        "header"
+        "main"
+        "support"
+        "footer";
 }
 
 
 /* MEDIUM GRID */
-@media (min-width: 480px) {
+@media (min-width: 1000px) {
     .container {
-        grid-template-columns: 1fr 1fr 1fr;
-        grid-template-rows: 80px 1fr 1fr 1fr 50px;
+        grid-template-columns: auto auto;
+        grid-template-rows: auto auto auto auto;
         grid-template-areas:
-            "header header header"
-            "header header header"
-            "main  main main"
-            "main  main main"
-            "footer footer  footer";
+            "logo logo"
+            "support header"
+            "support main"
+            "support main"
+            "footer footer";
     }
 }
 
 /* BIG GRID */
-@media (min-width: 800px) {
+@media (min-width: 1400px) {
     .container {
-        grid-template-columns: 120px 1fr 120px;
-        grid-template-rows: 80px 1fr 1fr 1fr 50px;
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+        grid-template-rows: 1fr 1fr auto auto;
         grid-template-areas:
-            "header header header"
-            "header header header"
-            "main  main main"
-            "main  main main"
-            "footer footer footer";
+            "logo empty empty empty"
+            "logo header header header"
+            "support main main main"
+            "footer footer footer footer";
     }
 }
 
-
-* { 
-    margin: 0;
-    padding: 0;
+#browse_support{
+    grid-area: support;
 }
 
-header  { background-color: lightgreen;  grid-area: header;}
-main { background-color: orange; grid-area: main;  }
-footer { background-color: hotpink; grid-area: footer;}
+#logo{
+    grid-area: logo;
+}
+
+body{
+    background-color: $color_background_primary;
+    padding: 0em 1em 0em 1em;
+    background: linear-gradient(135deg, white, white 40em, $color_background_primary 10em, $color_background_secondary 120em);
+}
+
+header{ 
+    grid-area: header;
+    background-color: mix($color_background_primary, white, 65%);
+    box-shadow: 3px 5px #333;
+    padding: 1em;
+    border: 1px solid black;
+}
+
+main { 
+    grid-area: main;
+    padding-top: 2em;
+
+    article{
+        margin-left: auto;
+        margin-right: auto;
+        opacity: 10%;
+        margin-bottom: 1em;
+    }
+    
+}
+
+footer { 
+    border-top: 1px solid black;
+    margin-top: 1em;
+    padding-top: 1em;
+    padding-bottom: 1em;
+    text-align: center;
+    grid-area: footer;
+}
+
+table{
+    border: 2px solid black;
+    margin: 0px;
+    padding: 0px;
+    font-weight: bold;
+    border-spacing: 1em;
+    background-color: mix($color_background_primary, white, 65%);
+    box-shadow: 3px 5px #333;
+
+    th{
+        border-bottom: 1px solid black;
+    }
+    .complete{
+        text-align: center;
+        border: 1px solid black;
+        background-color: limegreen;
+    }
+    .partial{
+        text-align: center;
+        border: 1px solid black;
+        background: repeating-linear-gradient(45deg, limegreen, mix(limegreen, crimson, 50%) 10px, crimson 10px, mix(crimson, limegreen, 50%) 20px);
+        background-color: purple;
+    }
+    .non{
+        text-align: center;
+        border: 1px solid black;
+        background-color: crimson;
+    }
+
+}
+
+h3{
+    font-style: italic;
+
+}
