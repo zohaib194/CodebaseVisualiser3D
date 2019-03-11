@@ -102,8 +102,11 @@ func (repo RepoModel) Load(file string, target string) (data FilesModel, err err
 		return data, err
 	}
 
+
 	ioReader := bytes.NewReader(output)
 	decoder := json.NewDecoder(ioReader)
+
+
 
 	if err := decoder.Decode(&data); err != nil {
 		log.Fatal("Could not decode json error: ", err.Error())

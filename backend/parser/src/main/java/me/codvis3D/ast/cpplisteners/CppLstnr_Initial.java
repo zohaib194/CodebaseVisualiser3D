@@ -57,7 +57,6 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	    }
 
 	    if(functionMetaData.has("parameters")){
-	    	//JSONArray variables = (JSONArray)functionMetaData.get("parameters");
 	    	Iterator i = functionMetaData.getJSONArray("parameters").iterator();
 
 	        while (i.hasNext()) {
@@ -75,9 +74,6 @@ public class CppLstnr_Initial extends CppExtendedListener {
 
 	    this.scopeStack.peek().addDataInModel(functionModel);
 	    this.enterScope(functionModel);
-
-		System.out.println(ctx.getText());
-
     }
 
     /**
@@ -128,7 +124,7 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	    			}
 	    		}
     		}	
-    	}
+    	} 
     }
 
     /**

@@ -32,7 +32,7 @@ void lol(){
     
 }
 
-int main(char* argv, int j)
+int main(int argc, char** argv)
 {
 	int i;
 	int j;
@@ -45,7 +45,7 @@ int main(char* argv, int j)
     return 0;
 }
 
-void (*signal(int, void (*fp)(int)))(int, foo);
+void (*signal(int, void (*fp)(int)))(int);
 
 auto hell() -> bool {
     return true;
@@ -58,7 +58,7 @@ auto heaven() -> bool {
 int lolasdasdasd(int i, int j, bool istrue, float normalFloat){
 	helloworld* hw = new helloworld();
 
-	int j,z,w,l = 0;
+	int z,w,l = 0;
 
 	std::vector<int> vInt;
 	std::vector<std::string> vString;
