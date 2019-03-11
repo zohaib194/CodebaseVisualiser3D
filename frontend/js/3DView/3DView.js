@@ -313,7 +313,7 @@ function sendInitialRequest() {
     // Message recieved from server.
     websocket.onmessage = function (event) {
         console.log(LOCALE.getSentence("userinfo_websocket_initial_message"));
-        console.log(event.data);
+
         // Parse the server response.
         var response = JSON.parse(event.data)
 
