@@ -54,20 +54,23 @@ function linkFunctionCalls(){
         if(funcModel.getCalls().length == 0){
             return;
         }
+        
+        console.log("Caller: ", callerIndex, funcName);
 
         // Loop through calls
         funcModel.getCalls().forEach( function(funcName, index) {
+            
+            calleeIndex = indexToFunctionMap.get(funcName)
+            console.log("Callee: ", calleeIndex, funcName);
 
             if(functionModels.has(funcName)){
-                console.log(element, index);
                 
-                calleeIndex = indexToFunctionMap.get(funcName)
-
                 fdg.addLink(
                     indexStack[callerIndex], 
                     indexStack[calleeIndex], 
                     new LinkProperties(1)
                 );
+
             }
             
         });
@@ -154,8 +157,9 @@ function handleFunctionData(functionData, filename) {
     functionModels.set(
         functionData.function.name,
         new FunctionMetaData( 
-            fileName,
+            filename,
             functionData.function.calls,
+            functionData.function.declrator_id,
             functionData.function.start_line, 
             functionData.function.end_line
         )
