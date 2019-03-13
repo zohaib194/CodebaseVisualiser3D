@@ -14,15 +14,13 @@ public class FunctionModel extends Model{
 	private String scope;
 	private int lineStart;
 	private int lineEnd;
-	private List<String> calls;
-	private List<VariableModel> variables;
 	private List<VariableModel> parameters;
+	private FunctionBodyModel functionBody;
 
 	FunctionModel(String name){
 		this.name = name;
-		this.calls = new ArrayList<>();
-		this.variables = new ArrayList<>();
 		this.parameters = new ArrayList<>();
+		this.functionBody = new FunctionBodyModel();
 	}
 
 	/**
@@ -34,9 +32,8 @@ public class FunctionModel extends Model{
 		this.name = name;
 		this.scope = "";
 		this.declaratorId = declarator;
-		this.calls = new ArrayList<>();
-		this.variables = new ArrayList<>();
 		this.parameters = new ArrayList<>();
+		this.functionBody = new FunctionBodyModel();
 	}
 
 	/**
@@ -55,6 +52,15 @@ public class FunctionModel extends Model{
 	 */
 	public void setScope(String scope){
 		this.scope = scope;
+	}
+
+	/**
+	 * Sets the declarator identifier.
+	 *
+	 * @param      declaratorId  The declarator identifier
+	 */
+	public void setDeclaratorId(String declaratorId){
+		this.declaratorId = declaratorId;
 	}
 
 	/**
@@ -93,14 +99,6 @@ public class FunctionModel extends Model{
 		this.lineEnd = lineEnd;
 	}
 
-	/**
-	 * Adds a call.
-	 *
-	 * @param      functionCall  The function call
-	 */
-	public void addCall(String functionCall){
-		this.calls.add(functionCall);
-	}
 
 	/**
 	 * Gets the line end.
@@ -109,15 +107,6 @@ public class FunctionModel extends Model{
 	 */
 	public int getLineEnd(){
 		return this.lineEnd;
-	}
-
-	/**
-	 * Adds a variable.
-	 *
-	 * @param      variable  The variable
-	 */
-	public void addVariable(VariableModel variable){
-		this.variables.add(variable);
 	}
 
 	/**
@@ -139,18 +128,24 @@ public class FunctionModel extends Model{
 	}
 
 	/**
+	 * Sets the function body.
+	 *
+	 * @param      body  The body
+	 */
+	public void setFunctionBody(FunctionBodyModel body){
+		this.functionBody = body;
+	}
+
+	/**
 	 * Adds the data in model.
 	 *
 	 * @param      data  The data
 	 */
 	@Override
 	protected <T> void addDataInModel(T data){
-
-		if (data instanceof String){
-			this.addCall((String) data);
-		} else if (data instanceof VariableModel){
-			this.addVariable((VariableModel) data);
-		}  else {
+		if(data instanceof FunctionBodyModel){
+			this.setFunctionBody((FunctionBodyModel) data);
+		} else {
 			System.out.println("Error adding data in function model: " + data.getClass());
 			System.exit(1);
 		}
@@ -163,7 +158,7 @@ public class FunctionModel extends Model{
 	 * @return     The parsed code.
 	 */
 	@Override
-	public JSONObject getParsedCode(){	
+	public JSONObject getParsedCode(){
 		JSONObject parsedCode = new JSONObject();
 
 		parsedCode.put("name", this.name);
@@ -171,18 +166,15 @@ public class FunctionModel extends Model{
 		parsedCode.put("scope", this.scope);
 		parsedCode.put("start_line", this.lineStart);
 		parsedCode.put("end_line", this.lineEnd);
-		parsedCode.put("calls", this.calls);
-
-		List<JSONObject> parsedVariables = this.convertClassListJsonObjectList(this.variables, "variable");
-		if (parsedVariables != null) {
-			parsedCode.put("variables", parsedVariables);
-		}
 
 		List<JSONObject> parsedParameters = this.convertClassListJsonObjectList(this.parameters, "parameter");
 		if (parsedParameters != null) {
 			parsedCode.put("parameters", parsedParameters);
 		}
 
+		if(this.functionBody != null){
+			parsedCode.put("function_body", this.functionBody.getParsedCode());
+		}
 
 		return parsedCode;
 	}

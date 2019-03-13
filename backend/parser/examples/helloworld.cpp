@@ -12,14 +12,14 @@ class helloworld
 	public:
 		hei();
 		~hei();
-		
+
 	};
 public:
 	helloworld();
 	void print();
 	~helloworld(){
 	}
-	
+
 };
 
 helloworld::helloworld(){
@@ -29,7 +29,7 @@ helloworld::helloworld(){
 void lolasdasdasd(){
 }
 void lol(){
-    
+
 }
 
 int main(int argc, char** argv)
@@ -45,7 +45,7 @@ int main(int argc, char** argv)
     return 0;
 }
 
-void (*signal(int, void (*fp)(int)))(int);
+//void (*signal(int, void (*fp)(int)))(int);
 
 auto hell() -> bool {
     return true;
@@ -64,10 +64,10 @@ int lolasdasdasd(int i, int j, bool istrue, float normalFloat){
 	std::vector<std::string> vString;
 	std::vector<bool> vBool;
 
-	std::unordered_map<std::string, std::string> map; 
-	
+	std::unordered_map<std::string, std::string> map;
+
 	// No viable input for line 70 ERROR in .G4 file from antlr.
-	//std::unordered_map<int, std::vector<int>> map1; 
+	//std::unordered_map<int, std::vector<int>> map1;
 
 	hw->print();
 	if(true){
@@ -84,7 +84,7 @@ namespace hello{
 	void foo();
 	void foo(int i);
     void foo1(int i){
-        
+
     }
 	void boo(){
 		foo();

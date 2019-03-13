@@ -12,8 +12,11 @@ public class VariableModel extends Model{
 	private String name;
 	private String type;
 
+	/**
+	 * Constructs the object.
+	 */
 	VariableModel(){
-		
+
 	}
 
 	/**
@@ -70,8 +73,8 @@ public class VariableModel extends Model{
 	 */
 	@Override
 	protected <T> void addDataInModel(T data){
-		System.out.println("Error variable is currently not a scope as scopeStack indicated");
-		System.exit(1);	
+		System.out.println("Error variable is currently not a scope as scopeStack indicated" + data.getClass());
+		System.exit(1);
 	}
 
 	/**
@@ -80,7 +83,7 @@ public class VariableModel extends Model{
 	 * @return     The parsed code.
 	 */
 	@Override
-	public JSONObject getParsedCode(){	
+	public JSONObject getParsedCode(){
 		JSONObject parsedCode = new JSONObject();
 
 		parsedCode.put("name", this.name);
