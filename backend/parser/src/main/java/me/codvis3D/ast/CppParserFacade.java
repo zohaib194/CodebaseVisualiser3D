@@ -46,9 +46,10 @@ public class CppParserFacade {
     public void parse(File file, String context) throws IOException {
         String code = readFile(file, Charset.forName("UTF-8"));
         CPP14Lexer lexer = new CPP14Lexer(new ANTLRInputStream(code));
-
+        lexer.removeErrorListeners();
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         CPP14Parser parser = new CPP14Parser(tokens);
+        parser.removeErrorListeners();
 
         ParseTree tree = parser.translationunit();
         

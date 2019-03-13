@@ -123,7 +123,7 @@ public class NamespaceModel extends Model {
 			this.addCall((String)data);
 
 		}else{
-			System.out.println("Error adding data in model");
+			System.out.println("Error adding data in namespace model");
 			System.exit(1);
 		}
 	}

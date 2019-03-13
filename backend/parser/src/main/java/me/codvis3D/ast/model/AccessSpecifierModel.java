@@ -8,19 +8,19 @@ import org.json.JSONObject;
 
 import me.codvis.ast.ClassModel;
 import me.codvis.ast.FunctionModel;
-//import me.codvis.ast.VariableModel;
+import me.codvis.ast.VariableModel;
 
 public class AccessSpecifierModel extends Model {
 	private String name;
 	List<ClassModel> classes;
 	List<FunctionModel> functions;
-	// List<VariableModel> variables;
+	List<VariableModel> variables;
 
 	AccessSpecifierModel() {
 		this.name = "";
-		this.publicData = new ArrayList<>();
-		this.privateData = new ArrayList<>();
-		this.protectedData = new ArrayList<>();
+		this.classes = new ArrayList<>();
+		this.functions = new ArrayList<>();
+		this.variables = new ArrayList<>();
 	}
 
 	public String getName() {
@@ -31,17 +31,29 @@ public class AccessSpecifierModel extends Model {
 		this.name = name;
 	}
 
-	public List<String> getClasses() {
+	public List<ClassModel> getClasses() {
 		return this.classes;
 	}
 
-	public List<String> getFunctions() {
+	public List<FunctionModel> getFunctions() {
 		return this.functions;
 	}
 
-	/*
-	 * public List<String> getVariables() { return this.variables; }
-	 */
+	public List<VariableModel> getVariables() {
+		return this.variables;
+	}
+
+	public void addClass(ClassModel data) {
+		this.classes.add(data);
+	}
+
+	public void addFunction(FunctionModel data) {
+		this.functions.add(data);
+	}
+
+	public void addVariable(VariableModel data) {
+		this.variables.add(data);
+	}
 
 	public JSONObject getParsedCode() {
 		JSONObject parsedCode = new JSONObject();
@@ -49,7 +61,7 @@ public class AccessSpecifierModel extends Model {
 		parsedCode.put("name", this.name);
 		parsedCode.put("classes", this.classes);
 		parsedCode.put("functions", this.functions);
-		// parsedCode.put("variables", this.variables);
+		parsedCode.put("variables", this.variables);
 		return parsedCode;
 	}
 
@@ -62,13 +74,12 @@ public class AccessSpecifierModel extends Model {
 	protected <T> void addDataInModel(T data) {
 
 		if (data instanceof ClassModel) {
-			this.addCall((ClassModel) data);
+			this.addClass((ClassModel) data);
 		} else if (data instanceof FunctionModel) {
-			this.addCall((FunctionModel) data);
-		} /*
-			 * else if (data instanceof VariableModel) { this.addCall((VariableModel) data);
-			 * }
-			 */ else {
+			this.addFunction((FunctionModel) data);
+		} else if (data instanceof VariableModel) {
+			this.addVariable((VariableModel) data);
+		} else {
 			System.out.println("Error adding data in model");
 			System.exit(1);
 		}

@@ -10,28 +10,51 @@ import org.json.JSONObject;
  */
 public class FunctionModel extends Model{
 	private String name;
-	private String namespace;
+	private String declaratorId;
+	private String scope;
 	private int lineStart;
 	private int lineEnd;
 	private List<String> calls;
+	private List<VariableModel> variables;
+	private List<VariableModel> parameters;
+
+	FunctionModel(String name){
+		this.name = name;
+		this.calls = new ArrayList<>();
+		this.variables = new ArrayList<>();
+		this.parameters = new ArrayList<>();
+	}
 
 	/**
 	 * Constructs the object, setting the function name.
 	 *
 	 * @param      name  The name
 	 */
-	FunctionModel(String name){
+	FunctionModel(String name, String declarator){
 		this.name = name;
+		this.scope = "";
+		this.declaratorId = declarator;
 		this.calls = new ArrayList<>();
+		this.variables = new ArrayList<>();
+		this.parameters = new ArrayList<>();
 	}
 
 	/**
-	 * Sets the namespace.
+	 * Gets the scope.
 	 *
-	 * @param      namespace  The namespace
+	 * @return     The scope.
 	 */
-	public void setNamespace(String namespace){
-		this.namespace = namespace;
+	public String getScope(){
+		return this.scope;
+	}
+
+	/**
+	 * Sets the scope.
+	 *
+	 * @param      scope  The scope
+	 */
+	public void setScope(String scope){
+		this.scope = scope;
 	}
 
 	/**
@@ -41,15 +64,6 @@ public class FunctionModel extends Model{
 	 */
 	public String getName(){
 		return this.name;
-	}
-
-	/**
-	 * Gets the namespace.
-	 *
-	 * @return     The namespace.
-	 */
-	public String getNamespace(){
-		return this.namespace;
 	}
 
 	/**
@@ -98,6 +112,33 @@ public class FunctionModel extends Model{
 	}
 
 	/**
+	 * Adds a variable.
+	 *
+	 * @param      variable  The variable
+	 */
+	public void addVariable(VariableModel variable){
+		this.variables.add(variable);
+	}
+
+	/**
+	 * Adds a parameter.
+	 *
+	 * @param      parameter  The parameter
+	 */
+	public void addParameter(VariableModel parameter){
+		this.parameters.add(parameter);
+	}
+
+	/**
+	 * Sets the parameters.
+	 *
+	 * @param      parameters  The parameters
+	 */
+	public void setParameters(List<VariableModel> parameters){
+		this.parameters = parameters;
+	}
+
+	/**
 	 * Adds the data in model.
 	 *
 	 * @param      data  The data
@@ -107,8 +148,10 @@ public class FunctionModel extends Model{
 
 		if (data instanceof String){
 			this.addCall((String) data);
-		} else {
-			System.out.println("Error adding data in model");
+		} else if (data instanceof VariableModel){
+			this.addVariable((VariableModel) data);
+		}  else {
+			System.out.println("Error adding data in function model: " + data.getClass());
 			System.exit(1);
 		}
 
@@ -124,9 +167,23 @@ public class FunctionModel extends Model{
 		JSONObject parsedCode = new JSONObject();
 
 		parsedCode.put("name", this.name);
+		parsedCode.put("declrator_id", this.declaratorId);
+		parsedCode.put("scope", this.scope);
 		parsedCode.put("start_line", this.lineStart);
 		parsedCode.put("end_line", this.lineEnd);
 		parsedCode.put("calls", this.calls);
+
+		List<JSONObject> parsedVariables = this.convertClassListJsonObjectList(this.variables, "variable");
+		if (parsedVariables != null) {
+			parsedCode.put("variables", parsedVariables);
+		}
+
+		List<JSONObject> parsedParameters = this.convertClassListJsonObjectList(this.parameters, "parameter");
+		if (parsedParameters != null) {
+			parsedCode.put("parameters", parsedParameters);
+		}
+
+
 		return parsedCode;
 	}
 }

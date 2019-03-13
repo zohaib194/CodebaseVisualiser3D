@@ -10,7 +10,10 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Stack;
+import java.util.*;
 
 import org.json.JSONObject;
 
@@ -66,41 +69,118 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 *
 	 * @param ctx The parsing context
 	 */
-	@Override
-	public void enterFunctiondefinition(CPP14Parser.FunctiondefinitionContext ctx) {
+    @Override
+    public void enterFunctiondefinition(CPP14Parser.FunctiondefinitionContext ctx) {
+        // Get interval between function start and end of function name.
+	    Interval interval = new Interval(ctx.start.getStartIndex(), ctx.declarator().stop.getStopIndex());
 
-		// Get interval between function start and end of function name.
-		Interval interval = new Interval(ctx.start.getStartIndex(), ctx.declarator().stop.getStopIndex());
+	    // Get the input stream of function definition rule.
+	    CharStream input = ctx.start.getInputStream();
 
-		// Get the input stream of function definition rule.
-		CharStream input = ctx.start.getInputStream();
+        FunctionModel functionModel = new FunctionModel(input.getText(interval));
+	    this.enterScope(functionModel);
+	    System.out.println(this.scopeStack.size() +" : "+ this.scopeStack.peek().getClass());
+	    System.out.println(ctx.getText());
+       /*
+        // Get interval between function start and end of function name.
+	    Interval interval = new Interval(ctx.start.getStartIndex(), ctx.declarator().stop.getStopIndex());
 
-		// Set this function model with name, lineStart and lineEnd.
-		FunctionModel functionModel = new FunctionModel(input.getText(interval));
-		functionModel.setLineStart(ctx.functionbody().start.getLine());
-		functionModel.setLineEnd(ctx.functionbody().stop.getLine());
+	    // Get the input stream of function definition rule.
+	    CharStream input = ctx.start.getInputStream();
 
-		this.scopeStack.peek().addDataInModel(functionModel);
-		this.enterScope(functionModel);
-	}
+	    JSONObject functionMetaData = new JSONObject();
+	    functionMetaData = fetchMetaData(ctx);
 
-	/**
-	 * Listener for exiting the current scope, expecting that scope to be one
-	 * entered by enterFunctiondefinition.
-	 *
-	 * @param ctx The parsing context
-	 */
-	@Override
-	public void exitFunctiondefinition(CPP14Parser.FunctiondefinitionContext ctx) {
-		this.exitScope();
-	}
+	    // Set this function model with name, declaratorid, scope(if exists), lineStart and lineEnd.
+	    FunctionModel functionModel = new FunctionModel(input.getText(interval), functionMetaData.getString("declarator"));
+	    if(functionMetaData.has("scope")){
+	    	functionModel.setScope(functionMetaData.getString("scope"));
+	    }
 
-	/**
+	    if(functionMetaData.has("parameters")){
+	    	Iterator i = functionMetaData.getJSONArray("parameters").iterator();
+
+	        while (i.hasNext()) {
+	            JSONObject variable = (JSONObject) i.next();
+	    		functionModel.addParameter(
+	    			new VariableModel(
+	    				(String)variable.get("name"),
+	    				(String)variable.get("type")
+	    			)
+	    		);
+	        }
+	    }
+	    functionModel.setLineStart(ctx.functionbody().start.getLine());
+	    functionModel.setLineEnd(ctx.functionbody().stop.getLine());
+
+	    this.scopeStack.peek().addDataInModel(functionModel);
+	    this.enterScope(functionModel);*/
+    }
+
+    /**
+     * Listener for exiting the current scope, expecting that scope to be one entered by enterFunctiondefinition.
+     *
+     * @param      ctx   The parsing context
+     */
+    @Override
+    public void exitFunctiondefinition(CPP14Parser.FunctiondefinitionContext ctx) {
+    	Model model = this.exitScope();
+    	if(model instanceof FunctionModel){
+	    	this.scopeStack.peek().addDataInModel((FunctionModel) model);
+    	} else {
+    		this.enterScope(model);
+    		System.out.println("Could not find function model in scope stack on exitFunctiondefinition.");
+	    	System.exit(1);
+    	}
+    }
+
+    /**
+     * Listener for parsing variables from scope.
+     *
+     * @param      ctx   The parsing context
+     */
+    @Override
+    public void enterStatement(CPP14Parser.StatementContext ctx) {
+    	CPP14Parser.DeclarationstatementContext declStatement = ctx.declarationstatement();
+    	CPP14Parser.BlockdeclarationContext blockdeclaration = null;
+    	CPP14Parser.InitdeclaratorlistContext initDeclaratorlist = null;
+    	String variableName = "";
+    	String variableType = "";
+    	if(declStatement != null){
+
+	    	if(declStatement.blockdeclaration() != null){
+	    		blockdeclaration = declStatement.blockdeclaration();
+
+	    		if(blockdeclaration.simpledeclaration() != null){
+
+	    			if(blockdeclaration.simpledeclaration().declspecifierseq() != null){
+	    				variableType = blockdeclaration.simpledeclaration().declspecifierseq().getText();
+
+		    			if(blockdeclaration.simpledeclaration().initdeclaratorlist() != null){
+		    				initDeclaratorlist = blockdeclaration.simpledeclaration().initdeclaratorlist();
+
+		    				while(initDeclaratorlist != null){
+		    					if(initDeclaratorlist.initdeclarator().declarator() == null){
+		    						break;
+		    					}
+
+	    						variableName = initDeclaratorlist.initdeclarator().declarator().getText();
+	    						this.scopeStack.peek().addDataInModel(new VariableModel(variableName, variableType));
+		    					initDeclaratorlist = initDeclaratorlist.initdeclaratorlist();
+			    			}
+		    			}
+	    			}
+	    		}
+    		}
+    	}
+    }
+
+    /**
 	 * Listener for parsing a namespace declaration. Adding namespace to filemodel.
-	 *
-	 * @param ctx The parsing context
-	 */
-	@Override
+     *
+     * @param      ctx   The parsing context
+     */
+    @Override
 	public void enterOriginalnamespacedefinition(CPP14Parser.OriginalnamespacedefinitionContext ctx) {
 		NamespaceModel namespace = new NamespaceModel(ctx.Identifier().getText());
 
@@ -129,9 +209,7 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	public void enterUsingdirective(CPP14Parser.UsingdirectiveContext ctx) {
 		UsingNamespaceModel usingNamespaceModel;
 		if (ctx.nestednamespecifier() != null) {
-			usingNamespaceModel = new UsingNamespaceModel(
-					ctx.nestednamespecifier().getText() + ctx.namespacename().getText(), ctx.getStart().getLine());
-
+			usingNamespaceModel = new UsingNamespaceModel(ctx.nestednamespecifier().getText() + ctx.namespacename().getText(), ctx.getStart().getLine());
 		} else {
 			usingNamespaceModel = new UsingNamespaceModel(ctx.namespacename().getText(), ctx.getStart().getLine());
 		}
@@ -147,6 +225,137 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	@Override
 	public void enterExpressionstatement(CPP14Parser.ExpressionstatementContext ctx) {
 		this.scopeStack.peek().addDataInModel(ctx.getText());
+	}
+
+/*	/**
+	 * Fetches a meta data of the function.
+	 *
+	 * @param      ctx   The context
+	 *
+	 * @return     return JSON object containing list of parameters, declrator ID, and scope function is from.
+
+	private JSONObject fetchMetaData(CPP14Parser.FunctiondefinitionContext ctx){
+		JSONObject functionMetaData = new JSONObject();
+		CPP14Parser.PtrdeclaratorContext ptrdeclarator = null;
+	  	CPP14Parser.NoptrdeclaratorContext noptrdeclarator = null;
+
+	  	if (ctx.declarator().ptrdeclarator() != null){
+	  		ptrdeclarator = ctx.declarator().ptrdeclarator();
+	  	} else {
+	  		noptrdeclarator = ctx.declarator().noptrdeclarator();
+	  	}
+
+	    while(true){
+		    if(ptrdeclarator != null){
+			    if (ptrdeclarator.ptrdeclarator() != null){
+			    	ptrdeclarator = ptrdeclarator.ptrdeclarator();
+
+
+			    }else if(ptrdeclarator.noptrdeclarator() != null){
+			    	noptrdeclarator = ptrdeclarator.noptrdeclarator();
+
+			    	while(true){
+			    		if (noptrdeclarator.declaratorid() != null) {
+			    			functionMetaData.put("declarator", noptrdeclarator.declaratorid().idexpression().getText());
+			    			if(noptrdeclarator.declaratorid().idexpression().qualifiedid() != null){
+			    				functionMetaData.put("scope", noptrdeclarator.declaratorid().idexpression().qualifiedid().nestednamespecifier().getText());
+			    				functionMetaData.put("declarator", noptrdeclarator.declaratorid().idexpression().qualifiedid().unqualifiedid().getText());
+			    			}
+
+							return functionMetaData;
+			    		}else if (noptrdeclarator.noptrdeclarator() != null) {
+
+							functionMetaData.put("parameters", fetchParameters(noptrdeclarator));
+			    			noptrdeclarator = noptrdeclarator.noptrdeclarator();
+			    			continue;
+			    		}else if (noptrdeclarator.ptrdeclarator() != null) {
+			    			ptrdeclarator = noptrdeclarator.ptrdeclarator();
+			    			break;
+			    		}else{
+			    			System.out.println("Could not understand simple functions");
+			    			System.exit(1);
+			    		}
+			    	}
+			    }else{
+			    	System.out.println("Could not understand simple functions");
+			    	System.exit(1);
+			    }
+			} else {
+				if(noptrdeclarator.declaratorid() != null){
+			    	functionMetaData.put("declarator", noptrdeclarator.declaratorid().getText());
+					return functionMetaData;
+			    }else if (noptrdeclarator.noptrdeclarator() != null) {
+	    			noptrdeclarator = noptrdeclarator.noptrdeclarator();
+	    		}else if (noptrdeclarator.ptrdeclarator() != null) {
+	    			ptrdeclarator = noptrdeclarator.ptrdeclarator();
+	    		}else{
+	    			System.out.println("Could not understand simple functions");
+	    			System.exit(1);
+	    		}
+			}
+		}
+	}
+*/
+	@Override
+	public void enterParameterdeclaration(CPP14Parser.ParameterdeclarationContext ctx) {
+		this.enterScope(new VariableModel());
+		System.out.println("Enter Parameter decl: " + this.scopeStack.size());
+		System.out.println("Enter Parameter decl: " + ctx.getText());
+	}
+
+	@Override
+	public void exitParameterdeclaration(CPP14Parser.ParameterdeclarationContext ctx) {
+		VariableModel vm = (VariableModel) this.exitScope();
+		Model model = this.exitScope();
+		if (model instanceof FunctionModel){
+			FunctionModel func = (FunctionModel) model;
+			func.addParameter(vm);
+			this.enterScope(func);
+			System.out.println("Exit Parameter decl: " + this.scopeStack.size());
+		} else {
+			this.enterScope(model);
+			System.out.println(ctx.getText());
+	    	System.out.println("Could not understand parent model for parameter declaration.");
+	    //	System.exit(1);
+		}
+		System.out.println("\n");
+	}
+
+
+	@Override
+	public void enterDeclarator(CPP14Parser.DeclaratorContext ctx) {
+		if (this.scopeStack.peek() instanceof VariableModel){
+			VariableModel vm = (VariableModel) this.exitScope();
+			vm.setName(ctx.getText());
+			this.enterScope(vm);
+			System.out.println("Decl: " + this.scopeStack.size());
+
+		}
+		if(ctx.noptrdeclarator() != null){
+			System.out.println("Ptrdeclarator: " + ctx.getText());
+		}
+	}
+
+	@Override
+	public void enterDeclspecifierseq(CPP14Parser.DeclspecifierseqContext ctx) {
+		if (this.scopeStack.peek() instanceof VariableModel){
+			VariableModel vm = (VariableModel) this.exitScope();
+			vm.setType(ctx.getText());
+			this.enterScope(vm);
+			System.out.println("seq: " + this.scopeStack.size());
+		}
+	}
+
+	@Override
+	public void enterAbstractdeclarator(CPP14Parser.AbstractdeclaratorContext ctx) {
+		System.out.println("abstractdeclarator: " + ctx.getText());
+
+		if (this.scopeStack.peek() instanceof VariableModel){
+			VariableModel vm = (VariableModel) this.exitScope();
+			vm.setName(ctx.getText());
+			this.enterScope(vm);
+			System.out.println(this.scopeStack.size());
+		}
 	}
 
 	/**
