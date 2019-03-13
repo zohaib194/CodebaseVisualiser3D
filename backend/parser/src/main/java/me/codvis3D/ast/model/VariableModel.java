@@ -12,6 +12,10 @@ public class VariableModel extends Model{
 	private String name;
 	private String type;
 
+	VariableModel(){
+		
+	}
+
 	/**
 	 * Constructs the object.
 	 *

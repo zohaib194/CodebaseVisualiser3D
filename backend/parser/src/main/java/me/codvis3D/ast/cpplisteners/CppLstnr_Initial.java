@@ -38,12 +38,22 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 *
 	 * @param      ctx   The parsing context
 	 */
-    @Override 
+    @Override
     public void enterFunctiondefinition(CPP14Parser.FunctiondefinitionContext ctx) {
-        
         // Get interval between function start and end of function name.
 	    Interval interval = new Interval(ctx.start.getStartIndex(), ctx.declarator().stop.getStopIndex());
-	    
+
+	    // Get the input stream of function definition rule.
+	    CharStream input = ctx.start.getInputStream();
+
+        FunctionModel functionModel = new FunctionModel(input.getText(interval));
+	    this.enterScope(functionModel);
+	    System.out.println(this.scopeStack.size() +" : "+ this.scopeStack.peek().getClass());
+	    System.out.println(ctx.getText());
+       /*
+        // Get interval between function start and end of function name.
+	    Interval interval = new Interval(ctx.start.getStartIndex(), ctx.declarator().stop.getStopIndex());
+
 	    // Get the input stream of function definition rule.
 	    CharStream input = ctx.start.getInputStream();
 
@@ -63,7 +73,7 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	            JSONObject variable = (JSONObject) i.next();
 	    		functionModel.addParameter(
 	    			new VariableModel(
-	    				(String)variable.get("name"), 
+	    				(String)variable.get("name"),
 	    				(String)variable.get("type")
 	    			)
 	    		);
@@ -73,7 +83,7 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	    functionModel.setLineEnd(ctx.functionbody().stop.getLine());
 
 	    this.scopeStack.peek().addDataInModel(functionModel);
-	    this.enterScope(functionModel);
+	    this.enterScope(functionModel);*/
     }
 
     /**
@@ -81,9 +91,16 @@ public class CppLstnr_Initial extends CppExtendedListener {
      *
      * @param      ctx   The parsing context
      */
-    @Override 
+    @Override
     public void exitFunctiondefinition(CPP14Parser.FunctiondefinitionContext ctx) {
-    	this.exitScope();
+    	Model model = this.exitScope();
+    	if(model instanceof FunctionModel){
+	    	this.scopeStack.peek().addDataInModel((FunctionModel) model);
+    	} else {
+    		this.enterScope(model);
+    		System.out.println("Could not find function model in scope stack on exitFunctiondefinition.");
+	    	System.exit(1);
+    	}
     }
 
     /**
@@ -91,7 +108,7 @@ public class CppLstnr_Initial extends CppExtendedListener {
      *
      * @param      ctx   The parsing context
      */
-    @Override 
+    @Override
     public void enterStatement(CPP14Parser.StatementContext ctx) {
     	CPP14Parser.DeclarationstatementContext declStatement = ctx.declarationstatement();
     	CPP14Parser.BlockdeclarationContext blockdeclaration = null;
@@ -99,32 +116,32 @@ public class CppLstnr_Initial extends CppExtendedListener {
     	String variableName = "";
     	String variableType = "";
     	if(declStatement != null){
-	    	
+
 	    	if(declStatement.blockdeclaration() != null){
 	    		blockdeclaration = declStatement.blockdeclaration();
-	    		
+
 	    		if(blockdeclaration.simpledeclaration() != null){
-	    			
+
 	    			if(blockdeclaration.simpledeclaration().declspecifierseq() != null){
 	    				variableType = blockdeclaration.simpledeclaration().declspecifierseq().getText();
-		    			
+
 		    			if(blockdeclaration.simpledeclaration().initdeclaratorlist() != null){
 		    				initDeclaratorlist = blockdeclaration.simpledeclaration().initdeclaratorlist();
-		    				
+
 		    				while(initDeclaratorlist != null){
 		    					if(initDeclaratorlist.initdeclarator().declarator() == null){
 		    						break;
-		    					} 
-		    					
+		    					}
+
 	    						variableName = initDeclaratorlist.initdeclarator().declarator().getText();
 	    						this.scopeStack.peek().addDataInModel(new VariableModel(variableName, variableType));
 		    					initDeclaratorlist = initDeclaratorlist.initdeclaratorlist();
-			    			} 
+			    			}
 		    			}
 	    			}
 	    		}
-    		}	
-    	} 
+    		}
+    	}
     }
 
     /**
@@ -133,7 +150,7 @@ public class CppLstnr_Initial extends CppExtendedListener {
      * @param      ctx   The parsing context
      */
     @Override
-	public void enterOriginalnamespacedefinition(CPP14Parser.OriginalnamespacedefinitionContext ctx) { 
+	public void enterOriginalnamespacedefinition(CPP14Parser.OriginalnamespacedefinitionContext ctx) {
 		NamespaceModel namespace = new NamespaceModel(ctx.Identifier().getText());
 
 	    this.scopeStack.peek().addDataInModel(namespace);
@@ -159,8 +176,8 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	public void enterUsingdirective(CPP14Parser.UsingdirectiveContext ctx) {
 		UsingNamespaceModel usingNamespaceModel;
 		if (ctx.nestednamespecifier() != null) {
-			usingNamespaceModel = new UsingNamespaceModel(ctx.nestednamespecifier().getText() + ctx.namespacename().getText(), ctx.getStart().getLine());	
-		
+			usingNamespaceModel = new UsingNamespaceModel(ctx.nestednamespecifier().getText() + ctx.namespacename().getText(), ctx.getStart().getLine());
+
 		}else{
 			usingNamespaceModel = new UsingNamespaceModel(ctx.namespacename().getText(), ctx.getStart().getLine());
 		}
@@ -173,18 +190,18 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 *
 	 * @param      ctx   The parsing context
 	 */
-	@Override 
-	public void enterExpressionstatement(CPP14Parser.ExpressionstatementContext ctx) { 
+	@Override
+	public void enterExpressionstatement(CPP14Parser.ExpressionstatementContext ctx) {
 	    this.scopeStack.peek().addDataInModel(ctx.getText());
 	}
 
-	/**
+/*	/**
 	 * Fetches a meta data of the function.
 	 *
 	 * @param      ctx   The context
 	 *
 	 * @return     return JSON object containing list of parameters, declrator ID, and scope function is from.
-	 */
+
 	private JSONObject fetchMetaData(CPP14Parser.FunctiondefinitionContext ctx){
 		JSONObject functionMetaData = new JSONObject();
 		CPP14Parser.PtrdeclaratorContext ptrdeclarator = null;
@@ -204,7 +221,7 @@ public class CppLstnr_Initial extends CppExtendedListener {
 
 			    }else if(ptrdeclarator.noptrdeclarator() != null){
 			    	noptrdeclarator = ptrdeclarator.noptrdeclarator();
-			    	
+
 			    	while(true){
 			    		if (noptrdeclarator.declaratorid() != null) {
 			    			functionMetaData.put("declarator", noptrdeclarator.declaratorid().idexpression().getText());
@@ -246,65 +263,67 @@ public class CppLstnr_Initial extends CppExtendedListener {
 			}
 		}
 	}
+*/
+	@Override
+	public void enterParameterdeclaration(CPP14Parser.ParameterdeclarationContext ctx) {
+		this.enterScope(new VariableModel());
+		System.out.println("Enter Parameter decl: " + this.scopeStack.size());
+		System.out.println("Enter Parameter decl: " + ctx.getText());
+	}
 
-	/**
-	 * Fetches parameters.
-	 *
-	 * @param      noptrdeclarator  The noptrdeclarator
-	 *
-	 * @return     List of parameters found.
-	 */
-	private List<VariableModel> fetchParameters(CPP14Parser.NoptrdeclaratorContext noptrdeclarator){
-		if(noptrdeclarator.parametersandqualifiers() == null){
-			return new ArrayList<>();
+	@Override
+	public void exitParameterdeclaration(CPP14Parser.ParameterdeclarationContext ctx) {
+		VariableModel vm = (VariableModel) this.exitScope();
+		Model model = this.exitScope();
+		if (model instanceof FunctionModel){
+			FunctionModel func = (FunctionModel) model;
+			func.addParameter(vm);
+			this.enterScope(func);
+			System.out.println("Exit Parameter decl: " + this.scopeStack.size());
+		} else {
+			this.enterScope(model);
+			System.out.println(ctx.getText());
+	    	System.out.println("Could not understand parent model for parameter declaration.");
+	    //	System.exit(1);
 		}
+		System.out.println("\n");
+	}
 
-		List<VariableModel> paramVariables = new ArrayList<>();
-			
-		if(noptrdeclarator.parametersandqualifiers() != null){
-			if(noptrdeclarator.parametersandqualifiers().parameterdeclarationclause() != null){
-				CPP14Parser.ParameterdeclarationclauseContext parameters = noptrdeclarator.parametersandqualifiers().parameterdeclarationclause();
-				if(parameters.parameterdeclarationlist() != null){
-					CPP14Parser.ParameterdeclarationlistContext paramList = parameters.parameterdeclarationlist();
-					CPP14Parser.ParameterdeclarationContext paraDecl = null;
-					
-					while(true){
-						if(paramList == null){
-							break;
-						}
 
-						if(paramList.parameterdeclaration() != null){
-							paraDecl = paramList.parameterdeclaration();
-							if(paraDecl.declarator() != null){
-								paramVariables.add(
-									new VariableModel(
-										paraDecl.declarator().getText(),
-										paraDecl.declspecifierseq().getText()
-									)
-								);
+	@Override
+	public void enterDeclarator(CPP14Parser.DeclaratorContext ctx) {
+		if (this.scopeStack.peek() instanceof VariableModel){
+			VariableModel vm = (VariableModel) this.exitScope();
+			vm.setName(ctx.getText());
+			this.enterScope(vm);
+			System.out.println("Decl: " + this.scopeStack.size());
 
-							} else if (paraDecl.abstractdeclarator() != null) {
-								paramVariables.add(
-									new VariableModel(
-										paraDecl.abstractdeclarator().getText(),
-										paraDecl.declspecifierseq().getText()
-									)
-								);
-							}
-							
-							paramList = paramList.parameterdeclarationlist();
-
-						} else if(paramList.parameterdeclarationlist() != null){
-							paramList = paramList.parameterdeclarationlist();
-							continue;
-
-						}
-					} 
-				}
-			}
 		}
-		
-		return paramVariables;    		
+		if(ctx.noptrdeclarator() != null){
+			System.out.println("Ptrdeclarator: " + ctx.getText());
+		}
+	}
+
+	@Override
+	public void enterDeclspecifierseq(CPP14Parser.DeclspecifierseqContext ctx) {
+		if (this.scopeStack.peek() instanceof VariableModel){
+			VariableModel vm = (VariableModel) this.exitScope();
+			vm.setType(ctx.getText());
+			this.enterScope(vm);
+			System.out.println("seq: " + this.scopeStack.size());
+		}
+	}
+
+	@Override
+	public void enterAbstractdeclarator(CPP14Parser.AbstractdeclaratorContext ctx) {
+		System.out.println("abstractdeclarator: " + ctx.getText());
+
+		if (this.scopeStack.peek() instanceof VariableModel){
+			VariableModel vm = (VariableModel) this.exitScope();
+			vm.setName(ctx.getText());
+			this.enterScope(vm);
+			System.out.println(this.scopeStack.size());
+		}
 	}
 
 	/**
@@ -312,7 +331,7 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 *
 	 * @return     The parsed code.
 	 */
-    public JSONObject getParsedCode() {  
+    public JSONObject getParsedCode() {
 		JSONObject parsedCode = new JSONObject();
 
     	return parsedCode.put("file", this.fileModel.getParsedCode());

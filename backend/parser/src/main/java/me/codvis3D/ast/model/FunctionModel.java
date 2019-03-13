@@ -18,6 +18,13 @@ public class FunctionModel extends Model{
 	private List<VariableModel> variables;
 	private List<VariableModel> parameters;
 
+	FunctionModel(String name){
+		this.name = name;
+		this.calls = new ArrayList<>();
+		this.variables = new ArrayList<>();
+		this.parameters = new ArrayList<>();
+	}
+
 	/**
 	 * Constructs the object, setting the function name.
 	 *

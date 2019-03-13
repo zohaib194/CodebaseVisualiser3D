@@ -65,7 +65,9 @@ int lolasdasdasd(int i, int j, bool istrue, float normalFloat){
 	std::vector<bool> vBool;
 
 	std::unordered_map<std::string, std::string> map; 
-	std::unordered_map<int, std::vector<int>> map1; 
+	
+	// No viable input for line 70 ERROR in .G4 file from antlr.
+	//std::unordered_map<int, std::vector<int>> map1; 
 
 	hw->print();
 	if(true){
