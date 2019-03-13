@@ -56,3 +56,8 @@ void hello::foo(){
 void helloworld::print() {
 
 }
+
+union UnionTest {
+	int aShit;
+	int bShit;
+};
