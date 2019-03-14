@@ -66,6 +66,10 @@ public class VariableModel extends Model{
 		return this.type;
 	}
 
+	public boolean hasType(){
+		return ((this.type == "") ? false : true);
+	}
+
 	/**
 	 * Adds the data in model.
 	 *

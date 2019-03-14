@@ -36,6 +36,15 @@ public class FunctionBodyModel extends Model{
 	}
 
 	/**
+	 * Sets the variables.
+	 *
+	 * @param      variables  The variables
+	 */
+	public void setVariables(List<VariableModel> variables){
+		this.variables = variables;
+	}
+
+	/**
 	 * Adds the data in model.
 	 *
 	 * @param      data  The data

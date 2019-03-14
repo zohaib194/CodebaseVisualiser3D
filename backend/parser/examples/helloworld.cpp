@@ -81,6 +81,8 @@ int lolasdasdasd(int i, int j, bool istrue, float normalFloat){
 
 namespace hello{
 	#include <iostream>
+	int globalVarFromNameSpace;
+	int globalInlineVarFromNameSpace, globalInlineVarFromNameSpace1 = 0;
 
 	void foo();
 	void foo(int i);

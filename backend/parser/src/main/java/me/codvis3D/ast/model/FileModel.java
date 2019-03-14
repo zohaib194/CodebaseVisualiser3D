@@ -66,7 +66,16 @@ public class FileModel extends Model{
 	public void addVariable(VariableModel variable){
 		this.variables.add(variable);
 	}
-	
+
+	/**
+	 * Sets the variables.
+	 *
+	 * @param      variables  The variables
+	 */
+	public void setVariables(List<VariableModel> variables){
+		this.variables = variables;
+	}
+
 	/**
 	 * Sets the functions.
 	 *
@@ -113,7 +122,7 @@ public class FileModel extends Model{
 	public List<UsingNamespaceModel> getUsingNamespaces(){
 		return this.usingNamespaces;
 	}
-	
+
 	/**
 	 * Adds the data in model.
 	 *
@@ -133,7 +142,7 @@ public class FileModel extends Model{
 
 		} else if (data instanceof VariableModel){
 			this.addVariable((VariableModel) data);
-		
+
 		} else {
 			System.out.println(data);
 			System.out.println("Error adding data in file model");
@@ -167,7 +176,7 @@ public class FileModel extends Model{
 		if (parsedUsingNamespaces != null) {
 			parsedCode.put("using_namespaces", parsedUsingNamespaces);
 		}
-		
+
 		List<JSONObject> parsedVariables = this.convertClassListJsonObjectList(this.variables, "variable");
 		if (parsedVariables != null) {
 			parsedCode.put("variables", parsedVariables);

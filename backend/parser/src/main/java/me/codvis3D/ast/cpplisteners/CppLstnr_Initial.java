@@ -66,7 +66,7 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	    	this.scopeStack.peek().addDataInModel((FunctionModel) model);
     	} else {
     		this.enterScope(model);
-    		System.err.println("Could not find function model in scope stack on exitFunctiondefinition.");
+    		System.err.println("Could not understand parent model for function definition.");
     	}
     }
 
@@ -104,7 +104,7 @@ public class CppLstnr_Initial extends CppExtendedListener {
 		if (ctx.nestednamespecifier() != null) {
 			usingNamespaceModel = new UsingNamespaceModel(ctx.nestednamespecifier().getText() + ctx.namespacename().getText(), ctx.getStart().getLine());
 
-		}else{
+		} else {
 			usingNamespaceModel = new UsingNamespaceModel(ctx.namespacename().getText(), ctx.getStart().getLine());
 		}
 
@@ -128,7 +128,7 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 */
 	@Override
 	public void enterSimpledeclaration(CPP14Parser.SimpledeclarationContext ctx) {
-		if(ctx.initdeclaratorlist() != null) {
+		if(this.isVariable(ctx)) {
 			this.enterScope(new VariableListModel());
 		}
 	}
@@ -140,11 +140,12 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 */
 	@Override
 	public void exitSimpledeclaration(CPP14Parser.SimpledeclarationContext ctx) {
-		if(ctx.initdeclaratorlist() != null) {
+		if(this.isVariable(ctx)) {
 			VariableListModel variableList = (VariableListModel) this.exitScope();
 
 			if ( this.scopeStack.peek() instanceof FunctionBodyModel ||
-			     this.scopeStack.peek() instanceof FileModel) {
+			     this.scopeStack.peek() instanceof FileModel ||
+			     this.scopeStack.peek() instanceof NamespaceModel) {
 
 				for (Iterator<String> i = variableList.getNames().iterator(); i.hasNext();) {
 				    String variableName = i.next();
@@ -152,9 +153,28 @@ public class CppLstnr_Initial extends CppExtendedListener {
 				}
 
 			} else {
-	    		System.err.println("Could not find function body model in scope stack on exitFunctiondefinition.");
+	    		System.err.println("Could not understand parent model for simple declaration.");
 	    	}
 		}
+	}
+
+	/**
+	 * Determines if ctx is a variable.
+	 *
+	 * @param      ctx   The parsing context
+	 *
+	 * @return     True if variable, False otherwise.
+	 */
+	protected boolean isVariable(CPP14Parser.SimpledeclarationContext ctx){
+		CPP14Parser.InitdeclaratorlistContext initDeclList = null;
+		if(ctx.initdeclaratorlist() != null){
+			initDeclList = ctx.initdeclaratorlist();
+			if(initDeclList.initdeclarator().declarator().ptrdeclarator().noptrdeclarator().declaratorid() != null){
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -192,7 +212,7 @@ public class CppLstnr_Initial extends CppExtendedListener {
 			this.enterScope(func);
 		} else {
 			this.enterScope(model);
-	    	System.err.println("Could not understand parent model for declaratorid. ");
+	    	System.err.println("Could not understand parent model for declarator id. ");
 		}
 	}
 
@@ -275,11 +295,13 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	public void enterDeclspecifierseq(CPP14Parser.DeclspecifierseqContext ctx) {
 		if (this.scopeStack.peek() instanceof VariableModel){
 			VariableModel vm = (VariableModel) this.exitScope();
-			vm.setType(ctx.getText());
+			this.prevType = ctx.getText();
+			vm.setType(this.prevType);
 			this.enterScope(vm);
 		} else if (this.scopeStack.peek() instanceof VariableListModel) {
 			VariableListModel vlm = (VariableListModel) this.exitScope();
-			vlm.setType(ctx.getText());
+			this.prevType = ctx.getText();
+			vlm.setType(this.prevType);
 			this.enterScope(vlm);
 		} else {
 	    	System.err.println("Could not understand parent model for declarator specifier sequence.");
