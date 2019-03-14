@@ -16,8 +16,8 @@ public class AccessSpecifierModel extends Model {
 	List<FunctionModel> functions;
 	List<VariableModel> variables;
 
-	AccessSpecifierModel() {
-		this.name = "";
+	AccessSpecifierModel(String name) {
+		this.name = name;
 		this.classes = new ArrayList<>();
 		this.functions = new ArrayList<>();
 		this.variables = new ArrayList<>();
@@ -80,7 +80,7 @@ public class AccessSpecifierModel extends Model {
 		} else if (data instanceof VariableModel) {
 			this.addVariable((VariableModel) data);
 		} else {
-			System.out.println("Error adding data in model");
+			System.out.println("Error adding data in accessspecifier model");
 			System.exit(1);
 		}
 

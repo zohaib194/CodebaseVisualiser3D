@@ -12,14 +12,14 @@ class helloworld
 	public:
 		hei();
 		~hei();
-		
 	};
 public:
 	helloworld();
 	void print();
 	~helloworld(){
 	}
-	
+private: 
+	int i; 
 };
 
 helloworld::helloworld(){
