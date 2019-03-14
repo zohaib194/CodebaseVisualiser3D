@@ -2,7 +2,7 @@
 #include <vector>
 #include <unordered_map>
 
-int globalVariable = 0;
+int globalVariable, globalVariable1 = 0;
 
 using namespace std;
 class helloworld
@@ -45,6 +45,7 @@ int main(int argc, char** argv)
     return 0;
 }
 
+// Function pointers are not parsed in current implementation.
 //void (*signal(int, void (*fp)(int)))(int);
 
 auto hell() -> bool {

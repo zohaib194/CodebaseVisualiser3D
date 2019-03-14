@@ -14,7 +14,7 @@ public class VariableListModel extends Model{
 	 */
 	VariableListModel(){
 		this.type = "";
-		this.name = new ArrayList<>();
+		this.names = new ArrayList<>();
 	}
 
 	/**
@@ -69,7 +69,7 @@ public class VariableListModel extends Model{
 	 */
 	@Override
 	protected <T> void addDataInModel(T data){
-		System.out.println("Error adding data in VariableList model: " + data.getClass());
+		System.out.println("Error adding data in variable list model " + data.getClass());
 		System.exit(1);
 	}
 

@@ -45,11 +45,14 @@ public class FunctionBodyModel extends Model{
 
 		if (data instanceof String){
 			this.addCall((String) data);
+
 		} else if (data instanceof VariableModel){
 			this.addVariable((VariableModel) data);
-		}  else {
+
+		} else {
 			System.out.println("Error adding data in function model: " + data.getClass());
 			System.exit(1);
+
 		}
 
 	}
