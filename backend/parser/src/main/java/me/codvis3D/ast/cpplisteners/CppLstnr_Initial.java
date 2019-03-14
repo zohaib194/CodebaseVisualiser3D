@@ -295,13 +295,11 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	public void enterDeclspecifierseq(CPP14Parser.DeclspecifierseqContext ctx) {
 		if (this.scopeStack.peek() instanceof VariableModel){
 			VariableModel vm = (VariableModel) this.exitScope();
-			this.prevType = ctx.getText();
-			vm.setType(this.prevType);
+			vm.setType(ctx.getText());
 			this.enterScope(vm);
 		} else if (this.scopeStack.peek() instanceof VariableListModel) {
 			VariableListModel vlm = (VariableListModel) this.exitScope();
-			this.prevType = ctx.getText();
-			vlm.setType(this.prevType);
+			vlm.setType(ctx.getText());
 			this.enterScope(vlm);
 		} else {
 	    	System.err.println("Could not understand parent model for declarator specifier sequence.");
