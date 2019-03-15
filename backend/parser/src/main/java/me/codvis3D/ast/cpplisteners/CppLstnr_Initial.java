@@ -149,7 +149,9 @@ public class CppLstnr_Initial extends CppExtendedListener {
 
 				for (Iterator<String> i = variableList.getNames().iterator(); i.hasNext();) {
 				    String variableName = i.next();
-					this.scopeStack.peek().addDataInModel(new VariableModel(variableName, variableList.getType()));
+				    VariableModel vm = new VariableModel(variableName, variableList.getType());
+				    vm.trimType();
+					this.scopeStack.peek().addDataInModel(vm);
 				}
 
 			} else {
@@ -167,10 +169,19 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 */
 	protected boolean isVariable(CPP14Parser.SimpledeclarationContext ctx){
 		CPP14Parser.InitdeclaratorlistContext initDeclList = null;
-		if(ctx.initdeclaratorlist() != null){
+		CPP14Parser.DeclaratorContext declarator = null;
+
+		if(ctx.initdeclaratorlist() != null) {
 			initDeclList = ctx.initdeclaratorlist();
-			if(initDeclList.initdeclarator().declarator().ptrdeclarator().noptrdeclarator().declaratorid() != null){
-				return true;
+			if(initDeclList.initdeclarator().declarator() != null) {
+				declarator = initDeclList.initdeclarator().declarator();
+				if(declarator.ptrdeclarator() != null) {
+					if(declarator.ptrdeclarator().noptrdeclarator() != null) {
+						if(declarator.ptrdeclarator().noptrdeclarator().declaratorid() != null) {
+							return true;
+						}
+					}
+				}
 			}
 		}
 
@@ -258,6 +269,7 @@ public class CppLstnr_Initial extends CppExtendedListener {
 		Model model = this.exitScope();
 		if (model instanceof FunctionModel){
 			FunctionModel func = (FunctionModel) model;
+			vm.trimType();
 			func.addParameter(vm);
 			this.enterScope(func);
 		} else {
@@ -286,23 +298,18 @@ public class CppLstnr_Initial extends CppExtendedListener {
 		}
 	}
 
-	/**
-	 * Listener for parsing types.
-	 *
-	 * @param      ctx   The parsing context
-	 */
 	@Override
-	public void enterDeclspecifierseq(CPP14Parser.DeclspecifierseqContext ctx) {
+	public void enterDeclspecifier(CPP14Parser.DeclspecifierContext ctx) {
 		if (this.scopeStack.peek() instanceof VariableModel){
 			VariableModel vm = (VariableModel) this.exitScope();
-			vm.setType(ctx.getText());
+			vm.applyModifierOnType(ctx.getText());
 			this.enterScope(vm);
 		} else if (this.scopeStack.peek() instanceof VariableListModel) {
 			VariableListModel vlm = (VariableListModel) this.exitScope();
-			vlm.setType(ctx.getText());
+			vlm.applyModifierOnType(ctx.getText());
 			this.enterScope(vlm);
 		} else {
-	    	System.err.println("Could not understand parent model for declarator specifier sequence.");
+	    	System.err.println("Could not understand parent model for variable modifier.");
 		}
 	}
 

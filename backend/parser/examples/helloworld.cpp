@@ -17,10 +17,17 @@ class helloworld
 public:
 	helloworld();
 	void print();
+	void print3(int *i){
+
+	}
 	~helloworld(){
 	}
 
 };
+
+void InputHandler::setCurrentWindow(GLFWwindow* window) {
+
+}
 
 helloworld::helloworld(){
 
@@ -48,7 +55,7 @@ int main(int argc, char** argv)
 // Function pointers are not parsed in current implementation.
 //void (*signal(int, void (*fp)(int)))(int);
 
-auto hell() -> bool {
+auto hell(helloworld* hey) -> bool {
     return true;
 }
 

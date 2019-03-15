@@ -5,6 +5,7 @@ package model
 import (
 	"bytes"
 	"encoding/json"
+	"io/ioutil"
 	"log"
 	"os/exec"
 	"path"
@@ -92,23 +93,35 @@ func (repo RepoModel) Load(file string, target string) (data FilesModel, err err
 		return data, err
 	}
 
+	log.Printf("file: %s", file)
 	// Setup the command to parse the file.
 	cmd = exec.Command("java", "me.codvis.ast.Main", "-f", file, "-t", target, "-c", "Initial")
 	cmd.Dir = JavaParserPath
-	output, err = cmd.CombinedOutput()
+	stdout, err := cmd.StdoutPipe()
 
 	if err != nil {
 		log.Println("Error executing java parser: ", err.Error())
 		return data, err
 	}
 
-	ioReader := bytes.NewReader(output)
-	decoder := json.NewDecoder(ioReader)
+	if err := cmd.Start(); err != nil {
+		log.Fatal(err)
+	}
 
-	if err := decoder.Decode(&data); err != nil {
+	outputBytes, err := ioutil.ReadAll(stdout)
+	log.Println(string(outputBytes))
+	ioReader := bytes.NewReader(outputBytes)
+	//decoder := json.NewDecoder(stdout)
+
+	if err := json.NewDecoder(ioReader).Decode(&data); err != nil {
 		log.Fatal("Could not decode json error: ", err.Error())
 		return data, err
 	}
+
+	if err := cmd.Wait(); err != nil {
+		log.Fatal(err)
+	}
+
 	data.File.LinesInFile = linesOfCode
 	data.File.Parsed = true
 

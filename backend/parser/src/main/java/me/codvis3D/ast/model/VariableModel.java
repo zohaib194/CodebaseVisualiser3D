@@ -104,6 +104,13 @@ public class VariableModel extends Model{
 	}
 
 	/**
+	 * Remove whitespace from both start and end.
+	 */
+	public void trimType(){
+		this.type = this.type.trim();
+	}
+
+	/**
 	 * Adds the data in model.
 	 *
 	 * @param      data  The data

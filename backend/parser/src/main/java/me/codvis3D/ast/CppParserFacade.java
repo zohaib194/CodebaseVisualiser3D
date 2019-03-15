@@ -67,6 +67,7 @@ public class CppParserFacade {
         ParseTreeWalker walker =  new ParseTreeWalker();
 
         if(listener == null){
+            System.err.println("[ERROR] no valid listener attacted.\n");
             System.exit(0);
         }
         walker.walk(listener, tree);

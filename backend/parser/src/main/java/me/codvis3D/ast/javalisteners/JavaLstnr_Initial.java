@@ -160,7 +160,9 @@ public class JavaLstnr_Initial extends JavaExtendedListener {
 
 			for (Iterator<String> i = variableList.getNames().iterator(); i.hasNext();) {
 			    String variableName = i.next();
-				this.scopeStack.peek().addDataInModel(new VariableModel(variableName, variableList.getType()));
+			    VariableModel vm = new VariableModel(variableName, variableList.getType());
+			    vm.trimType();
+				this.scopeStack.peek().addDataInModel(vm);
 			}
 
 		} else {
@@ -189,6 +191,7 @@ public class JavaLstnr_Initial extends JavaExtendedListener {
 		Model model = this.exitScope();
 		if (model instanceof FunctionModel){
 			FunctionModel func = (FunctionModel) model;
+			vm.trimType();
 			func.addParameter(vm);
 			this.enterScope(func);
 		} else {
@@ -222,6 +225,7 @@ public class JavaLstnr_Initial extends JavaExtendedListener {
 			Model model = this.exitScope();
 			if (model instanceof FunctionModel){
 				FunctionModel func = (FunctionModel) model;
+				vm.trimType();
 				func.addParameter(vm);
 				this.enterScope(func);
 			} else {
@@ -253,9 +257,11 @@ public class JavaLstnr_Initial extends JavaExtendedListener {
 		if (model instanceof FunctionModel){
 			FunctionModel func = (FunctionModel) model;
 			if(vm.hasName()){
+				vm.trimType();
 				func.addParameter(vm);
 			} else {
 				vm.setName("this");
+				vm.trimType();
 				func.addParameter(vm);
 			}
 			this.enterScope(func);
