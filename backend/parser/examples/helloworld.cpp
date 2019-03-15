@@ -62,9 +62,10 @@ int lolasdasdasd(int i, int j, bool istrue, float normalFloat){
 	int z,w,l = 0;
 
 	std::vector<int> vInt;
-	std::vector<std::string> vString;
 	std::vector<bool> vBool;
 
+	// These are considered function calls.
+	std::vector<std::string> vString;
 	std::unordered_map<std::string, std::string> map;
 
 	// No viable input for line 70 ERROR in .G4 file from antlr.

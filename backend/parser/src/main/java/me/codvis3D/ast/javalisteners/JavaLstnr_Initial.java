@@ -35,25 +35,16 @@ public class JavaLstnr_Initial extends JavaExtendedListener {
 	 *
 	 * @param      ctx   The parsing context
 	 */
-    @Override 
+    @Override
     public void enterMethodDeclaration(Java9Parser.MethodDeclarationContext ctx) {  //see gramBaseListener for allowed functions
-    	  // Get interval between function start and end of function name.
+    	// Get interval between function start and end of function name.
 	    Interval interval = new Interval(ctx.methodHeader().start.getStartIndex(), ctx.methodHeader().stop.getStopIndex());
-	    
+
 	    // Get the input stream of function definition rule.
 	    CharStream input = ctx.start.getInputStream();
-
-	    // Set this function model with name, lineStart and lineEnd.
       	FunctionModel functionModel = new FunctionModel(input.getText(interval), ctx.methodHeader().methodDeclarator().identifier().getText());
-      	functionModel.setLineStart(ctx.methodBody().start.getLine());
+    	functionModel.setLineStart(ctx.methodBody().start.getLine());
       	functionModel.setLineEnd(ctx.methodBody().stop.getLine());
-	    functionModel.setParameters(
-	    	fetchParameters(
-	    		ctx.methodHeader().methodDeclarator()
-	    	)
-	    );
-
-	   	this.scopeStack.peek().addDataInModel(functionModel);
 	    this.enterScope(functionModel);
     }
 
@@ -62,10 +53,29 @@ public class JavaLstnr_Initial extends JavaExtendedListener {
      *
      * @param      ctx   The parsing context
      */
-    @Override 
-    public void exitMethodDeclaration(Java9Parser.MethodDeclarationContext ctx) { 
-    	this.exitScope();
+    @Override
+    public void exitMethodDeclaration(Java9Parser.MethodDeclarationContext ctx) {
+    	Model model = this.exitScope();
+
+    	if(model instanceof FunctionModel){
+	    	this.scopeStack.peek().addDataInModel((FunctionModel) model);
+    	} else {
+    		this.enterScope(model);
+    		System.err.println("Could not understand parent model for method declaration.");
+    	}
     }
+
+	@Override
+	public void enterMethodBody(Java9Parser.MethodBodyContext ctx) {
+		this.enterScope(new FunctionBodyModel());
+	}
+
+	@Override
+	public void exitMethodBody(Java9Parser.MethodBodyContext ctx) {
+		FunctionBodyModel functionBody = (FunctionBodyModel) this.exitScope();
+		this.scopeStack.peek().addDataInModel(functionBody);
+	}
+
 
     /**
      * Listener for parsing a package/namespace declaration. Adding package name to filemodel.
@@ -75,7 +85,7 @@ public class JavaLstnr_Initial extends JavaExtendedListener {
 	@Override
 	public void enterPackageDeclaration(Java9Parser.PackageDeclarationContext ctx){
 		NamespaceModel namespace = new NamespaceModel(ctx.packageName().getText());
-		
+
 		this.scopeStack.peek().addDataInModel(namespace);
 	    this.enterScope(namespace);
 	}
@@ -96,7 +106,7 @@ public class JavaLstnr_Initial extends JavaExtendedListener {
 
 		if ( importSingle != null) {
 			usingNamespaceModel = new UsingNamespaceModel(importSingle.typeName().getText(), importSingle.typeName().getStart().getLine());
-		
+
 		} else if (importOnDemand != null) {
 			usingNamespaceModel = new UsingNamespaceModel(importOnDemand.typeName().getText(), importOnDemand.typeName().getStart().getLine());
 
@@ -107,140 +117,212 @@ public class JavaLstnr_Initial extends JavaExtendedListener {
 			usingNamespaceModel = new UsingNamespaceModel(importTypeOnDemand.packageOrTypeName().getText(), importTypeOnDemand.packageOrTypeName().getStart().getLine());
 
 		}else{
-			System.out.println("Unhandeled using dirctive");
+			System.err.println("Unhandeled using dirctive");
 			return;
 		}
 
 	   	this.scopeStack.peek().addDataInModel(usingNamespaceModel);
-	}	
+	}
 
 	/**
 	 * Listener for parsing function calls.
 	 *
 	 * @param      ctx   The parsing context
 	 */
-	@Override 
-	public void enterMethodInvocation(Java9Parser.MethodInvocationContext ctx) { 
+	@Override
+	public void enterMethodInvocation(Java9Parser.MethodInvocationContext ctx) {
 	    this.scopeStack.peek().addDataInModel(ctx.getText());
 	}
 
 	/**
-	 * Listener for parsing variables from scope.
+	 * Listener for adding local variables in to the scope.
 	 *
 	 * @param      ctx   The parsing context
 	 */
-	@Override 
-	public void enterBlockStatement(Java9Parser.BlockStatementContext ctx) { 
-		String name = "";
-		String type = "";
-		if(ctx.localVariableDeclarationStatement() != null){
+	@Override
+	public void enterLocalVariableDeclarationStatement(Java9Parser.LocalVariableDeclarationStatementContext ctx) {
+		this.enterScope(new VariableListModel());
+	}
 
-			type = fetchVariableModifiers(ctx.localVariableDeclarationStatement().localVariableDeclaration().variableModifier());
-			type += ctx.localVariableDeclarationStatement().localVariableDeclaration().unannType().getText();
-			
-			List<Java9Parser.VariableDeclaratorContext> variableDeclList = ctx.localVariableDeclarationStatement().localVariableDeclaration().variableDeclaratorList().variableDeclarator();
-			
-			for (Iterator<Java9Parser.VariableDeclaratorContext> i = variableDeclList.iterator(); i.hasNext();) {
-				Java9Parser.VariableDeclaratorContext variable = i.next();
-				name = variable.variableDeclaratorId().getText();
-	   			this.scopeStack.peek().addDataInModel(new VariableModel(name, type));
+	/**
+	 * Listener for exiting the variable scope and add data in to parent model.
+	 *
+	 * @param      ctx   The parsing context
+	 */
+	@Override
+	public void exitLocalVariableDeclarationStatement(Java9Parser.LocalVariableDeclarationStatementContext ctx) {
+
+		VariableListModel variableList = (VariableListModel) this.exitScope();
+
+		if ( this.scopeStack.peek() instanceof FunctionBodyModel ||
+		     this.scopeStack.peek() instanceof FileModel ||
+		     this.scopeStack.peek() instanceof NamespaceModel) {
+
+			for (Iterator<String> i = variableList.getNames().iterator(); i.hasNext();) {
+			    String variableName = i.next();
+				this.scopeStack.peek().addDataInModel(new VariableModel(variableName, variableList.getType()));
+			}
+
+		} else {
+    		System.err.println("Could not understand parent model for simple declaration.");
+    	}
+	}
+
+	/**
+	 * Listener for adding formal parameters into the scope.
+	 *
+	 * @param      ctx   The parsing context
+	 */
+	@Override
+	public void enterFormalParameter(Java9Parser.FormalParameterContext ctx) {
+		this.enterScope(new VariableModel());
+	}
+
+	/**
+	 * Listener for exiting parameter scope and adding data into the parent model.
+	 *
+	 * @param      ctx   The parsing context
+	 */
+	@Override
+	public void exitFormalParameter(Java9Parser.FormalParameterContext ctx) {
+		VariableModel vm = (VariableModel) this.exitScope();
+		Model model = this.exitScope();
+		if (model instanceof FunctionModel){
+			FunctionModel func = (FunctionModel) model;
+			func.addParameter(vm);
+			this.enterScope(func);
+		} else {
+			this.enterScope(model);
+	    	System.err.println("Could not understand parent model for formal parameter.");
+		}
+
+	}
+
+	/**
+	 * Listener for adding last formal parameter into the scope.
+	 *
+	 * @param      ctx   The parsing context
+	 */
+	@Override
+	public void enterLastFormalParameter(Java9Parser.LastFormalParameterContext ctx) {
+		if(ctx.variableDeclaratorId() != null){
+			this.enterScope(new VariableModel());
+		}
+	}
+
+	/**
+	 * Listener for exiting the last formal parameter scope and adding data into parent model.
+	 *
+	 * @param      ctx   The parsing context
+	 */
+	@Override
+	public void exitLastFormalParameter(Java9Parser.LastFormalParameterContext ctx) {
+		if(ctx.variableDeclaratorId() != null){
+			VariableModel vm = (VariableModel) this.exitScope();
+			Model model = this.exitScope();
+			if (model instanceof FunctionModel){
+				FunctionModel func = (FunctionModel) model;
+				func.addParameter(vm);
+				this.enterScope(func);
+			} else {
+				this.enterScope(model);
+		    	System.err.println("Could not understand parent model for last formal parameter.");
 			}
 		}
 	}
 
 	/**
-	 * Fetches parameters.
+	 * Listener for adding receiver parameter into the scope.
 	 *
 	 * @param      ctx   The parsing context
-	 *
-	 * @return     List of parameters within given method declarator.
 	 */
-	private List<VariableModel> fetchParameters(Java9Parser.MethodDeclaratorContext ctx) { 
-		Java9Parser.FormalParametersContext formalParams = null;
-		Java9Parser.LastFormalParameterContext lastFormalParam = null;
-		Java9Parser.ReceiverParameterContext receiverParam = null;
-		List<VariableModel> parameters = new ArrayList<>();
-		String type = "";
-		String name = "";
-
-		if(ctx.formalParameterList() == null) {
-			return new ArrayList<>();
-		}
-
-		formalParams = ctx.formalParameterList().formalParameters();
-		lastFormalParam = ctx.formalParameterList().lastFormalParameter();
-		receiverParam = ctx.formalParameterList().receiverParameter();
-		
-		// Parse formal parameters.
-		if(formalParams != null) {
-			if(formalParams.receiverParameter() != null){
-				type = formalParams.receiverParameter().unannType().getText();
-				if(formalParams.receiverParameter().identifier() != null){
-					name = formalParams.receiverParameter().identifier().getText() + " this";
-				} else {
-					name += "this";
-				}
-   				parameters.add(new VariableModel(name, type));
-			}
-
-			List<Java9Parser.FormalParameterContext> params = formalParams.formalParameter();
-			for (Iterator<Java9Parser.FormalParameterContext> i = params.iterator(); i.hasNext();) {
-				Java9Parser.FormalParameterContext parameter = i.next();
-
-				type = fetchVariableModifiers(parameter.variableModifier());
-				type += parameter.unannType().getText();
-				name = parameter.variableDeclaratorId().getText();
-
-   				parameters.add(new VariableModel(name, type));
-			}
-
-		}
-
-		// Parse the last parameters (single parameters.)
-		if(lastFormalParam != null){
-			if(lastFormalParam.formalParameter() != null){
-				type = fetchVariableModifiers(lastFormalParam.formalParameter().variableModifier());
-				type += lastFormalParam.formalParameter().unannType().getText();
-				name = lastFormalParam.formalParameter().variableDeclaratorId().getText(); 
-			} else {
-				type = fetchVariableModifiers(lastFormalParam.variableModifier());
-				type += lastFormalParam.unannType().getText();
-				name = lastFormalParam.variableDeclaratorId().getText();
-			}
-
-   			parameters.add(new VariableModel(name, type));
-		}
-
-		// Parse receiver parameters (this).
-		if(receiverParam != null){
-			type = receiverParam.unannType().getText();
-			if(receiverParam.identifier() != null){
-				name = receiverParam.identifier().getText() + " this";
-			} else {
-				name += "this";
-			}
-   			parameters.add(new VariableModel(name, type));
-		}
-
-		return parameters;
+	@Override
+	public void enterReceiverParameter(Java9Parser.ReceiverParameterContext ctx) {
+		this.enterScope(new VariableModel());
 	}
 
 	/**
-	 * Fetches variable modifiers.
+	 * Listener for exiting the receiver parameter scope and adding data into the parent model.
 	 *
-	 * @param      variableModifiers  The variable modifiers parsing context.
-	 *
-	 * @return     a string containing all modifiers with whitespaces.
+	 * @param      ctx   The parsing context
 	 */
-	private String fetchVariableModifiers(List<Java9Parser.VariableModifierContext> variableModifiers) {
-		String modifiers = "";
-		
-		for (Iterator<Java9Parser.VariableModifierContext> j = variableModifiers.iterator(); j.hasNext();) {
-			Java9Parser.VariableModifierContext variableModifier = j.next();
-			modifiers += variableModifier.getText() + " ";
+	@Override
+	public void exitReceiverParameter(Java9Parser.ReceiverParameterContext ctx) {
+		VariableModel vm = (VariableModel) this.exitScope();
+		Model model = this.exitScope();
+		if (model instanceof FunctionModel){
+			FunctionModel func = (FunctionModel) model;
+			if(vm.hasName()){
+				func.addParameter(vm);
+			} else {
+				vm.setName("this");
+				func.addParameter(vm);
+			}
+			this.enterScope(func);
+		} else {
+			this.enterScope(model);
+	    	System.err.println("Could not understand parent model for receiver parameter.");
 		}
+	}
 
-		return modifiers;
+	/**
+	 * Listener for parsing variable id.
+	 *
+	 * @param      ctx   The parsing context
+	 */
+	@Override
+	public void enterVariableDeclaratorId(Java9Parser.VariableDeclaratorIdContext ctx) {
+		if (this.scopeStack.peek() instanceof VariableModel){
+			VariableModel vm = (VariableModel) this.exitScope();
+			vm.setName(ctx.getText());
+			this.enterScope(vm);
+		} else if (this.scopeStack.peek() instanceof VariableListModel) {
+			VariableListModel vlm = (VariableListModel) this.exitScope();
+			vlm.addName(ctx.getText());
+			this.enterScope(vlm);
+		} else {
+	    	System.err.println("Could not understand parent model for identifier.");
+		}
+	}
+
+	/**
+	 * Listener for parsing primitive type.
+	 *
+	 * @param      ctx   The parsing context
+	 */
+	@Override
+	public void enterUnannType(Java9Parser.UnannTypeContext ctx) {
+		if (this.scopeStack.peek() instanceof VariableModel){
+			VariableModel vm = (VariableModel) this.exitScope();
+			vm.applyUnnanTypeOnType(ctx.getText());
+			this.enterScope(vm);
+		} else if (this.scopeStack.peek() instanceof VariableListModel) {
+			VariableListModel vlm = (VariableListModel) this.exitScope();
+			vlm.applyUnnanTypeOnType(ctx.getText());
+			this.enterScope(vlm);
+		} else {
+	    	System.err.println("Could not understand parent model for unannType.");
+		}
+	}
+
+	/**
+	 * Listener for parsing variable modifiers.
+	 *
+	 * @param      ctx   The parsing context
+	 */
+	@Override
+	public void enterVariableModifier(Java9Parser.VariableModifierContext ctx) {
+		if (this.scopeStack.peek() instanceof VariableModel){
+			VariableModel vm = (VariableModel) this.exitScope();
+			vm.applyModifierOnType(ctx.getText());
+			this.enterScope(vm);
+		} else if (this.scopeStack.peek() instanceof VariableListModel) {
+			VariableListModel vlm = (VariableListModel) this.exitScope();
+			vlm.applyModifierOnType(ctx.getText());
+			this.enterScope(vlm);
+		} else {
+	    	System.err.println("Could not understand parent model for variable modifier.");
+		}
 	}
 
 	/**

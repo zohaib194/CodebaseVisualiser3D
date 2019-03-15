@@ -1,43 +1,45 @@
 package hello.world;
 
-public class HelloWorld { 
-   String l;
-   public class Yes {
-      public void no(){
+public class HelloWorld {
+	private String l;
+	public class Yes {
+		public void no(int i, int j, int z){
 
-      }
-   }
+		}
+		public void n(Yes this) {
+
+		}
+	}
 
 
-   public static void main(String[] args) {
-      final String lol;
-      int i,j,z,w;
-      Yes yeeeeeh = new Yes(); 
+	public static void main(String[] args) {
+		final String lol;
+		int i,j,z,w;
 
-      yeeeeeh.no();
-   	
-      if (TRUE) {
-   		System.out.println("Hello, World");	
-         boo();
-   	}else{
-   		foo(1);
-   	}
+		if (true) {
+			System.out.println("Hello, World");
+			boo("hey");
+		}else{
+			foo(1, false);
+		}
 
-   }
+	}
 
-   public static final void boo (final String lol){
-   		if(true) {
-   			return;
-   		}
-   }
+	public static final void boo (final String lol){
+		if(true) {
+			return;
+		}
+	}
 
-   public int calc(HelloWorld this){
-       this.foo(1);
+	public int calc(HelloWorld this){
+		Yes yeeeeeh = new Yes();
+		yeeeeeh.no(1, 2, 3);
+		this.foo(1, true);
 
-       return 0;
-    }
+		return 0;
+	}
 
-   public Bool foo(int a, final Bool l){
-   		return true;
-   }
+	public static boolean foo(int a, final boolean l){
+		return true;
+	}
 }

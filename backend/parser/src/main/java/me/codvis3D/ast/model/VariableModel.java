@@ -16,7 +16,8 @@ public class VariableModel extends Model{
 	 * Constructs the object.
 	 */
 	VariableModel(){
-
+		this.name = "";
+		this.type = "";
 	}
 
 	/**
@@ -66,8 +67,40 @@ public class VariableModel extends Model{
 		return this.type;
 	}
 
+	/**
+	 * Determines if it has type.
+	 *
+	 * @return     True if has type, False otherwise.
+	 */
 	public boolean hasType(){
 		return ((this.type == "") ? false : true);
+	}
+
+	/**
+	 * Determines if it has name.
+	 *
+	 * @return     True if has name, False otherwise.
+	 */
+	public boolean hasName(){
+		return ((this.name == "") ? false : true);
+	}
+
+	/**
+	 * Concatenate type with modifiers.
+	 *
+	 * @param      modifier  The modifier
+	 */
+	public void applyModifierOnType(String modifier){
+		this.type += modifier + " ";
+	}
+
+	/**
+	 * Concatenate type with primitive type.
+	 *
+	 * @param      type  The type
+	 */
+	public void applyUnnanTypeOnType(String type){
+		this.type += type;
 	}
 
 	/**

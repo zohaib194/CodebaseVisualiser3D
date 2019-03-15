@@ -63,6 +63,24 @@ public class VariableListModel extends Model{
 	}
 
 	/**
+	 * Concatenate type with modifiers.
+	 *
+	 * @param      modifier  The modifier
+	 */
+	public void applyModifierOnType(String modifier){
+		this.type += modifier + " ";
+	}
+
+	/**
+	 * Concatenate type with primitiv type.
+	 *
+	 * @param      type  The type
+	 */
+	public void applyUnnanTypeOnType(String type){
+		this.type += type;
+	}
+
+	/**
 	 * Adds the data in model.
 	 *
 	 * @param      data  The data
