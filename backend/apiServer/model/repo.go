@@ -3,9 +3,7 @@
 package model
 
 import (
-	"bytes"
 	"encoding/json"
-	"io/ioutil"
 	"log"
 	"os/exec"
 	"path"
@@ -108,9 +106,7 @@ func (repo RepoModel) Load(file string, target string) (data FilesModel, err err
 		log.Fatal(err)
 	}
 
-	outputBytes, err := ioutil.ReadAll(stdout)
-
-	if err := json.NewDecoder(outputBytes).Decode(&data); err != nil {
+	if err := json.NewDecoder(stdout).Decode(&data); err != nil {
 		log.Fatal("Could not decode json error: ", err.Error())
 		return data, err
 	}
