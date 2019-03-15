@@ -72,7 +72,7 @@ func (codeSnippet CodeSnippetController) GetImplementation(w http.ResponseWriter
 		lineStart, ok := r.URL.Query()["lineStart"]
 		if !ok || len(lineStart[0]) < 1 {
 			http.Error(w, "Invalid url parameter 'lineStart'", http.StatusBadRequest)
-			util.TypeLogger.Error("%s: Received request did not hava \"lineStart\" field", packageName)
+			util.TypeLogger.Error("%s: Received request did not have \"lineStart\" field", packageName)
 			return
 		}
 
@@ -80,7 +80,7 @@ func (codeSnippet CodeSnippetController) GetImplementation(w http.ResponseWriter
 		lineEnd, ok := r.URL.Query()["lineEnd"]
 		if !ok || len(lineEnd[0]) < 1 {
 			http.Error(w, "Invalid url parameter 'lineEnd'", http.StatusBadRequest)
-			util.TypeLogger.Error("%s: Received request did not hava \"lineEnd\" field", packageName)
+			util.TypeLogger.Error("%s: Received request did not have \"lineEnd\" field", packageName)
 			return
 		}
 
@@ -96,14 +96,14 @@ func (codeSnippet CodeSnippetController) GetImplementation(w http.ResponseWriter
 		startLine, err := strconv.Atoi(lineStart[0])
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-			util.TypeLogger.Error("%s: Could not convert startLine to integer: %s", packageName, err.Error)
+			util.TypeLogger.Error("%s: Could not convert startLine to integer: %s", packageName, err.Error())
 			return
 		}
 
 		endLine, err := strconv.Atoi(lineEnd[0])
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-			util.TypeLogger.Error("%s: Could not convert endtLine to integer: %s", packageName, err.Error)
+			util.TypeLogger.Error("%s: Could not convert end Line to integer: %s", packageName, err.Error())
 			return
 		}
 
@@ -117,7 +117,7 @@ func (codeSnippet CodeSnippetController) GetImplementation(w http.ResponseWriter
 
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-			util.TypeLogger.Error("%s: Failed to get lies of code: %s", packageName, err.Error)
+			util.TypeLogger.Error("%s: Failed to get lines of code: %s", packageName, err.Error())
 			return
 		}
 

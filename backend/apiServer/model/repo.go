@@ -84,7 +84,7 @@ func (repo RepoModel) Load(file string, target string) (data FilesModel, err err
 	output, err := cmd.CombinedOutput()
 
 	if err != nil {
-		util.TypeLogger.Error("%s: Failed to count lines in file: %s", err.Error())
+		util.TypeLogger.Error("%s: Failed to count lines in file: %s", packageName, err.Error())
 		return data, err
 	}
 
@@ -93,7 +93,7 @@ func (repo RepoModel) Load(file string, target string) (data FilesModel, err err
 	linesOfCode, err := strconv.Atoi(splitWCOutput[0])
 
 	if err != nil {
-		util.TypeLogger.Error("%s: Failed to convert string to int: %s", err.Error())
+		util.TypeLogger.Error("%s: Failed to convert string to int: %s", packageName, err.Error())
 		return data, err
 	}
 
@@ -103,7 +103,7 @@ func (repo RepoModel) Load(file string, target string) (data FilesModel, err err
 	output, err = cmd.CombinedOutput()
 
 	if err != nil {
-		util.TypeLogger.Error("%s: Failed to execute java parser: %s", err.Error())
+		util.TypeLogger.Error("%s: Failed to execute java parser: %s", packageName, err.Error())
 		return data, err
 	}
 
@@ -111,7 +111,7 @@ func (repo RepoModel) Load(file string, target string) (data FilesModel, err err
 	decoder := json.NewDecoder(ioReader)
 
 	if err := decoder.Decode(&data); err != nil {
-		util.TypeLogger.Error("%s: Failed to decode json: %s", err.Error())
+		util.TypeLogger.Error("%s: Failed to decode json: %s", packageName, err.Error())
 		return data, err
 	}
 	data.File.LinesInFile = linesOfCode
@@ -146,7 +146,7 @@ func (repo RepoModel) GetRepoFiles() (files string, err error) {
 	bytes, err := cmd.CombinedOutput()
 
 	if err != nil {
-		util.TypeLogger.Error("%s: Error executing finde %s", packageName, err.Error())
+		util.TypeLogger.Error("%s: Error executing find %s", packageName, err.Error())
 		return "", err
 	}
 
@@ -231,7 +231,7 @@ func (repo RepoModel) FetchAll() (repoModels []bson.M, err error) {
 	reposModels, err := DB.FindAllURI()
 
 	if err != nil {
-		util.TypeLogger.Debug("%s: Failed to find repository", packageName)
+		util.TypeLogger.Warn("%s: Failed to find repository", packageName)
 		return []bson.M{}, err
 	}
 

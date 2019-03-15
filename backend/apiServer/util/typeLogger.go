@@ -130,7 +130,7 @@ func SetLogLevel(level string) bool {
 	}
 }
 
-// SetLogFile tries to set a file printout should be sendt to retruning true or false based on whether it was successfull or not
+// SetLogFile tries to set a file printout should be sent to returning true or false based on whether it was successfull or not
 func SetLogFile(filepath string) bool {
 	if len(filepath) == 0 {
 		return false

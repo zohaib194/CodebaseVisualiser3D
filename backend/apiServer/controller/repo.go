@@ -193,7 +193,7 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 
 			if saverResponse.Err != nil {
 				if saverResponse.Err.Error() == "Already exists" {
-					util.TypeLogger.Info("%s: Request conflicted with existing repositoru", packageName)
+					util.TypeLogger.Info("%s: Request conflicted with existing repository", packageName)
 					reason := WebsocketResponse{
 						StatusText: http.StatusText(http.StatusConflict),
 						StatusCode: http.StatusConflict,
@@ -485,7 +485,7 @@ func (repo RepoController) ParseInitial(w http.ResponseWriter, r *http.Request) 
 		files, err := exstRepo.GetRepoFiles()
 
 		if err != nil {
-			util.TypeLogger.Error("%s: Failed to repository files: %s", packageName, err.Error())
+			util.TypeLogger.Error("%s: Failed to find repository files: %s", packageName, err.Error())
 			reason := WebsocketResponse{
 				StatusText: http.StatusText(http.StatusInternalServerError),
 				StatusCode: http.StatusInternalServerError,

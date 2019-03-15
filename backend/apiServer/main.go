@@ -53,7 +53,7 @@ func main() {
 	}
 
 	// API routings
-	util.TypeLogger.Info("%s: Setting up api routs", packageName)
+	util.TypeLogger.Info("%s: Setting up api routes", packageName)
 	router.HandleFunc("/repo/add", controller.RepoController{}.NewRepoFromURI)
 	router.HandleFunc("/repo/list", controller.RepoController{}.GetAllRepos)
 	router.HandleFunc("/repo/{repoId}/initial/", controller.RepoController{}.ParseInitial)
