@@ -9,9 +9,27 @@ class helloworld
 {
 	class hei
 	{
+		int sfdgnfggggdn;
 	public:
 		hei();
 		~hei();
+	private: 
+		int EEEEEEEEEEEEELLLLLLLLLLLLLLOOOOOOOOOOOO;
+		int* getMeSomethingNice(int trell, float troll);
+	public:
+		int j, k, l, m = 0, o;
+		int aoo();
+		int boo();
+		int coo();
+		int doo();
+	protected: 
+		int a;
+		int eoo();
+		int foo();
+		int goo();
+		int hoo();
+	private:
+		int ioo();
 	};
 public:
 	helloworld();
