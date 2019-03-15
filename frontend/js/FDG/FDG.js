@@ -6,18 +6,20 @@
  * @param {THREE.Vector3} gravityCenter - Center of gravity. default (0,0,0).
  */
 var FDG = (function FDG(
-    minDistance, 
-    maxDistance, 
-    gravityForce, 
+    minDistance,
+    maxDistance,
+    maxSize,
+    gravityForce,
     gravityCenter = new THREE.Vector3(0, 0, 0)
     ) {
         var minDistance = minDistance;
         var maxDistance = maxDistance;
+        var maxSize = maxSize;
         var gravityForce = gravityForce;
         var gravityCenter = gravityCenter;
-        
+
         var nodes = new Array();
-        
+
         /**
          * Function ofr getting node index from nodes array.
          * @param {string} name - name of node to fetch.
@@ -26,7 +28,7 @@ var FDG = (function FDG(
             // Find node based on name.
            return nodes.findIndex((node) => { return (node.getName() == name) });
         }
-        
+
         /**
          * Getter for nodes array.
          */
@@ -35,12 +37,28 @@ var FDG = (function FDG(
         }
 
         /**
+         * Getter for maximum size of the graph.
+         */
+        var getMaxSize = function() {
+            return maxSize;
+        }
+
+        /**
+         * Sets the maximum size.
+         *
+         * @param {float} maxSize - The maximum size of the graph
+         */
+        var setMaxSize = function(maxSize) {
+            maxSize = maxSize;
+        }
+
+        /**
          * Function for adding a node to the graph.
          * @param {Node} node - Node object to be added.
          */
         var addNode = function(node) {
             // If node exists (has same name). Abort.
-            if (getNodeIndex(node.getName()) >= 0) {
+            if (getNodeIndex(node.getName()) >= 0 && node.type != "scope") {
                 console.log(
                     LOCALE.getSentence("fdg_node_exists") + ": " + node.getName()
                 );
@@ -50,7 +68,7 @@ var FDG = (function FDG(
             // New node exists, add it.
             if (typeof node !== "undefined") {
                 // Give back the index it appears in.
-                // Push appends to the back and returns 
+                // Push appends to the back and returns
                 // the new lenght, hence "- 1".
                 return nodes.push(node) - 1;
             }
@@ -63,13 +81,13 @@ var FDG = (function FDG(
          * @param {LinkProperties} link - LinkProperties object.
          */
         var addLink = function(indexFrom, indexTo, linkProp) {
-            // Nodes doesn't exists, nodes are the same, 
+            // Nodes doesn't exists, nodes are the same,
             // or both nodes has a link to eachother, abort linking!
             if (
-                typeof nodes[indexFrom] === "undefined" || 
-                typeof nodes[indexTo] === "undefined" || 
-                indexFrom === indexTo || 
-                (nodes[indexFrom].getLinks().has(indexTo) && 
+                typeof nodes[indexFrom] === "undefined" ||
+                typeof nodes[indexTo] === "undefined" ||
+                indexFrom === indexTo ||
+                (nodes[indexFrom].getLinks().has(indexTo) &&
                 nodes[indexTo].getLinks().has(indexFrom))
             ) {
                 return;
@@ -79,7 +97,7 @@ var FDG = (function FDG(
             nodes[indexFrom].setLink(indexTo, linkProp);
             nodes[indexTo].setLink(indexFrom, linkProp);
         }
-        
+
         /**
          * Function for executing the FDG algorithm.
          * @param {int} iterations - How many iterations the graph should run.
@@ -95,9 +113,9 @@ var FDG = (function FDG(
                             nodes[x].getTotalForce(
                                 // Send a deep copy of array!
                                 [...nodes],
-                                minDistance, 
-                                maxDistance, 
-                                gravityForce, 
+                                minDistance,
+                                maxDistance,
+                                gravityForce,
                                 gravityCenter
                             )
                         );

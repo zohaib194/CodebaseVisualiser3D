@@ -50,16 +50,16 @@ let destroyNameplate = function(name) {
 /**
  * A generic object used for representing functions and other syntax.
  * @constructor
- * 
+ *
  * @param {THREE.Vector3} position - Position the cube willl be placed at.
  * @param {Integer} color - The color of the cube, preferrably not black.
  * @param {string} name - Name of the object to be display on hover (not active).
  * @param {THREE.Geometry} geometry - Mesh to display. Defualt white cube (0.1,0.1,0.1).
  */
 var Drawable = (function (
-        pos, 
-        color, 
-        name, 
+        pos,
+        color,
+        name,
         geometry
     ) {
 
@@ -69,18 +69,18 @@ var Drawable = (function (
         );
         return;
     }
-    
+
     // Drawable setup.
-    var mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ color: color }));
+    var mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ color: color, transparent: true, opacity: 0.5}));
     // Position THREE.js drawable.
     mesh.position.set(pos.x, pos.y, pos.z);
     mesh.name = name;
     scene.add(mesh);
-    
+
     // Drawable's edge highlight setup.
     var edgeGeometry = new THREE.EdgesGeometry(mesh.geometry);
     var edgeMaterial = new THREE.LineBasicMaterial({
-        color: STYLE.getDrawables().edge.color, 
+        color: STYLE.getDrawables().edge.color,
         linewidth: 1
     });
     var wireframe = new THREE.LineSegments(edgeGeometry, edgeMaterial);
@@ -93,12 +93,12 @@ var Drawable = (function (
      * Function for drawing drawable object.
      */
     var draw = function() {
-        // Has no object to display, abort. 
+        // Has no object to display, abort.
         if (typeof mesh === "undefined") {
             console.log(LOCALE.getSentence("displayobject_undefined"));
             return;
         }
-        
+
         // Calc camera forward.
         var cameraForward = new THREE.Vector3(0, 0, 0);
         cameraForward.subVectors(controls.target, camera.position);
@@ -106,7 +106,7 @@ var Drawable = (function (
         // Calc vector from camrea to object.
         var cameraToObject = new THREE.Vector3(0, 0, 0);
         cameraToObject.subVectors(mesh.position, camera.position);
-        
+
         // If object is in-front of camera, display nameplate.
         if (cameraForward.dot(cameraToObject) > 0) {
             var widthHalf = window.innerWidth / 2;

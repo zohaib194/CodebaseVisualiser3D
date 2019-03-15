@@ -1,20 +1,22 @@
 /**
- * Function for making a node object. 
+ * Function for making a node object.
  * Represents any datastructure (function, class, namespace, variable, etc.).
  * @constructor
  * @param {THREE.Vector3()} position - Position of the node in the world.
  * @param {string} name - Name of the node (identifier).
+ * @param {float} size - Size of the node
  * @param {string} type - Type of the node.
  */
-var Node = (function(pos, name, type) {
+var Node = (function(pos, name, size, type) {
     var position = pos;
+    var size = size;
     var metadata = {
         name: name,
         type: type
     };
-    
+
     var links = new Map();
-    
+
     /**
      * Calculates total force on node.
      * @param {Node[]} nodes - Array of all nodes in fdg object.
@@ -24,23 +26,23 @@ var Node = (function(pos, name, type) {
      * @param {THREE.Vector3} gravityCenter - Center of gravity. Defualts to (0, 0, 0).
      */
     var getTotalForce = function(
-        nodes, 
-        minDistance, 
-        maxDistance, 
-        gravityForce = 0, 
+        nodes,
+        minDistance,
+        maxDistance,
+        gravityForce = 0,
         gravityCenter = new THREE.Vector3(0, 0, 0)
     ) {
-            
+
         // Nodes doesn't exist or empty, abort.
         if (nodes === "undefined" || nodes.length <= 0) {
             return;
         }
-        
+
         var force = new THREE.Vector3(0, 0, 0);
         var forceScalar = 0;
         var diff = new THREE.Vector3(0, 0, 0);
         var dist = 0;
-        
+
         // Run though every link
         links.forEach((link, nodeIndex) => {
             // Get the attractive force vector.
@@ -48,7 +50,7 @@ var Node = (function(pos, name, type) {
                 nodes[nodeIndex].getPosition(),
                 position
             );
-            
+
             // Take length before normalization.
             dist = diff.length();
             diff.normalize();
@@ -67,13 +69,13 @@ var Node = (function(pos, name, type) {
             force.add(diff.multiplyScalar(forceScalar));
         });
 
-        // Add gravitational force to center graph 
+        // Add gravitational force to center graph
         // on gravitational center.
         var gravity = new THREE.Vector3().subVectors(
-            gravityCenter, 
+            gravityCenter,
             position
         );
-        
+
         // Return force with added gravity.
         return force.add(gravity.normalize().multiplyScalar(gravityForce));
     }
@@ -91,6 +93,13 @@ var Node = (function(pos, name, type) {
     var getName = function() {
         return metadata.name;
     };
+
+    /**
+     * getter for size
+     */
+     var getSize = function(){
+        return size;
+     }
 
     /**
      * Getter for type.
@@ -112,7 +121,8 @@ var Node = (function(pos, name, type) {
     var setPosition = function(pos) {
         position.set(pos.x, pos.y, pos.z);
     };
-    
+
+
     /**
      * Setter for name.
      */
@@ -138,6 +148,7 @@ var Node = (function(pos, name, type) {
     return {
         getTotalForce: getTotalForce,
         getPosition: getPosition,
+        getSize: getSize,
         getName: getName,
         getType: getType,
         getLinks: getLinks,
