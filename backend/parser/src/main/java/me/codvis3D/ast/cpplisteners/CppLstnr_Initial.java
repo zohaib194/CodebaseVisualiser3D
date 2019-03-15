@@ -42,12 +42,19 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 */
 	@Override
 	public void enterClassspecifier(CPP14Parser.ClassspecifierContext ctx) {
-		// System.out.println("Entered class: " +
-		// ctx.classhead().classheadname().classname().Identifier().getText());
+
 		ClassModel classModel = new ClassModel();
 		this.scopeStack.peek().addDataInModel(classModel);
 		this.enterScope(classModel);
-		AccessSpecifierModel accessSpecifierModel = new AccessSpecifierModel("private");
+		// Add default access specifier, private for class, public for union and struct.
+		AccessSpecifierModel accessSpecifierModel = null;
+		if (ctx.classhead().classkey().Class() != null) {
+			accessSpecifierModel = new AccessSpecifierModel("private");
+		} else if (ctx.classhead().classkey().Union() != null || ctx.classhead().classkey().Struct() != null) {
+			accessSpecifierModel = new AccessSpecifierModel("public");
+		} else { // Wrong class key found.
+			System.err.println("Not correct Class specifier");
+		}
 		this.scopeStack.peek().addDataInModel(accessSpecifierModel);
 		this.enterScope(accessSpecifierModel);
 	}
@@ -60,14 +67,13 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 */
 	@Override
 	public void exitClassspecifier(CPP14Parser.ClassspecifierContext ctx) {
+		// IS there an access specfier, exit it.
 		if (this.scopeStack.peek() instanceof AccessSpecifierModel) {
 			this.exitScope();
-		} else {
+		} else { // No access specfier.
 			System.err.println("Couldn't find access specifier in class");
 		}
 		this.exitScope();
-		// System.out.println("Exited class: " +
-		// ctx.classhead().classheadname().classname().Identifier().getText());
 	}
 
 	/**
@@ -78,7 +84,6 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	@Override
 	public void enterAccessspecifier(CPP14Parser.AccessspecifierContext ctx) {
 		String name = ctx.getText();
-		// System.out.println("Entered accessspecifer: " + name);
 		// Currently in AccessSpecifierModel.
 		if (this.scopeStack.peek() instanceof AccessSpecifierModel) {
 			// Found a different specifier than the current one.
@@ -98,7 +103,6 @@ public class CppLstnr_Initial extends CppExtendedListener {
 						asm = new AccessSpecifierModel(name);
 						this.scopeStack.peek().addDataInModel(asm);
 					}
-
 					this.enterScope(asm);
 				}
 			}
@@ -123,17 +127,18 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 */
 	@Override
 	public void enterClassname(CPP14Parser.ClassnameContext ctx) {
-		System.out.println("Entered Classheadname: " + ctx.getText());
 		String className = "";
 
+		// Get name of class.
 		if (ctx.Identifier() != null) {
 			className = ctx.Identifier().getText();
 		} else if (ctx.simpletemplateid() != null) {
 			className = ctx.simpletemplateid().getText();
-		} else {
+		} else { // Couldn't find name of class.
 			System.err.println("Couldn't find name of class!");
 		}
 
+		// Inside AccessSpecifierModel, update ClassModel underneath if existant.
 		if (this.scopeStack.peek() instanceof AccessSpecifierModel && className != "") {
 			AccessSpecifierModel asm = (AccessSpecifierModel) this.exitScope();
 
@@ -152,7 +157,7 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 */
 	@Override
 	public void exitClassname(CPP14Parser.ClassnameContext ctx) {
-		System.out.println("Exited Classheadname: " + ctx.getText());
+		//
 	}
 
 	/**
