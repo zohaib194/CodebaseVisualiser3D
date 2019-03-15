@@ -35,7 +35,11 @@ public class Model {
 	 */
 	protected <T extends Model> JSONArray convertClassListJsonObjectList(List<T> objectList) {
 		if (objectList.size() > 0) {
-			return new JSONArray(objectList);
+			JSONArray jsonArray = new JSONArray();
+			for (T obj : objectList) {
+				jsonArray.put(obj.getParsedCode());
+			}
+			return jsonArray;
 		}
 		return null;
 	}

@@ -42,11 +42,11 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 */
 	@Override
 	public void enterClassspecifier(CPP14Parser.ClassspecifierContext ctx) {
-		System.out.println("Entered class: " + ctx.classhead().classheadname().classname().Identifier().getText());
+		// System.out.println("Entered class: " +
+		// ctx.classhead().classheadname().classname().Identifier().getText());
 		ClassModel classModel = new ClassModel();
 		this.scopeStack.peek().addDataInModel(classModel);
 		this.enterScope(classModel);
-		System.out.println("Adding private access specifier");
 		AccessSpecifierModel accessSpecifierModel = new AccessSpecifierModel("private");
 		this.scopeStack.peek().addDataInModel(accessSpecifierModel);
 		this.enterScope(accessSpecifierModel);
@@ -62,12 +62,12 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	public void exitClassspecifier(CPP14Parser.ClassspecifierContext ctx) {
 		if (this.scopeStack.peek() instanceof AccessSpecifierModel) {
 			this.exitScope();
-			System.out.println("Exited access specifier scope");
 		} else {
-			System.err.println("Couldn't find access specifier in class!");
+			System.err.println("Couldn't find access specifier in class");
 		}
 		this.exitScope();
-		System.out.println("Exited class: " + ctx.classhead().classheadname().classname().Identifier().getText());
+		// System.out.println("Exited class: " +
+		// ctx.classhead().classheadname().classname().Identifier().getText());
 	}
 
 	/**
@@ -78,34 +78,27 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	@Override
 	public void enterAccessspecifier(CPP14Parser.AccessspecifierContext ctx) {
 		String name = ctx.getText();
-		System.out.println("Entered accessspecifer: " + name);
+		// System.out.println("Entered accessspecifer: " + name);
 		// Currently in AccessSpecifierModel.
 		if (this.scopeStack.peek() instanceof AccessSpecifierModel) {
-			System.out.println("Inside access specifier scope");
 			// Found a different specifier than the current one.
 			if (((AccessSpecifierModel) this.scopeStack.peek()).getName() != name) {
-				System.out.println("Found different access specifier scope! Exiting current");
 				// Exit it!
 				this.exitScope();
+
 				// Within a class model.
 				if (this.scopeStack.peek() instanceof ClassModel) {
-					System.out.println("Class scope as current!");
 					ClassModel classModel = (ClassModel) this.scopeStack.peek();
-
-					for (AccessSpecifierModel asm : classModel.getAccessSpecifiers()) {
-						System.out.println("Class: " + classModel.getName() + " | " + asm.getName());
-					}
 
 					// Get exsiting access specifier model with name
 					AccessSpecifierModel asm = classModel.getAccessSpecifier(name);
 
-					if (asm == null) { // New specifier, add it and set as current scope.
-						System.out.println("NEW ACCESS SPECIFIER with name: " + name);
+					// New specifier, add it and set as current scope.
+					if (asm == null) {
 						asm = new AccessSpecifierModel(name);
 						this.scopeStack.peek().addDataInModel(asm);
 					}
 
-					System.out.println("Entering access specifier with name: " + asm.getName());
 					this.enterScope(asm);
 				}
 			}

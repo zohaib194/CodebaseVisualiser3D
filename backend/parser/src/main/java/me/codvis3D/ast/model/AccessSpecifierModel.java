@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Stack;
 
 import org.json.JSONObject;
+import org.json.JSONArray;
 
 import me.codvis.ast.ClassModel;
 import me.codvis.ast.FunctionModel;
@@ -59,9 +60,22 @@ public class AccessSpecifierModel extends Model {
 		JSONObject parsedCode = new JSONObject();
 
 		parsedCode.put("name", this.name);
-		parsedCode.put("classes", this.classes);
-		parsedCode.put("functions", this.functions);
-		parsedCode.put("variables", this.variables);
+
+		JSONArray parsedClasses = this.convertClassListJsonObjectList(this.classes);
+		if (parsedClasses != null) {
+			parsedCode.put("classes", parsedClasses);
+		}
+
+		JSONArray parsedFunctions = this.convertClassListJsonObjectList(this.functions);
+		if (parsedFunctions != null) {
+			parsedCode.put("functions", parsedFunctions);
+		}
+
+		JSONArray parsedVariables = this.convertClassListJsonObjectList(this.variables);
+		if (parsedVariables != null) {
+			parsedCode.put("variables", parsedVariables);
+		}
+
 		return parsedCode;
 	}
 

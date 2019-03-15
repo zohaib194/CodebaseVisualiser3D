@@ -189,26 +189,27 @@ public class FileModel extends Model {
 
 		parsedCode.put("file_name", this.fileName);
 
-		/*
-		 * List<JSONObject> *JSONArray parsedFunctions =
-		 * this.convertClassListJsonObjectList(this.functions); if (parsedFunctions !=
-		 * null) { parsedCode.put("functions", parsedFunctions); }
-		 * 
-		 * /* List<JSONObject> *JSONArray parsedNamespaces =
-		 * this.convertClassListJsonObjectList(this.namespaces); if (parsedNamespaces !=
-		 * null) { parsedCode.put("namespaces", parsedNamespaces); }
-		 * 
-		 * /* List<JSONObject> *JSONArray parsedUsingNamespaces = this
-		 * .convertClassListJsonObjectList(this.usingNamespaces); if
-		 * (parsedUsingNamespaces != null) { parsedCode.put("using_namespaces",
-		 * parsedUsingNamespaces); }
-		 * 
-		 * /* List<JSONObject> *JSONArray parsedVariables =
-		 * this.convertClassListJsonObjectList(this.variables); if (parsedVariables !=
-		 * null) { parsedCode.put("variables", parsedVariables); }
-		 * 
-		 * /* List<JSONObject>
-		 */JSONArray parsedClasses = this.convertClassListJsonObjectList(this.classes);
+		JSONArray parsedFunctions = this.convertClassListJsonObjectList(this.functions);
+		if (parsedFunctions != null) {
+			parsedCode.put("functions", parsedFunctions);
+		}
+
+		JSONArray parsedNamespaces = this.convertClassListJsonObjectList(this.namespaces);
+		if (parsedNamespaces != null) {
+			parsedCode.put("namespaces", parsedNamespaces);
+		}
+
+		JSONArray parsedUsingNamespaces = this.convertClassListJsonObjectList(this.usingNamespaces);
+		if (parsedUsingNamespaces != null) {
+			parsedCode.put("using_namespaces", parsedUsingNamespaces);
+		}
+
+		JSONArray parsedVariables = this.convertClassListJsonObjectList(this.variables);
+		if (parsedVariables != null) {
+			parsedCode.put("variables", parsedVariables);
+		}
+
+		JSONArray parsedClasses = this.convertClassListJsonObjectList(this.classes);
 		if (parsedClasses != null) {
 			parsedCode.put("classes", parsedClasses);
 		}

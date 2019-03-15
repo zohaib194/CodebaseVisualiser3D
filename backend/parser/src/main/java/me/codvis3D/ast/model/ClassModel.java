@@ -26,18 +26,12 @@ public class ClassModel extends Model {
 	}
 
 	public AccessSpecifierModel getAccessSpecifier(String name) {
+		// If Access Specifier exists, return it, else nothing.
 		for (int i = 0; i < this.accessSpecifiers.size(); i++) {
-			System.out.println("CURRENT ITEM: " + this.accessSpecifiers.get(i).getName() + "!");
-			if (this.accessSpecifiers.get(i).getName() == name) {
-				System.out.println("FOUND ACCESS SPECIFIER: " + name);
+			if (this.accessSpecifiers.get(i).getName().equals(name)) {
 				return this.accessSpecifiers.get(i);
 			}
 		}
-		/*
-		 * for (AccessSpecifierModel accessSpecifierModel : this.accessSpecifiers) { if
-		 * (accessSpecifierModel.getName() == name) { return accessSpecifierModel; } }
-		 */
-		System.out.println("COULDN'T FIND ACCESS SPECIFIER: " + name);
 		return null;
 	}
 
@@ -50,9 +44,9 @@ public class ClassModel extends Model {
 	}
 
 	public void addAccessSpecifier(AccessSpecifierModel data) {
-		// If Access specifier doens't already exist, add it.
+		// If Access Specifier doens't already exist, add it.
 		for (AccessSpecifierModel accessSpecifierModel : this.accessSpecifiers) {
-			if (accessSpecifierModel.getName() == data.getName()) {
+			if (accessSpecifierModel.getName().equals(data.getName())) {
 				return;
 			}
 		}
