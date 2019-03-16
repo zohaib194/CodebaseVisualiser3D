@@ -8,8 +8,11 @@
  * @param {string} type - Type of the node.
  */
 var Node = (function(pos, name, size, type) {
+    var index;
     var position = pos;
     var size = size;
+    var children = Array();
+    var parent = null;
     var metadata = {
         name: name,
         type: type
@@ -42,6 +45,7 @@ var Node = (function(pos, name, size, type) {
         var forceScalar = 0;
         var diff = new THREE.Vector3(0, 0, 0);
         var dist = 0;
+        var indexRange = {min: null, max: null};
 
         // Run though every link
         links.forEach((link, nodeIndex) => {
@@ -95,6 +99,15 @@ var Node = (function(pos, name, size, type) {
     };
 
     /**
+     * Gets the index.
+     *
+     * @return {number} The index.
+     */
+    var getIndex = function() {
+        return index;
+    }
+
+    /**
      * getter for size
      */
      var getSize = function(){
@@ -114,6 +127,95 @@ var Node = (function(pos, name, size, type) {
     var getLinks = function() {
         return links;
     };
+
+    /**
+     * Gets the parent node.
+     *
+     * @return     {Node}  The parent.
+     */
+    var getParent = function(){
+        return parent;
+    };
+
+    /**
+     * Gets the child nodes.
+     *
+     * @return {Array}  The children.
+     */
+    var getChildren = function(){
+        return children;
+    }
+
+    /**
+     * Gets the all sucessors.
+     */
+    var getSucessors = function(){
+        var successors = new Array();
+        children.forEach( function(child, index) {
+            successors.push(child.getSucessors());
+        });
+        successors.push(children);
+        return successors;
+    }
+
+    /**
+     * Gets the siblings including itself.
+     */
+    var getSiblings = function(){
+        if (parent != null) {
+            parent.getChildren();
+        }
+    }
+
+    /**
+     * Gets the node index by name if the node is this node or one of its children.
+     *
+     * @param  {string} nodeName - The name of the node to find.
+     * @return {number} The node index, -1 if node can not be found.
+     */
+    var getNodeIndex = function(nodeName){
+        // Check if requested node is self
+        if (name = nodeName) {
+            return index;
+
+        } else {                                    // Check if requested node is amongst children.
+
+            var nodeIndex = -1;                     // Defaults to not found node.
+            children.forEach((child, index) =>{
+                nodeIndex = child.getNodeIndex(nodeName);
+                if (nodeIndex != -1) {              // Check if child found node.
+                    return
+                }
+            });
+
+            return nodeIndex;
+        }
+
+        return -1;
+    }
+
+    /**
+     * Adds a child node.
+     *
+     * @param {Node} child - The child node to add
+     */
+    var addChild = function(child){
+        child.setIndex(children[children.length() - 1].getIndex() + 1);
+        if (typeof newNode === "object" && newNode.isNode()) {
+            children.push(newNode);
+        }else{
+            console.log("Could not add to FDGTree: not a Node");
+        }
+    }
+
+    /**
+     * Sets the index.
+     *
+     * @param {number} newIndex - The new index.
+     */
+    var setIndex = function(newIndex){
+        index = newIndex;
+    }
 
     /**
      * Setter for position.
@@ -144,6 +246,11 @@ var Node = (function(pos, name, size, type) {
         links.set(key, value);
     };
 
+
+    var setParent = function(newParent){
+        parent = newParent
+    }
+
     // Expose private functions for global use.
     return {
         getTotalForce: getTotalForce,
@@ -152,6 +259,11 @@ var Node = (function(pos, name, size, type) {
         getName: getName,
         getType: getType,
         getLinks: getLinks,
+        getParent: getParent,
+        getChildren: getChildren,
+        getSiblings: getSiblings,
+        getNodeIndex: getNodeIndex,
+        addChild: addChild,
         setPosition: setPosition,
         setName: setName,
         setType: setType,

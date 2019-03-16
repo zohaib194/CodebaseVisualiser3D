@@ -18,7 +18,12 @@ var FDG = (function FDG(
         var gravityForce = gravityForce;
         var gravityCenter = gravityCenter;
 
-        var nodes = new Array();
+        tree = {root: new Node(
+            THREE.Vector3(0,0,0),
+            "root",
+            null,
+            "root"
+        )}
 
         /**
          * Function ofr getting node index from nodes array.
@@ -26,14 +31,14 @@ var FDG = (function FDG(
          */
         var getNodeIndex = function(name) {
             // Find node based on name.
-           return nodes.findIndex((node) => { return (node.getName() == name) });
+           return tree.root.getNodeIndex(name);
         }
 
         /**
          * Getter for nodes array.
          */
         var getNodes = function() {
-            return nodes;
+            return tree.root.getSucessors();
         }
 
         /**
@@ -53,25 +58,11 @@ var FDG = (function FDG(
         }
 
         /**
-         * Function for adding a node to the graph.
-         * @param {Node} node - Node object to be added.
+         * Function for setting the tree for creating the fdg graph.
+         * @param {Node} tree - Root node of the fdg problem.
          */
-        var addNode = function(node) {
-            // If node exists (has same name). Abort.
-            if (getNodeIndex(node.getName()) >= 0 && node.type != "scope") {
-                console.log(
-                    LOCALE.getSentence("fdg_node_exists") + ": " + node.getName()
-                );
-                return;
-            }
-
-            // New node exists, add it.
-            if (typeof node !== "undefined") {
-                // Give back the index it appears in.
-                // Push appends to the back and returns
-                // the new lenght, hence "- 1".
-                return nodes.push(node) - 1;
-            }
+        var setTree = function(tree) {
+           tree.root = tree;
         }
 
         /**
@@ -81,21 +72,24 @@ var FDG = (function FDG(
          * @param {LinkProperties} link - LinkProperties object.
          */
         var addLink = function(indexFrom, indexTo, linkProp) {
+            nodeFrom = tree.root.getNode(indexFrom);
+            nodeTo = tree.root.getNode(indexTo);
             // Nodes doesn't exists, nodes are the same,
             // or both nodes has a link to eachother, abort linking!
             if (
-                typeof nodes[indexFrom] === "undefined" ||
-                typeof nodes[indexTo] === "undefined" ||
+                nodeFrom === null ||
+                nodeTo === null ||
                 indexFrom === indexTo ||
-                (nodes[indexFrom].getLinks().has(indexTo) &&
-                nodes[indexTo].getLinks().has(indexFrom))
+                (nodeFrom.getLinks().has(indexTo) &&
+                nodesTo.getLinks().has(indexFrom))
             ) {
+                console.log("Can not link nodes, either null, same or already connected");
                 return;
             }
 
             // Add bi-directional links.
-            nodes[indexFrom].setLink(indexTo, linkProp);
-            nodes[indexTo].setLink(indexFrom, linkProp);
+            nodeFrom.setLink(indexTo, linkProp);
+            nodeTo.setLink(indexFrom, linkProp);
         }
 
         /**
@@ -103,6 +97,16 @@ var FDG = (function FDG(
          * @param {int} iterations - How many iterations the graph should run.
          */
         var execute = function(iterations) {
+            executeSubTree(iterations, tree.root)
+        }
+
+        var executeSubTree = function(iterations, tree){
+            nodes = subtree.getChildren();
+            // recursivly run force directed graph
+            nodes.forEach( function(node, index) {
+                executeSubTree(iterations, node);
+            });
+
             // Run though every node per every iteration.
             for (i = 0; i < iterations; i++) {
                 for (x = 0; x < nodes.length; x++) {
@@ -128,6 +132,8 @@ var FDG = (function FDG(
         return {
             getNodeIndex: getNodeIndex,
             getNodes: getNodes,
+            getMaxSize: getMaxSize,
+            setMaxSize: setMaxSize,
             addNode: addNode,
             addLink: addLink,
             execute: execute
