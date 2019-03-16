@@ -10,9 +10,13 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Stack;
+import java.util.*;
 
 import org.json.JSONObject;
+
 /**
  * Class for exstending listeners and parsing code requiered for initial 3D view for code abstraction.
  */
@@ -34,22 +38,19 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 *
 	 * @param      ctx   The parsing context
 	 */
-    @Override 
+    @Override
     public void enterFunctiondefinition(CPP14Parser.FunctiondefinitionContext ctx) {
-        
         // Get interval between function start and end of function name.
 	    Interval interval = new Interval(ctx.start.getStartIndex(), ctx.declarator().stop.getStopIndex());
-	    
+
 	    // Get the input stream of function definition rule.
 	    CharStream input = ctx.start.getInputStream();
 
-	    // Set this function model with name, lineStart and lineEnd.
-	    FunctionModel functionModel = new FunctionModel(input.getText(interval));
-	    functionModel.setLineStart(ctx.functionbody().start.getLine());
+        FunctionModel functionModel = new FunctionModel(input.getText(interval));
+       	functionModel.setLineStart(ctx.functionbody().start.getLine());
 	    functionModel.setLineEnd(ctx.functionbody().stop.getLine());
-
-	    this.scopeStack.peek().addDataInModel(functionModel);
 	    this.enterScope(functionModel);
+
     }
 
     /**
@@ -57,9 +58,16 @@ public class CppLstnr_Initial extends CppExtendedListener {
      *
      * @param      ctx   The parsing context
      */
-    @Override 
+    @Override
     public void exitFunctiondefinition(CPP14Parser.FunctiondefinitionContext ctx) {
-    	this.exitScope();
+    	Model model = this.exitScope();
+
+    	if(model instanceof FunctionModel){
+	    	this.scopeStack.peek().addDataInModel((FunctionModel) model);
+    	} else {
+    		this.enterScope(model);
+    		System.err.println("Could not understand parent model for function definition.");
+    	}
     }
 
     /**
@@ -68,7 +76,7 @@ public class CppLstnr_Initial extends CppExtendedListener {
      * @param      ctx   The parsing context
      */
     @Override
-	public void enterOriginalnamespacedefinition(CPP14Parser.OriginalnamespacedefinitionContext ctx) { 
+	public void enterOriginalnamespacedefinition(CPP14Parser.OriginalnamespacedefinitionContext ctx) {
 		NamespaceModel namespace = new NamespaceModel(ctx.Identifier().getText());
 
 	    this.scopeStack.peek().addDataInModel(namespace);
@@ -94,9 +102,9 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	public void enterUsingdirective(CPP14Parser.UsingdirectiveContext ctx) {
 		UsingNamespaceModel usingNamespaceModel;
 		if (ctx.nestednamespecifier() != null) {
-			usingNamespaceModel = new UsingNamespaceModel(ctx.nestednamespecifier().getText() + ctx.namespacename().getText(), ctx.getStart().getLine());	
-		
-		}else{
+			usingNamespaceModel = new UsingNamespaceModel(ctx.nestednamespecifier().getText() + ctx.namespacename().getText(), ctx.getStart().getLine());
+
+		} else {
 			usingNamespaceModel = new UsingNamespaceModel(ctx.namespacename().getText(), ctx.getStart().getLine());
 		}
 
@@ -108,9 +116,217 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 *
 	 * @param      ctx   The parsing context
 	 */
-	@Override 
-	public void enterExpressionstatement(CPP14Parser.ExpressionstatementContext ctx) { 
+	@Override
+	public void enterExpressionstatement(CPP14Parser.ExpressionstatementContext ctx) {
 	    this.scopeStack.peek().addDataInModel(ctx.getText());
+	}
+
+	/**
+	 * Listener for adding variable declaration into the scope.
+	 *
+	 * @param      ctx   The parsing context
+	 */
+	@Override
+	public void enterSimpledeclaration(CPP14Parser.SimpledeclarationContext ctx) {
+		if(this.isVariable(ctx)) {
+			this.enterScope(new VariableListModel());
+		}
+	}
+
+	/**
+	 * Listener for exiting the current scope, and add data in model parent scope.
+	 *
+	 * @param      ctx   The parsing context
+	 */
+	@Override
+	public void exitSimpledeclaration(CPP14Parser.SimpledeclarationContext ctx) {
+		if(this.isVariable(ctx)) {
+			VariableListModel variableList = (VariableListModel) this.exitScope();
+
+			if ( this.scopeStack.peek() instanceof FunctionBodyModel ||
+			     this.scopeStack.peek() instanceof FileModel ||
+			     this.scopeStack.peek() instanceof NamespaceModel) {
+
+				for (Iterator<String> i = variableList.getNames().iterator(); i.hasNext();) {
+				    String variableName = i.next();
+				    VariableModel vm = new VariableModel(variableName, variableList.getType());
+				    vm.trimType();
+					this.scopeStack.peek().addDataInModel(vm);
+				}
+
+			} else {
+	    		System.err.println("Could not understand parent model for simple declaration.");
+	    	}
+		}
+	}
+
+	/**
+	 * Determines if ctx is a variable.
+	 *
+	 * @param      ctx   The parsing context
+	 *
+	 * @return     True if variable, False otherwise.
+	 */
+	protected boolean isVariable(CPP14Parser.SimpledeclarationContext ctx){
+		CPP14Parser.InitdeclaratorlistContext initDeclList = null;
+		CPP14Parser.DeclaratorContext declarator = null;
+
+		if(ctx.initdeclaratorlist() != null) {
+			initDeclList = ctx.initdeclaratorlist();
+			if(initDeclList.initdeclarator().declarator() != null) {
+				declarator = initDeclList.initdeclarator().declarator();
+				if(declarator.ptrdeclarator() != null) {
+					if(declarator.ptrdeclarator().noptrdeclarator() != null) {
+						if(declarator.ptrdeclarator().noptrdeclarator().declaratorid() != null) {
+							return true;
+						}
+					}
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Listener for parsing function body.
+	 *
+	 * @param      ctx   The parsing context
+	 */
+	@Override
+	public void enterFunctionbody(CPP14Parser.FunctionbodyContext ctx) {
+		this.enterScope(new FunctionBodyModel());
+	}
+
+	/**
+	 * Listener for exiting the current scope and adding data into function model scope.
+	 *
+	 * @param      ctx   The parsing context
+	 */
+	@Override
+	public void exitFunctionbody(CPP14Parser.FunctionbodyContext ctx) {
+		FunctionBodyModel functionBody = (FunctionBodyModel) this.exitScope();
+		this.scopeStack.peek().addDataInModel(functionBody);
+	}
+
+	/**
+	 * Listener for parsing declaratorid for function model.
+	 *
+	 * @param      ctx   The parsing context
+	 */
+	@Override
+	public void enterDeclaratorid(CPP14Parser.DeclaratoridContext ctx) {
+		Model model = this.exitScope();
+		if(model instanceof FunctionModel){
+			FunctionModel func = (FunctionModel) model;
+			func.setDeclaratorId(ctx.getText());
+			this.enterScope(func);
+		} else {
+			this.enterScope(model);
+	    	System.err.println("Could not understand parent model for declarator id. ");
+		}
+	}
+
+	/**
+	 * Listener for parsing scope of a function.
+	 *
+	 * @param      ctx   The parsing context
+	 */
+	@Override
+	public void enterQualifiedid(CPP14Parser.QualifiedidContext ctx) {
+		if(ctx.nestednamespecifier() != null){
+			Model model = this.exitScope();
+			if(model instanceof FunctionModel) {
+				FunctionModel func = (FunctionModel) model;
+				func.setScope(ctx.nestednamespecifier().getText());
+				this.enterScope(func);
+			} else {
+				this.enterScope(model);
+	    		System.err.println("Could not understand parent model for scope id.");
+
+			}
+		}
+	}
+
+	/**
+	 * Listener for parsing parameters.
+	 *
+	 * @param      ctx   The parsing context
+	 */
+	@Override
+	public void enterParameterdeclaration(CPP14Parser.ParameterdeclarationContext ctx) {
+		this.enterScope(new VariableModel());
+	}
+
+	/**
+	 * Listener for existing the current scope and add data in function model scope.
+	 *
+	 * @param      ctx   The parsing context
+	 */
+	@Override
+	public void exitParameterdeclaration(CPP14Parser.ParameterdeclarationContext ctx) {
+		VariableModel vm = (VariableModel) this.exitScope();
+		Model model = this.exitScope();
+		if (model instanceof FunctionModel){
+			FunctionModel func = (FunctionModel) model;
+			vm.trimType();
+			func.addParameter(vm);
+			this.enterScope(func);
+		} else {
+			this.enterScope(model);
+	    	System.err.println("Could not understand parent model for parameter declaration.");
+		}
+	}
+
+	/**
+	 * Listener for parsing declarators.
+	 *
+	 * @param      ctx   The parsing context
+	 */
+	@Override
+	public void enterDeclarator(CPP14Parser.DeclaratorContext ctx) {
+		if (this.scopeStack.peek() instanceof VariableModel){
+			VariableModel vm = (VariableModel) this.exitScope();
+			vm.setName(ctx.getText());
+			this.enterScope(vm);
+		} else if (this.scopeStack.peek() instanceof VariableListModel) {
+			VariableListModel vlm = (VariableListModel) this.exitScope();
+			vlm.addName(ctx.getText());
+			this.enterScope(vlm);
+		} else {
+	    	System.err.println("Could not understand parent model for declarator.");
+		}
+	}
+
+	@Override
+	public void enterDeclspecifier(CPP14Parser.DeclspecifierContext ctx) {
+		if (this.scopeStack.peek() instanceof VariableModel){
+			VariableModel vm = (VariableModel) this.exitScope();
+			vm.applyModifierOnType(ctx.getText());
+			this.enterScope(vm);
+		} else if (this.scopeStack.peek() instanceof VariableListModel) {
+			VariableListModel vlm = (VariableListModel) this.exitScope();
+			vlm.applyModifierOnType(ctx.getText());
+			this.enterScope(vlm);
+		} else {
+	    	System.err.println("Could not understand parent model for variable modifier.");
+		}
+	}
+
+	/**
+	 * Listener for parsing abstract declarator.
+	 *
+	 * @param      ctx   The parsing context
+	 */
+	@Override
+	public void enterAbstractdeclarator(CPP14Parser.AbstractdeclaratorContext ctx) {
+		if (this.scopeStack.peek() instanceof VariableModel){
+			VariableModel vm = (VariableModel) this.exitScope();
+			vm.setName(ctx.getText());
+			this.enterScope(vm);
+		} else {
+	    	System.err.println("Could not understand parent model for abstract declarator.");
+		}
 	}
 
 	/**
@@ -118,7 +334,7 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 *
 	 * @return     The parsed code.
 	 */
-    public JSONObject getParsedCode() {  
+    public JSONObject getParsedCode() {
 		JSONObject parsedCode = new JSONObject();
 
     	return parsedCode.put("file", this.fileModel.getParsedCode());

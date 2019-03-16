@@ -15,6 +15,8 @@ public class FileModel extends Model{
 	private List<FunctionModel> functions;
 	private List<NamespaceModel> namespaces;
 	private List<UsingNamespaceModel> usingNamespaces;
+	private List<VariableModel> variables;
+
 
 	/**
 	 * Constructs the object, setting the filename.
@@ -26,6 +28,7 @@ public class FileModel extends Model{
 		this.functions = new ArrayList<>();
 		this.namespaces = new ArrayList<>();
 		this.usingNamespaces = new ArrayList<>();
+		this.variables = new ArrayList<>();
 	}
 
 	/**
@@ -56,6 +59,24 @@ public class FileModel extends Model{
 	}
 
 	/**
+	 * Adds a variable.
+	 *
+	 * @param      variable  The variable
+	 */
+	public void addVariable(VariableModel variable){
+		this.variables.add(variable);
+	}
+
+	/**
+	 * Sets the variables.
+	 *
+	 * @param      variables  The variables
+	 */
+	public void setVariables(List<VariableModel> variables){
+		this.variables = variables;
+	}
+
+	/**
 	 * Sets the functions.
 	 *
 	 * @param      functions  The functions
@@ -63,6 +84,7 @@ public class FileModel extends Model{
 	public void setFunctions(List<FunctionModel> functions){
 		this.functions = functions;
 	}
+
 
 	/**
 	 * Gets the filename.
@@ -100,7 +122,7 @@ public class FileModel extends Model{
 	public List<UsingNamespaceModel> getUsingNamespaces(){
 		return this.usingNamespaces;
 	}
-	
+
 	/**
 	 * Adds the data in model.
 	 *
@@ -110,16 +132,20 @@ public class FileModel extends Model{
 	protected <T> void addDataInModel(T data){
 
 		if (data instanceof FunctionModel) {
-			this.addFunction((FunctionModel)data);
+			this.addFunction((FunctionModel) data);
 
-		}else if (data instanceof  NamespaceModel) {
-			this.addNamespace((NamespaceModel)data);
+		} else if (data instanceof  NamespaceModel) {
+			this.addNamespace((NamespaceModel) data);
 
-		}else if (data instanceof UsingNamespaceModel) {
-			this.addUsingNamespace((UsingNamespaceModel)data);
+		} else if (data instanceof UsingNamespaceModel) {
+			this.addUsingNamespace((UsingNamespaceModel) data);
 
-		}else{
-			System.out.println("Error adding data in model");
+		} else if (data instanceof VariableModel){
+			this.addVariable((VariableModel) data);
+
+		} else {
+			System.out.println(data);
+			System.out.println("Error adding data in file model");
 			System.exit(1);
 		}
 
@@ -150,7 +176,12 @@ public class FileModel extends Model{
 		if (parsedUsingNamespaces != null) {
 			parsedCode.put("using_namespaces", parsedUsingNamespaces);
 		}
-		
+
+		List<JSONObject> parsedVariables = this.convertClassListJsonObjectList(this.variables, "variable");
+		if (parsedVariables != null) {
+			parsedCode.put("variables", parsedVariables);
+		}
+
 		return parsedCode;
 	}
 
