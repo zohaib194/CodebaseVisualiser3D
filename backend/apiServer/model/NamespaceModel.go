@@ -8,8 +8,9 @@ type NamespacesModel struct {
 
 // NamespaceModel represents code for a single namespace
 type NamespaceModel struct {
-	Functions     []FunctionsModel  `json:"functions"`
 	NamespaceName string            `json:"name"`
+	Functions     []FunctionsModel  `json:"functions"`
 	Namespaces    []NamespacesModel `json:"namespaces"`
 	Classes       []ClassesModel    `json:"classes"`
+	Variables     []VariablesModel  `json:"variables"`
 }
