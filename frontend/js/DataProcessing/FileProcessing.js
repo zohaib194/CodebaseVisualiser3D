@@ -33,8 +33,8 @@ function linkElements() {
     // If I have a parent, add attractive link between us.
     if (indexStack.length >= 2) {
         fdg.addLink(
-            indexStack[indexStack.length - 2], 
-            indexStack[indexStack.length - 1], 
+            indexStack[indexStack.length - 2],
+            indexStack[indexStack.length - 1],
             new LinkProperties(1)
         );
     } else {    // Missing parrent, state so.
@@ -46,33 +46,33 @@ function linkElements() {
  * Links function calls.
  */
 function linkFunctionCalls(){
-    indexToFunctionMap.forEach( function(callerIndex, funcName) {
+    indexToFunctionMap.forEach( function(callerIndex, callerFuncName) {
 
         // Get the function caller.
-        funcModel = functionModels.get(funcName);
+        funcModel = functionModels.get(callerFuncName);
         // Check the calls length.
         if(funcModel.getCalls().length == 0){
             return;
         }
-        
-        console.log("Caller: ", callerIndex, funcName);
+
+        console.log("Caller: ", callerIndex, callerFuncName);
 
         // Loop through calls
-        funcModel.getCalls().forEach( function(funcName, index) {
-            
+        funcModel.getCalls().forEach( function(calleeFuncName, index) {
+
             calleeIndex = indexToFunctionMap.get(funcName)
             console.log("Callee: ", calleeIndex, funcName);
 
             if(functionModels.has(funcName)){
-                
+
                 fdg.addLink(
-                    indexStack[callerIndex], 
-                    indexStack[calleeIndex], 
+                    indexStack[callerIndex],
+                    indexStack[calleeIndex],
                     new LinkProperties(1)
                 );
 
             }
-            
+
         });
 
     });
@@ -88,8 +88,8 @@ function handleClassData(classData, filename) {
     indexStack.push(
         fdg.addNode(
             new Node(
-                randomPosition(), 
-                classData.Class.name, 
+                randomPosition(),
+                classData.Class.name,
                 "class"
             )
         )
@@ -114,8 +114,8 @@ function handleNamespaceData(namespaceData, filename) {
     indexStack.push(
         fdg.addNode(
             new Node(
-                randomPosition(), 
-                namespaceData.namespace.name, 
+                randomPosition(),
+                namespaceData.namespace.name,
                 "namespace"
             )
         )
@@ -141,8 +141,8 @@ function handleFunctionData(functionData, filename) {
     // Add node and save index to stack.
     index = fdg.addNode(
             new Node(
-                randomPosition(), 
-                functionData.function.name, 
+                randomPosition(),
+                functionData.function.name,
                 "function"
             )
         );
@@ -156,11 +156,11 @@ function handleFunctionData(functionData, filename) {
     // Save the function data in function model.
     functionModels.set(
         functionData.function.name,
-        new FunctionMetaData( 
+        new FunctionMetaData(
             filename,
             functionData.function.calls,
             functionData.function.declrator_id,
-            functionData.function.start_line, 
+            functionData.function.start_line,
             functionData.function.end_line
         )
     );
@@ -213,12 +213,12 @@ function handleProjectData(projectData) {
     // Handle every file given.
     projectData.files.forEach((file) => {
 
-        // If file is not parsed, skip it 
+        // If file is not parsed, skip it
         // ("return" returns from lambda not forEach).
         if (file.file.parsed != true) {
             return;
         }
-    
+
         // File is parsed correctly, process it.
         lineCount += file.file.linesInFile;
         handleCodeData(file.file, file.file.file_name);

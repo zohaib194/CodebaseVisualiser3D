@@ -10,28 +10,57 @@ import org.json.JSONObject;
  */
 public class FunctionModel extends Model{
 	private String name;
-	private String namespace;
+	private String declaratorId;
+	private String scope;
 	private int lineStart;
 	private int lineEnd;
-	private List<String> calls;
+	private List<VariableModel> parameters;
+	private FunctionBodyModel functionBody;
+
+	FunctionModel(String name){
+		this.name = name;
+		this.parameters = new ArrayList<>();
+		this.functionBody = new FunctionBodyModel();
+	}
 
 	/**
 	 * Constructs the object, setting the function name.
 	 *
 	 * @param      name  The name
 	 */
-	FunctionModel(String name){
+	FunctionModel(String name, String declarator){
 		this.name = name;
-		this.calls = new ArrayList<>();
+		this.scope = "";
+		this.declaratorId = declarator;
+		this.parameters = new ArrayList<>();
+		this.functionBody = new FunctionBodyModel();
 	}
 
 	/**
-	 * Sets the namespace.
+	 * Gets the scope.
 	 *
-	 * @param      namespace  The namespace
+	 * @return     The scope.
 	 */
-	public void setNamespace(String namespace){
-		this.namespace = namespace;
+	public String getScope(){
+		return this.scope;
+	}
+
+	/**
+	 * Sets the scope.
+	 *
+	 * @param      scope  The scope
+	 */
+	public void setScope(String scope){
+		this.scope = scope;
+	}
+
+	/**
+	 * Sets the declarator identifier.
+	 *
+	 * @param      declaratorId  The declarator identifier
+	 */
+	public void setDeclaratorId(String declaratorId){
+		this.declaratorId = declaratorId;
 	}
 
 	/**
@@ -41,15 +70,6 @@ public class FunctionModel extends Model{
 	 */
 	public String getName(){
 		return this.name;
-	}
-
-	/**
-	 * Gets the namespace.
-	 *
-	 * @return     The namespace.
-	 */
-	public String getNamespace(){
-		return this.namespace;
 	}
 
 	/**
@@ -79,14 +99,6 @@ public class FunctionModel extends Model{
 		this.lineEnd = lineEnd;
 	}
 
-	/**
-	 * Adds a call.
-	 *
-	 * @param      functionCall  The function call
-	 */
-	public void addCall(String functionCall){
-		this.calls.add(functionCall);
-	}
 
 	/**
 	 * Gets the line end.
@@ -98,20 +110,45 @@ public class FunctionModel extends Model{
 	}
 
 	/**
+	 * Adds a parameter.
+	 *
+	 * @param      parameter  The parameter
+	 */
+	public void addParameter(VariableModel parameter){
+		this.parameters.add(parameter);
+	}
+
+	/**
+	 * Sets the parameters.
+	 *
+	 * @param      parameters  The parameters
+	 */
+	public void setParameters(List<VariableModel> parameters){
+		this.parameters = parameters;
+	}
+
+	/**
+	 * Sets the function body.
+	 *
+	 * @param      body  The body
+	 */
+	public void setFunctionBody(FunctionBodyModel body){
+		this.functionBody = body;
+	}
+
+	/**
 	 * Adds the data in model.
 	 *
 	 * @param      data  The data
 	 */
 	@Override
 	protected <T> void addDataInModel(T data){
-
-		if (data instanceof String){
-			this.addCall((String) data);
+		if(data instanceof FunctionBodyModel){
+			this.setFunctionBody((FunctionBodyModel) data);
 		} else {
-			System.out.println("Error adding data in model");
+			System.out.println("Error adding data in function model " + data.getClass());
 			System.exit(1);
 		}
-
 	}
 
 	/**
@@ -120,13 +157,24 @@ public class FunctionModel extends Model{
 	 * @return     The parsed code.
 	 */
 	@Override
-	public JSONObject getParsedCode(){	
+	public JSONObject getParsedCode(){
 		JSONObject parsedCode = new JSONObject();
 
 		parsedCode.put("name", this.name);
+		parsedCode.put("declrator_id", this.declaratorId);
+		parsedCode.put("scope", this.scope);
 		parsedCode.put("start_line", this.lineStart);
 		parsedCode.put("end_line", this.lineEnd);
-		parsedCode.put("calls", this.calls);
+
+		List<JSONObject> parsedParameters = this.convertClassListJsonObjectList(this.parameters, "parameter");
+		if (parsedParameters != null) {
+			parsedCode.put("parameters", parsedParameters);
+		}
+
+		if(this.functionBody != null){
+			parsedCode.put("function_body", this.functionBody.getParsedCode());
+		}
+
 		return parsedCode;
 	}
 }
