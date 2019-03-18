@@ -9,11 +9,16 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Stack;
 import java.util.*;
+import java.lang.Class;
+import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import org.json.JSONObject;
 
@@ -120,6 +125,41 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	public void enterExpressionstatement(CPP14Parser.ExpressionstatementContext ctx) {
 	    this.scopeStack.peek().addDataInModel(ctx.getText());
 	}
+/**
+
+	@Override
+	public void enterLiteral(CPP14Parser.LiteralContext ctx) {
+
+		System.out.println("LiteralContext: "+ctx.getText() + " " + ctx.start.getLine());
+	}
+
+
+	@Override
+	public void enterPostfixexpression(CPP14Parser.PostfixexpressionContext ctx) {
+		//if(ctx.primaryexpression() != null){
+			System.out.println("PostfixexpressionContext: "+ctx.getText() + " " + ctx.start.getLine());
+		//}
+
+	}
+
+
+	@Override
+	public void enterMultiplicativeexpression(CPP14Parser.MultiplicativeexpressionContext ctx) {
+			System.out.println("\nMultiplicativeexpressionContext: "+ctx.getText() + " " + ctx.start.getLine());
+
+	}
+	@Override
+	public void enterAssignmentexpression(CPP14Parser.AssignmentexpressionContext ctx) {
+		if(ctx.conditionalexpression() != null){
+			System.out.println("conditionalexpression: "+ctx.getText() + " " + ctx.start.getLine());
+		} else if(ctx.logicalorexpression() != null && isPtrVariable(ctx.initializerclause())){
+			System.out.println("\n\nlogicalorexpression: "+ctx.logicalorexpression().getText() + " " + ctx.start.getLine());
+			System.out.println("\n\nlogicalorexpression: "+ctx.getText() + " " + ctx.start.getLine());
+		} else if(ctx.throwexpression() != null){
+			System.out.println("throwexpression: "+ctx.getText() + " " + ctx.start.getLine());
+		}
+	}
+**/
 
 	/**
 	 * Listener for adding variable declaration into the scope.
@@ -128,10 +168,27 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 */
 	@Override
 	public void enterSimpledeclaration(CPP14Parser.SimpledeclarationContext ctx) {
+		System.out.println("SimpledeclarationContext: "+ctx.getText() + " " + ctx.start.getLine());
+
 		if(this.isVariable(ctx)) {
 			this.enterScope(new VariableListModel());
 		}
 	}
+/*
+	@Override
+	public void enterPostfixexpression(CPP14Parser.PostfixexpressionContext ctx) {
+		System.out.println("PostfixexpressionContext: "+ctx.getText() + " " + ctx.start.getLine());
+	}
+
+	public boolean isPtrVariable(CPP14Parser.InitializerclauseContext ctx){
+		if(ctx.assignmentexpression() != null) {
+			return true;
+		}
+
+		return false;
+	}
+*/
+
 
 	/**
 	 * Listener for exiting the current scope, and add data in model parent scope.

@@ -45,8 +45,15 @@ int main(int argc, char** argv)
 	int j;
 	bool ol;
 	bool lo;
-    helloworld hello = helloworld();
+
+	j = 3;
+	i *= 2;
+    helloworld hello = helloworld123();
+    helloworld* hello1 = new helloworld456();
+    helloworld* hello2;
+    hello2 = new helloworld789();
 	hello.print();
+	hello1->print();
 	lolasdasdasd();
     std::cout << "Hello World!";
     return 0;

@@ -60,10 +60,12 @@ function linkFunctionCalls(){
         // Loop through calls
         funcModel.getCalls().forEach( function(calleeFuncName, index) {
 
-            calleeIndex = indexToFunctionMap.get(funcName)
-            console.log("Callee: ", calleeIndex, funcName);
+            calleeIndex = indexToFunctionMap.get(calleeFuncName)
+            console.log("Callee: ", calleeIndex, calleeFuncName);
 
-            if(functionModels.has(funcName)){
+
+
+           /* if(functionModels.has(funcName)){
 
                 fdg.addLink(
                     indexStack[callerIndex],
@@ -72,7 +74,7 @@ function linkFunctionCalls(){
                 );
 
             }
-
+            */
         });
 
     });
