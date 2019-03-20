@@ -61,7 +61,7 @@ public class ClassModel extends Model {
 
 		JSONArray parsedAccessSpecifiers = this.convertClassListJsonObjectList(this.accessSpecifiers);
 		if (parsedAccessSpecifiers != null) {
-			parsedCode.put("accessSpecifiers", parsedAccessSpecifiers);
+			parsedCode.put("access_specifiers", parsedAccessSpecifiers);
 		}
 		return parsedCode;
 	}
