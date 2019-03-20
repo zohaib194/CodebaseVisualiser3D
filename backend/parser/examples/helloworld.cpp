@@ -2,17 +2,38 @@
 #include <vector>
 #include <unordered_map>
 
+int singleLineGlobalVar;
 int globalVariable, globalVariable1 = 0;
 
+int a = 1, *p = NULL, f(), (*pf)(double);
+
+void (*signal(int, void (*fp)(int)))(int);
 using namespace std;
 class helloworld
 {
 	class hei
 	{
+		int sfdgnfggggdn;
 	public:
 		hei();
-		~hei();
-
+		~hei() {};
+	private: 
+		int EEEEEEEEEEEEELLLLLLLLLLLLLLOOOOOOOOOOOO;
+		int* getMeSomethingNice(int trell, float troll);
+	public:
+		int j, k, l, m = 0, o;
+		int aoo();
+		int boo();
+		int coo();
+		int doo();
+	protected: 
+		int a;
+		int eoo();
+		int foo();
+		int goo();
+		int hoo();
+	private:
+		int ioo();
 	};
 public:
 	helloworld();
@@ -20,9 +41,11 @@ public:
 	void print3(int *i){
 
 	}
+
 	~helloworld(){
 	}
-
+private: 
+	int i;
 };
 
 void InputHandler::setCurrentWindow(GLFWwindow* window) {
@@ -41,17 +64,17 @@ void lol(){
 
 int main(int argc, char** argv)
 {
-	int i;
-	int j;
+	int i2;
+	int j2;
 	bool ol;
 	bool lo;
 
 	j = 3;
 	i *= 2;
-    helloworld hello = helloworld123();
-    helloworld* hello1 = new helloworld456();
+    helloworld hello = helloworld();
+    helloworld* hello1 = new helloworld();
     helloworld* hello2;
-    hello2 = new helloworld789();
+    hello2 = new helloworld();
 	hello.print();
 	hello1->print();
 	lolasdasdasd();
@@ -60,7 +83,6 @@ int main(int argc, char** argv)
 }
 
 // Function pointers are not parsed in current implementation.
-//void (*signal(int, void (*fp)(int)))(int);
 
 auto hell(helloworld* hey) -> bool {
     return true;
@@ -127,3 +149,8 @@ void hello::foo(int i){
 void helloworld::print() {
 
 }
+
+union UnionTest {
+	int aShit;
+	int bShit;
+};
