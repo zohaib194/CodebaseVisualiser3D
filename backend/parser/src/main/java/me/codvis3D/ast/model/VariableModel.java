@@ -12,8 +12,12 @@ public class VariableModel extends Model{
 	private String name;
 	private String type;
 
+	/**
+	 * Constructs the object.
+	 */
 	VariableModel(){
-		
+		this.name = "";
+		this.type = "";
 	}
 
 	/**
@@ -64,14 +68,57 @@ public class VariableModel extends Model{
 	}
 
 	/**
+	 * Determines if it has type.
+	 *
+	 * @return     True if has type, False otherwise.
+	 */
+	public boolean hasType(){
+		return ((this.type == "") ? false : true);
+	}
+
+	/**
+	 * Determines if it has name.
+	 *
+	 * @return     True if has name, False otherwise.
+	 */
+	public boolean hasName(){
+		return ((this.name == "") ? false : true);
+	}
+
+	/**
+	 * Concatenate type with modifiers.
+	 *
+	 * @param      modifier  The modifier
+	 */
+	public void applyModifierOnType(String modifier){
+		this.type += modifier + " ";
+	}
+
+	/**
+	 * Concatenate type with primitive type.
+	 *
+	 * @param      type  The type
+	 */
+	public void applyUnnanTypeOnType(String type){
+		this.type += type;
+	}
+
+	/**
+	 * Remove whitespace from both start and end.
+	 */
+	public void trimType(){
+		this.type = this.type.trim();
+	}
+
+	/**
 	 * Adds the data in model.
 	 *
 	 * @param      data  The data
 	 */
 	@Override
 	protected <T> void addDataInModel(T data){
-		System.out.println("Error variable is currently not a scope as scopeStack indicated");
-		System.exit(1);	
+		System.out.println("Error variable is currently not a scope as scopeStack indicated" + data.getClass());
+		System.exit(1);
 	}
 
 	/**
@@ -80,7 +127,7 @@ public class VariableModel extends Model{
 	 * @return     The parsed code.
 	 */
 	@Override
-	public JSONObject getParsedCode(){	
+	public JSONObject getParsedCode(){
 		JSONObject parsedCode = new JSONObject();
 
 		parsedCode.put("name", this.name);

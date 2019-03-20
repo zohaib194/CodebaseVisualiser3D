@@ -2,8 +2,11 @@
 #include <vector>
 #include <unordered_map>
 
-int globalVariable = 0;
+int globalVariable, globalVariable1 = 0;
 
+int a = 1, *p = NULL, f(), (*pf)(double);
+
+void (*signal(int, void (*fp)(int)))(int);
 using namespace std;
 class helloworld
 {
@@ -12,7 +15,7 @@ class helloworld
 		int sfdgnfggggdn;
 	public:
 		hei();
-		~hei();
+		~hei() {};
 	private: 
 		int EEEEEEEEEEEEELLLLLLLLLLLLLLOOOOOOOOOOOO;
 		int* getMeSomethingNice(int trell, float troll);
@@ -34,11 +37,19 @@ class helloworld
 public:
 	helloworld();
 	void print();
+	void print3(int *i){
+
+	}
+
 	~helloworld(){
 	}
 private: 
-	int i; 
+	int i;
 };
+
+void InputHandler::setCurrentWindow(GLFWwindow* window) {
+
+}
 
 helloworld::helloworld(){
 
@@ -47,13 +58,13 @@ helloworld::helloworld(){
 void lolasdasdasd(){
 }
 void lol(){
-    
+
 }
 
 int main(int argc, char** argv)
 {
-	int i;
-	int j;
+	int i2;
+	int j2;
 	bool ol;
 	bool lo;
     helloworld hello = helloworld();
@@ -63,9 +74,9 @@ int main(int argc, char** argv)
     return 0;
 }
 
-//void (*signal(int, void (*fp)(int)))(int);
+// Function pointers are not parsed in current implementation.
 
-auto hell() -> bool {
+auto hell(helloworld* hey) -> bool {
     return true;
 }
 
@@ -79,13 +90,14 @@ int lolasdasdasd(int i, int j, bool istrue, float normalFloat){
 	int z,w,l = 0;
 
 	std::vector<int> vInt;
-	std::vector<std::string> vString;
 	std::vector<bool> vBool;
 
-	std::unordered_map<std::string, std::string> map; 
-	
+	// These are considered function calls.
+	std::vector<std::string> vString;
+	std::unordered_map<std::string, std::string> map;
+
 	// No viable input for line 70 ERROR in .G4 file from antlr.
-	//std::unordered_map<int, std::vector<int>> map1; 
+	//std::unordered_map<int, std::vector<int>> map1;
 
 	hw->print();
 	if(true){
@@ -98,11 +110,13 @@ int lolasdasdasd(int i, int j, bool istrue, float normalFloat){
 
 namespace hello{
 	#include <iostream>
+	int globalVarFromNameSpace;
+	int globalInlineVarFromNameSpace, globalInlineVarFromNameSpace1 = 0;
 
 	void foo();
 	void foo(int i);
     void foo1(int i){
-        
+
     }
 	void boo(){
 		foo();

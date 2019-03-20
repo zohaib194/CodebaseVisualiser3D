@@ -85,6 +85,15 @@ public class FileModel extends Model {
 	}
 
 	/**
+	 * Sets the variables.
+	 *
+	 * @param      variables  The variables
+	 */
+	public void setVariables(List<VariableModel> variables){
+		this.variables = variables;
+	}
+
+	/**
 	 * Sets the functions.
 	 *
 	 * @param functions The functions

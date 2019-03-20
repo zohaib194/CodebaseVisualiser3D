@@ -16,6 +16,7 @@ public class NamespaceModel extends Model {
 	private List<NamespaceModel> namespaces;
 	private List<UsingNamespaceModel> usingNamespaces;
 	private List<String> calls;
+	private List<VariableModel> variables;
 
 	/**
 	 * Constructs the namespace, setting the name.
@@ -28,6 +29,7 @@ public class NamespaceModel extends Model {
 		this.namespaces = new ArrayList<>();
 		this.usingNamespaces = new ArrayList<>();
 		this.calls = new ArrayList<>();
+		this.variables = new ArrayList<>();
 	}
 
 	/**
@@ -103,6 +105,33 @@ public class NamespaceModel extends Model {
 	}
 
 	/**
+	 * Adds a variable.
+	 *
+	 * @param      variable  The variable
+	 */
+	public void addVariable(VariableModel variable){
+		this.variables.add(variable);
+	}
+
+	/**
+	 * Gets the variables.
+	 *
+	 * @return     The variables.
+	 */
+	public List<VariableModel> getVariables(){
+		return this.variables;
+	}
+
+	/**
+	 * Sets the variables.
+	 *
+	 * @param      variables  The variables
+	 */
+	public void setVariables(List<VariableModel> variables){
+		this.variables = variables;
+	}
+
+	/**
 	 * Adds the data in model.
 	 *
 	 * @param data The data
@@ -113,7 +142,7 @@ public class NamespaceModel extends Model {
 		if (data instanceof FunctionModel) {
 			this.addFunction((FunctionModel) data);
 
-		} else if (data instanceof NamespaceModel) {
+		} else if (data instanceof  NamespaceModel) {
 			this.addNamespace((NamespaceModel) data);
 
 		} else if (data instanceof UsingNamespaceModel) {
@@ -121,6 +150,9 @@ public class NamespaceModel extends Model {
 
 		} else if (data instanceof String) {
 			this.addCall((String) data);
+
+		} else if (data instanceof VariableModel){
+			this.addVariable((VariableModel) data);
 
 		} else {
 			System.out.println("Error adding data in namespace model");
@@ -152,6 +184,11 @@ public class NamespaceModel extends Model {
 		JSONArray parsedUsingNamespaces = this.convertClassListJsonObjectList(this.usingNamespaces);
 		if (parsedUsingNamespaces != null) {
 			parsedCode.put("using_namespaces", parsedUsingNamespaces);
+		}
+
+		JSONArray parsedVariables = this.convertClassListJsonObjectList(this.variables);
+		if (parsedVariables != null) {
+			parsedCode.put("variables", parsedVariables);
 		}
 
 		parsedCode.put("calls", this.calls);
