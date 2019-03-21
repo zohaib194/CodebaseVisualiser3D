@@ -112,11 +112,13 @@ function runFDGOnJSONData(data) {
     handleProjectData(data);
 
     // Apply negative links on those who aren't related
-    for (i = 0; i < fdg.getNodes().length; i++) {
-        for (j = 0; j < fdg.getNodes().length; j++) {
+    var nodesforLinking = fdg.getNodes();
+    fdg.addLink(0,1, new LinkProperties(-1));
+    /*for (i = 0; i < nodesforLinking.length; i++) {
+        for (j = 0; j < nodesforLinking.length; j++) {
             fdg.addLink(i, j, new LinkProperties(-1));
         }
-    }
+    }*/
 
     // Run for 100 iterations shifting the position of nodes.
     document.getElementById("status").innerHTML =
@@ -127,7 +129,6 @@ function runFDGOnJSONData(data) {
     document.getElementById("status").innerHTML =
         LOCALE.getSentence("userinfo_structure_visualization_assigment");
     fdg.getNodes().forEach((node) => {
-        console.log("name: "+ node.getName() +"size: " + node.getSize());
         /**
          * Function for selecting proper type from configuration.
          * @param {string} type - The type of node.

@@ -18,7 +18,7 @@ var FDG = (function FDG(
         var gravityForce = gravityForce;
         var gravityCenter = gravityCenter;
 
-        tree = {root: new Node(
+        var tree = {root: new Node(
             THREE.Vector3(0,0,0),
             "root",
             null,
@@ -38,7 +38,7 @@ var FDG = (function FDG(
          * Getter for nodes array.
          */
         var getNodes = function() {
-            return tree.root.getSucessors();
+            return tree.root.getSuccessors(0);
         }
 
         /**
@@ -59,10 +59,10 @@ var FDG = (function FDG(
 
         /**
          * Function for setting the tree for creating the fdg graph.
-         * @param {Node} tree - Root node of the fdg problem.
+         * @param {Node} newRoot - Root node of the fdg problem.
          */
-        var setTree = function(tree) {
-           tree.root = tree;
+        var setTree = function(newRoot) {
+           tree.root = newRoot;
         }
 
         /**
@@ -72,8 +72,10 @@ var FDG = (function FDG(
          * @param {LinkProperties} link - LinkProperties object.
          */
         var addLink = function(indexFrom, indexTo, linkProp) {
-            nodeFrom = tree.root.getNode(indexFrom);
-            nodeTo = tree.root.getNode(indexTo);
+            nodeFrom = tree.root.getNode(indexFrom, 0);
+            nodeTo = tree.root.getNode(indexTo, 0);
+            //console.log("From: " + nodeFrom);
+            //console.log("To: " + nodeTo);
             // Nodes doesn't exists, nodes are the same,
             // or both nodes has a link to eachother, abort linking!
             if (
@@ -97,14 +99,25 @@ var FDG = (function FDG(
          * @param {int} iterations - How many iterations the graph should run.
          */
         var execute = function(iterations) {
-            executeSubTree(iterations, tree.root)
+            executeSubTree(iterations, tree.root, 0);
         }
 
-        var executeSubTree = function(iterations, tree){
-            nodes = subtree.getChildren();
+        /**
+         * Recursivly runs FDG algorithm on all its sub graphs
+         *
+         * @param {number}  iterations    - The iterations
+         * @param {object}  subtree       - The tree
+         * @param {number}  subtreeOffset - Global index offset from local
+         */
+        var executeSubTree = function(iterations, subtree, subtreeOffset){
+            var children = subtree.getChildren();
+            var nodes = new Map();
             // recursivly run force directed graph
-            nodes.forEach( function(node, index) {
-                executeSubTree(iterations, node);
+            var indexOffset = subtreeOffset;
+            children.forEach( function(child, index) {
+                executeSubTree(iterations, child, indexOffset);
+                indexOffset += child.getIndex();
+                nodes.set(indexOffset, child);
             });
 
             // Run though every node per every iteration.
@@ -117,6 +130,7 @@ var FDG = (function FDG(
                             nodes[x].getTotalForce(
                                 // Send a deep copy of array!
                                 [...nodes],
+                                subtreeOffset,
                                 minDistance,
                                 maxDistance,
                                 gravityForce,
@@ -134,7 +148,7 @@ var FDG = (function FDG(
             getNodes: getNodes,
             getMaxSize: getMaxSize,
             setMaxSize: setMaxSize,
-            addNode: addNode,
+            setTree: setTree,
             addLink: addLink,
             execute: execute
         }

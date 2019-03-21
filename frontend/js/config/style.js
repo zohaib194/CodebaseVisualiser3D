@@ -61,7 +61,7 @@ var STYLE = (function() {
                         color: 0x67d8ef
                     },
                     namespace: {
-                        shape: "cone",
+                        shape: "dodecahedron",
                         color: 0xac80ff
                     },
                     link: {

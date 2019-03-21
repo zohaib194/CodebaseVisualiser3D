@@ -5,6 +5,7 @@ $status_loader_secondary_color: #b0b0b0;
 body {
     margin: 0%;
     overflow: hidden;
+    color: white;
 }
 
 #output {
@@ -27,10 +28,9 @@ body {
 }
 
 %status_textstyling {
-    color: black;
     text-align: center;
     touch-action: none;
-} 
+}
 
 #status, #status_parsedcount, #status_skippedcount {
     @extend %status_textstyling;

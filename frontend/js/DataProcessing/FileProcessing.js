@@ -53,7 +53,7 @@ function handleClassData(classData, filename) {
     var size = 5;
 
     children.forEach( function(child, index) {
-        size += child.getSize();
+        size += child.getSize() * 5;
     });
 
     // Add node and save index.
@@ -63,7 +63,6 @@ function handleClassData(classData, filename) {
         size,
         "class"
     );
-
 
     classCount++;
 
@@ -86,7 +85,7 @@ function handleNamespaceData(namespaceData, filename) {
     var size = 5;
 
     children.forEach( function(child, index) {
-        size += child.getSize();
+        size += child.getSize() * 5;
     });
 
     nodeSelf = new Node(
@@ -119,7 +118,7 @@ function handleFunctionData(functionData, filename) {
     nodeSelf = new Node(
         position,
         functionData.function.name,
-        innerGeometry.size,
+        size,
         "function"
     );
 
@@ -182,6 +181,14 @@ function handleProjectData(projectData) {
     functionCount = 0;
     namespaceCount = 0;
     lineCount = 0;
+
+    var root = new Node(
+        new THREE.Vector3(0,0,0),
+        "root",
+        null,
+        "root"
+    );
+
     // Handle every file given.
     projectData.files.forEach((file) => {
 
@@ -193,17 +200,16 @@ function handleProjectData(projectData) {
 
         // File is parsed correctly, process it.
         lineCount += file.file.linesInFile;
-        fdg.setTree(
-            handleCodeData(file.file, file.file.file_name,
-                new Node(
-                    THREE.Vector3(0,0,0),
-                    "root",
-                    null,
-                    "root"
-                )
-            )
-        );
+        var children = handleCodeData(file.file, file.file.file_name);
+
+        children.forEach( function(child, index) {
+            root.addChild(child);
+            child.setParent(root);
+        });
+
     });
+
+    fdg.setTree(root);
 
     windowMgr.setFunctionCount(functionCount);
     windowMgr.setClassCount(classCount);

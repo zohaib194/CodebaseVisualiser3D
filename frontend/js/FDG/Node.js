@@ -30,6 +30,7 @@ var Node = (function(pos, name, size, type) {
      */
     var getTotalForce = function(
         nodes,
+        leftIndex,
         minDistance,
         maxDistance,
         gravityForce = 0,
@@ -48,34 +49,48 @@ var Node = (function(pos, name, size, type) {
         var indexRange = {min: null, max: null};
 
         // Run though every link
-        links.forEach((link, nodeIndex) => {
-            // Get the attractive force vector.
-            diff.subVectors(
-                nodes[nodeIndex].getPosition(),
-                position
-            );
+        links.forEach(function(link, nodeIndex) {
+            //Check if connected node is in same scope
+            var node = nodes.get[nodeIndex];
+            if (typeof node !== "unidentified") {
 
-            // Take length before normalization.
-            dist = diff.length();
-            diff.normalize();
+                // Get the attractive force vector.
+                diff.subVectors(
+                    node.getPosition(),
+                    position
+                );
 
-            // Choose physical rule based on attractive force.
-            // Positive = attractive, negative = repulsive.
-            if (link.attraction >= 0) {
-                // Attractive forces are based on logarithmic spring strenghts.
-                forceScalar = (link.attraction * Math.log10(dist / minDistance));
-            } else {    // Repulsive force.
-                // Repulsive forces are based on Hookes law (inverse square law).
-                forceScalar = (link.attraction * (maxDistance / Math.pow(dist, 2)));
+                // Take length before normalization.
+                dist = diff.length();
+                diff.normalize();
+
+                // Choose physical rule based on attractive force.
+                // Positive = attractive, negative = repulsive.
+                if (link.attraction >= 0) {
+                    // Attractive forces are based on logarithmic spring strenghts.
+                    forceScalar = (
+                        link.attraction * Math.log10(
+                            dist / (minDistance + size + 5000 + node.getSize())
+                        )
+                    );
+                } else {    // Repulsive force.
+                    // Repulsive forces are based on Hookes law (inverse square law).
+                    forceScalar = (link.attraction *
+                        (
+                            (maxDistance + size + 5000 + node.getSize()) /
+                            Math.pow(dist, 2)
+                        )
+                    );
+                }
+
+                // Sum attractive and repulsive forces to total force
+                force.add(diff.multiplyScalar(forceScalar));
             }
-
-            // Sum attractive and repulsive forces to total force
-            force.add(diff.multiplyScalar(forceScalar));
         });
 
         // Add gravitational force to center graph
         // on gravitational center.
-        var gravity = new THREE.Vector3().subVectors(
+        var gravity = new THREE.Vector3(0,0,0).subVectors(
             gravityCenter,
             position
         );
@@ -84,12 +99,26 @@ var Node = (function(pos, name, size, type) {
         return force.add(gravity.normalize().multiplyScalar(gravityForce));
     }
 
+    var isNode = function(){
+        return true;
+    }
+
     /**
-     * Getter for position.
+     * Gets the global position given by its parents position and itself.
+     *
+     * @return     {Three.Vector3}  The position.
      */
     var getPosition = function() {
-        return position;
+        if (parent != null && parent.isNode()) {
+            var pos = new THREE.Vector3(0, 0, 0);
+            pos.addVectors(parent.getPosition(), position);
+            return pos;
+        }
+        else{
+            return position;
+        }
     };
+
 
     /**
      * Getter for name.
@@ -104,6 +133,16 @@ var Node = (function(pos, name, size, type) {
      * @return {number} The index.
      */
     var getIndex = function() {
+
+        // If node has not gotten an index yet; get one.
+        if (typeof index === "undefined") {
+            index = 1;
+
+            children.forEach( function(child, index) {
+                index += child.getIndex();
+            });
+        }
+
         return index;
     }
 
@@ -149,12 +188,12 @@ var Node = (function(pos, name, size, type) {
     /**
      * Gets the all sucessors.
      */
-    var getSucessors = function(){
+    var getSuccessors = function(level){
         var successors = new Array();
         children.forEach( function(child, index) {
-            successors.push(child.getSucessors());
+            successors = successors.concat(child.getSuccessors(level+1));
+            successors.push(child);
         });
-        successors.push(children);
         return successors;
     }
 
@@ -195,14 +234,42 @@ var Node = (function(pos, name, size, type) {
     }
 
     /**
+     * Gets the node based on index.
+     *
+     * @param  {number} requestedIndex - The requested node index
+     * @return {object} The node.
+     */
+    var getNode = function(requestedIndex, level){
+        //console.log("\t".repeat(level) + index + " ("+requestedIndex+")");
+        var localOffset = 0;                                // Used to calculate relative index.
+        var requestedNode = null;
+        if (index-1 == requestedIndex) {                    // Check if self in requested node.
+            //console.log("found");
+            return this
+        }
+
+        children.forEach( function(child, i) {              // Check if children is requested node.
+            localIndex = child.getIndex();
+            if ((localIndex-1)+localOffset > requestedIndex){// Check if requested is within childs range.
+                localOffset += localIndex;
+            }else {
+                // Child cointain range with requested node.
+                requestedNode = child.getNode(requestedIndex - localOffset);
+                return;
+            }
+        });
+        return requestedNode;                               // indicate that node was not found
+    }
+
+    /**
      * Adds a child node.
      *
      * @param {Node} child - The child node to add
      */
     var addChild = function(child){
-        child.setIndex(children[children.length() - 1].getIndex() + 1);
-        if (typeof newNode === "object" && newNode.isNode()) {
-            children.push(newNode);
+        if (typeof child === "object" && child.isNode()) {
+            child.setIndex();
+            children.push(child);
         }else{
             console.log("Could not add to FDGTree: not a Node");
         }
@@ -213,8 +280,21 @@ var Node = (function(pos, name, size, type) {
      *
      * @param {number} newIndex - The new index.
      */
-    var setIndex = function(newIndex){
-        index = newIndex;
+    var setIndex = function(){
+        index = subTreeSize() +1;
+    }
+
+    /**
+     * Calculates size of nodes subtree by looking at the
+     * childrens local index in the subtree
+     * @return {number} size of subtree.
+     */
+    var subTreeSize = function(){
+        var size = 0;
+        children.forEach( function(child, index) {
+            size += child.getIndex();
+        });
+        return size;
     }
 
     /**
@@ -223,7 +303,6 @@ var Node = (function(pos, name, size, type) {
     var setPosition = function(pos) {
         position.set(pos.x, pos.y, pos.z);
     };
-
 
     /**
      * Setter for name.
@@ -246,25 +325,30 @@ var Node = (function(pos, name, size, type) {
         links.set(key, value);
     };
 
-
     var setParent = function(newParent){
         parent = newParent
     }
 
     // Expose private functions for global use.
     return {
+        isNode: isNode,
         getTotalForce: getTotalForce,
         getPosition: getPosition,
         getSize: getSize,
         getName: getName,
+        getIndex: getIndex,
+        getNode: getNode,
         getType: getType,
         getLinks: getLinks,
         getParent: getParent,
         getChildren: getChildren,
         getSiblings: getSiblings,
+        getSuccessors: getSuccessors,
         getNodeIndex: getNodeIndex,
         addChild: addChild,
+        setIndex: setIndex,
         setPosition: setPosition,
+        setParent: setParent,
         setName: setName,
         setType: setType,
         setLink: setLink
