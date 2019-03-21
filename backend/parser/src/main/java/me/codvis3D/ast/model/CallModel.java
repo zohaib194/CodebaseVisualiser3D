@@ -88,6 +88,9 @@ public class CallModel extends Model{
 	public JSONObject getParsedCode(){
 		JSONObject parsedCode = new JSONObject();
 
+		parsedCode.put("identifier", this.identifier);
+
+		parsedCode.put("Scope", this.scopeIdentifier);
 		return parsedCode;
 	}
 

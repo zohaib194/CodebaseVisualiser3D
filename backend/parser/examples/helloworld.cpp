@@ -17,7 +17,7 @@ class helloworld
 	public:
 		hei();
 		~hei() {};
-	private: 
+	private:
 		int EEEEEEEEEEEEELLLLLLLLLLLLLLOOOOOOOOOOOO;
 		int* getMeSomethingNice(int trell, float troll);
 	public:
@@ -26,7 +26,7 @@ class helloworld
 		int boo();
 		int coo();
 		int doo();
-	protected: 
+	protected:
 		int a;
 		int eoo();
 		int foo();
@@ -44,7 +44,7 @@ public:
 
 	~helloworld(){
 	}
-private: 
+private:
 	int i;
 };
 
@@ -75,10 +75,15 @@ int main(int argc, char** argv)
     helloworld* hello1 = new helloworld();
     helloworld* hello2;
     hello2 = new helloworld();
+
 	hello.print();
+	hello.hei.aoo();
 	hello1->print();
 	lolasdasdasd();
+	outerOuterNamespace::outerNamespace::hello::objectInNamespace.print();
+
     std::cout << "Hello World!";
+
     return 0;
 }
 
@@ -120,6 +125,7 @@ namespace hello{
 	#include <iostream>
 	int globalVarFromNameSpace;
 	int globalInlineVarFromNameSpace, globalInlineVarFromNameSpace1 = 0;
+	helloworld objectInNamespace;
 
 	void foo();
 	void foo(int i);

@@ -290,52 +290,106 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 */
 	@Override
 	public void enterExpressionstatement(CPP14Parser.ExpressionstatementContext ctx) {
+		System.out.println("Entered ExpressionstatementContext");
 		this.enterScope(new CallModel());
 		//this.scopeStack.peek().addDataInModel(ctx.getText());
+
 	}
 
 	@Override
 	public void exitExpressionstatement(CPP14Parser.ExpressionstatementContext ctx) {
-		CallModel calls = (CallModel) this.exitScope();
+		System.out.println("\n\n" + "ExpressionstatementContext: "+ctx.getText() + " " + ctx.start.getLine());
+		System.out.println("Exited ExpressionstatementContext");
+		CallModel call = (CallModel) this.exitScope();
 
-		Model model = this.exitScope();
-		//if(model instanceof )
+		String context = ctx.getText();
+		int countParantheses = 0;
+		int startParantheses = 0;
+		int endParanthese = 0;
+
+		for(int i = context.length() - 1; i >= 0; i--) {
+			char character = context.charAt(i);
+
+			if(character == ")"){
+				countParantheses++;
+				if(endParantheses = 0) {
+					endParantheses = i;
+				}
+
+			} else if(character == "("){
+				countParantheses--;
+				if(countParantheses == 0){
+					startParantheses = i;
+
+					break;
+				}
+			}
+		}
+
+		Stirng parameterList = context.subSequence(startParantheses, endParantheses);
+
+		context = context.replace(parameterList, "");
+
+		String[] splitContext = scopeContext.split("::|->|\.")
+
+		if(this.scopeStack.peek() instanceof FunctionBodyModel){
+			this.scopeStack.peek().addDataInModel(call);
+		}
 	}
-
 
 
 
 	@Override
 	public void enterPostfixexpression(CPP14Parser.PostfixexpressionContext ctx) {
-		//if(this.scopeStack.peek() instanceof CallModel){
-		//	CallModel callModel = (CallModel) this.scopeStack.pop();
+		if(this.scopeStack.peek() instanceof CallModel){
+			CallModel callModel = (CallModel) this.scopeStack.pop();
 
 			if(ctx.postfixexpression() != null && ctx.idexpression() != null){
+				callModel.setIdentifier(ctx.idexpression().getText());
+
+				//callModel.addScopeIdentifier(ctx.postfixexpression().getText());
 
 				System.out.println("\n\n" + "PostfixexpressionContext/idexpression: "+ctx.getText() + " " + ctx.start.getLine());
+
 			} else if(ctx.simpletypespecifier() != null) {
 				System.out.println("\n\n" + "PostfixexpressionContext/simpletypespecifier: "+ctx.getText() + " " + ctx.start.getLine());
 				//callModel.setIdentifier(ctx.getText());
 
 			} else if(ctx.postfixexpression() != null) {
-				System.out.println("\n\n" + "PostfixexpressionContext with (: "+ctx.getText() + " " + ctx.start.getLine());
-				//callModel.setIdentifier(ctx.getText());
+				System.out.println("\n\n" + "PostfixexpressionContext/postfixexpression: "+ctx.getText() + " " + ctx.start.getLine());
+				callModel.setIdentifier(ctx.getText());
+
+			} else if(ctx.typenamespecifier() != null){
+				System.out.println("\n\n" + "PostfixexpressionContext/typenamespecifier: "+ctx.getText() + " " + ctx.start.getLine());
 
 			}
-		//	this.enterScope(callModel);
 
-		//}
+			if(ctx.primaryexpression() != null){
+				System.out.println("\n\n" + "PostfixexpressionContext/primaryexpression: "+ctx.getText() + " " + ctx.start.getLine());
+
+			}
+			this.enterScope(callModel);
+
+		}
 	}
 
+/*
 	@Override
 	public void enterSimpletypespecifier(CPP14Parser.SimpletypespecifierContext ctx) {
 		if(this.scopeStack.peek() instanceof CallModel){
 			CallModel callModel = (CallModel) this.scopeStack.pop();
-			if(ctx.nestednamespecifier() != null || ctx.thetypename() != null){
+			if(ctx.nestednamespecifier() != null){
 				//System.out.println("\n\n" + "SimpletypespecifierContext/nestednamespecifier: "+ctx.getText() + " " + ctx.start.getLine());
 
 				callModel.addScopeIdentifier(ctx.nestednamespecifier().getText());
-				callModel.addScopeIdentifier(ctx.thetypename().getText());
+				callModel.setIdentifier(ctx.thetypename().getText());
+			} else if(ctx.thetypename() != null) {
+				callModel.setIdentifier(ctx.thetypename().getText());
+
+				if(ctx.nestednamespecifier() != null){
+					callModel.addScopeIdentifier(ctx.nestednamespecifier().getText());
+				}
+
 			} else {
 				//System.out.println("\n\n" + "SimpletypespecifierContext: "+ctx.getText() + " " + ctx.start.getLine());
 				callModel.addScopeIdentifier(ctx.getText());
@@ -343,7 +397,7 @@ public class CppLstnr_Initial extends CppExtendedListener {
 			this.enterScope(callModel);
 		}
 	}
-
+*/
 /**
 
 	@Override
@@ -535,6 +589,7 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 */
 	@Override
 	public void enterQualifiedid(CPP14Parser.QualifiedidContext ctx) {
+		System.out.println("\n\n" + "QualifiedidContext: "+ctx.nestednamespecifier().getText() + " " + ctx.start.getLine());
 		if (ctx.nestednamespecifier() != null) {
 			Model model = this.exitScope();
 			if (model instanceof FunctionModel) {
@@ -609,6 +664,7 @@ public class CppLstnr_Initial extends CppExtendedListener {
 
 	@Override
 	public void enterDeclspecifier(CPP14Parser.DeclspecifierContext ctx) {
+		System.out.println("\n\n" + "DeclspecifierContext: "+ctx.getText() + " " + ctx.start.getLine());
 		if (this.scopeStack.peek() instanceof VariableModel) {
 			VariableModel vm = (VariableModel) this.exitScope();
 			vm.applyModifierOnType(ctx.getText());

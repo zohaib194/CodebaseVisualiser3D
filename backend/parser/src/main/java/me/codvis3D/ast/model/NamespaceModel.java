@@ -155,7 +155,7 @@ public class NamespaceModel extends Model {
 			this.addVariable((VariableModel) data);
 
 		} else {
-			System.out.println("Error adding data in namespace model");
+			System.out.println("Error adding data in namespace model: " + data.getClass().getName());
 			System.exit(1);
 		}
 	}
