@@ -15,21 +15,43 @@ buildscript {
     }
 }
 
-
 apply plugin: 'java'
 apply plugin: 'me.champeau.gradle.antlr4'
+apply plugin: 'jacoco'
 
-test {
-    useJUnitPlatform()
+jacoco {
+    //reportsDir = file("$buildDir/jacoco/reports")
+    //destinationFile = file("$buildDir/jacoco/jacocoTest.exec")
+    //classDumpDir = file("$buildDir/jacoco/classpathdumps")
+    toolVersion = "0.8.2"
 }
 
+jacocoTestReport {
+    reports {
+        xml.enabled false
+        csv.enabled false
+        html {
+            enabled true
+            destination file("$buildDir/jacoco/reports")
+        }
+    }
+}
+
+test.finalizedBy jacocoTestReport
+test {
+    useJUnitPlatform()
+    jacoco {
+        append = false
+        destinationFile = file("$buildDir/jacoco/jacocoTest.exec")
+        //classDumpFile = file("$buildDir/jacoco/classpathdumps")
+    }
+}
 
 repositories {
     mavenLocal()
     jcenter()
     mavenCentral()
 }
-
 
 dependencies {
     // https://mvnrepository.com/artifact/org.json/json
