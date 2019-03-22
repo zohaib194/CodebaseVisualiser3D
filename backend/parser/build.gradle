@@ -84,3 +84,16 @@ task fatJar(type: Jar) {
     with jar
     exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA'
 }
+
+task release(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'Java-Parser',
+                   'Implementation-Version': '0.0.1'
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+    exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA'
+}
+release.finalizedBy test
+
