@@ -88,10 +88,10 @@ public class NamespaceModelTest {
 
 		jsonObj = model.getParsedCode();
 
-		assertEquals(1, jsonObj.getJSONArray("functions").toList().size(), "Incorrect nr of functions");
-		assertEquals(1, jsonObj.getJSONArray("namespaces").toList().size(), "Incorrect nr of namespaces");
-		assertEquals(1, jsonObj.getJSONArray("using_namespaces").toList().size(), "Incorrect nr of using_namespaces");
-		assertEquals(1, jsonObj.getJSONArray("calls").toList().size(), "Incorrect nr of calls");
-		assertEquals(1, jsonObj.getJSONArray("variables").toList().size(), "Incorrect nr of variables");
+		assertEquals(1, jsonObj.getJSONArray("functions").length(), "Incorrect nr of functions");
+		assertEquals(1, jsonObj.getJSONArray("namespaces").length(), "Incorrect nr of namespaces");
+		assertEquals(1, jsonObj.getJSONArray("using_namespaces").length(), "Incorrect nr of using_namespaces");
+		assertEquals(1, jsonObj.getJSONArray("calls").length(), "Incorrect nr of calls");
+		assertEquals(1, jsonObj.getJSONArray("variables").length(), "Incorrect nr of variables");
 	}
 }
