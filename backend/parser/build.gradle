@@ -57,6 +57,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.json/json
     compile group: 'org.json', name: 'json', version: '20180813'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
+    testImplementation("com.ginsberg:junit5-system-exit:1.0.0")
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
 }
 
