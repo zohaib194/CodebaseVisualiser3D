@@ -61,8 +61,8 @@ func (db *MongoDB) Init() error {
 	return nil
 }
 
-//add adds rm to db if it is not already in it.
-func (db *MongoDB) add(rm *RepoModel) error {
+//Add adds rm to db if it is not already in it.
+func (db *MongoDB) Add(rm *RepoModel) error {
 	util.TypeLogger.Debug("%s: Call for add", packageName)
 	defer util.TypeLogger.Debug("%s: Ended Call for add", packageName)
 
@@ -160,4 +160,18 @@ func (db *MongoDB) FindAllURI() (repos []bson.M, err error) {
 	}
 
 	return repos, nil
+}
+
+// DropDB deletes the database
+func (db *MongoDB) DropDB() (err error) {
+	util.TypeLogger.Debug("%s: Call for DropDB", packageName)
+	defer util.TypeLogger.Debug("%s: Ended Call for DropDB", packageName)
+
+	session, err := mgo.Dial(db.DatabaseURL)
+	if err != nil {
+		util.TypeLogger.Fatal("%s: Failed to connect to database", packageName)
+	}
+	defer session.Close()
+
+	return session.DB(db.DatabaseName).DropDatabase()
 }
