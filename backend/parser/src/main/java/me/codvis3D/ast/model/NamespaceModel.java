@@ -45,7 +45,7 @@ public class NamespaceModel extends Model {
 	 *
 	 * @return The functions.
 	 */
-	public List<VariableModel> getFunctions() {
+	public List<FunctionModel> getFunctions() {
 		return this.functions;
 	}
 
@@ -54,7 +54,7 @@ public class NamespaceModel extends Model {
 	 *
 	 * @return The namespaces.
 	 */
-	public List<VariableModel> getNamespaces() {
+	public List<NamespaceModel> getNamespaces() {
 		return this.namespaces;
 	}
 
@@ -63,7 +63,7 @@ public class NamespaceModel extends Model {
 	 *
 	 * @return The usingNamespaces.
 	 */
-	public List<VariableModel> getUsingNamespaces() {
+	public List<UsingNamespaceModel> getUsingNamespaces() {
 		return this.usingNamespaces;
 	}
 
@@ -72,7 +72,7 @@ public class NamespaceModel extends Model {
 	 *
 	 * @return The calls.
 	 */
-	public List<VariableModel> getCalls() {
+	public List<String> getCalls() {
 		return this.calls;
 	}
 
