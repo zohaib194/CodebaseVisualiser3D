@@ -36,7 +36,7 @@ public class FunctionModel extends Model {
 		this.declaratorId = declarator;
 		this.scope = "";
 		this.parameters = new ArrayList<>();
-		this.functionBody = new FunctionBodyModel();
+		this.functionBody = null;
 	}
 
 	/**
