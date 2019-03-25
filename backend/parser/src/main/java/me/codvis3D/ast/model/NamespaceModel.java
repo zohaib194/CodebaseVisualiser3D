@@ -226,7 +226,9 @@ public class NamespaceModel extends Model {
 			parsedCode.put("variables", parsedVariables);
 		}
 
-		parsedCode.put("calls", this.calls);
+		if (this.calls.size() > 0) {
+			parsedCode.put("calls", this.calls);
+		}
 
 		return parsedCode;
 	}
