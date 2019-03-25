@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.Stack;
 import org.json.JSONObject;
 
+import me.codvis.ast.FunctionBodyModel;
+import me.codvis.ast.VariableModel;
+
 /**
  * Class for abstracting a code function.
  */
@@ -71,6 +74,24 @@ public class FunctionModel extends Model {
 	 */
 	public int getLineEnd() {
 		return this.lineEnd;
+	}
+
+	/**
+	 * Gets the parameters.
+	 *
+	 * @return The parameters.
+	 */
+	public List<VariableModel> getParameters() {
+		return this.parameters;
+	}
+
+	/**
+	 * Gets the function body.
+	 *
+	 * @return The function body.
+	 */
+	public FunctionBodyModel getFunctionBody() {
+		return this.functionBody;
 	}
 
 	/**
@@ -145,6 +166,8 @@ public class FunctionModel extends Model {
 	protected <T> void addDataInModel(T data) {
 		if (data instanceof FunctionBodyModel) {
 			this.setFunctionBody((FunctionBodyModel) data);
+		} else if (data instanceof VariableModel) {
+			this.addParameter((VariableModel) data);
 		} else {
 			System.out.println("Error adding data in function model " + data.getClass());
 			System.exit(1);
