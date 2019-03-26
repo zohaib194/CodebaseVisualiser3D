@@ -75,7 +75,9 @@ public class FunctionBodyModel extends Model {
 	public JSONObject getParsedCode() {
 		JSONObject parsedCode = new JSONObject();
 
-		parsedCode.put("calls", this.calls);
+		if (this.calls.size() > 0) {
+			parsedCode.put("calls", this.calls);
+		}
 
 		List<JSONObject> parsedVariables = this.convertClassListJsonObjectList(this.variables, "variable");
 		if (parsedVariables != null) {
