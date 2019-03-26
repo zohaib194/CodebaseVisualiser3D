@@ -169,6 +169,7 @@ func Test_CodeSnippetController_GetImplementation(t *testing.T) {
 	}
 }
 
+// newTestFile creates a testfile with name test.test and lorem ipsum generated text.
 func newTestFile() testFile {
 
 	file := testFile{
