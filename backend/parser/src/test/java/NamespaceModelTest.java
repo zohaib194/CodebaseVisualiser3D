@@ -50,20 +50,20 @@ public class NamespaceModelTest {
 	@Test
 	@ExpectSystemExitWithStatus(1)
 	public void testAddDataInModel() {
-		assertEquals(0, model.getFunctions().size(), "Pre-existing functions in empty model");
-		assertEquals(0, model.getNamespaces().size(), "Pre-existing namespace in empty model");
-		assertEquals(0, model.getUsingNamespaces().size(), "Pre-existing using namespace in empty model");
-		assertEquals(0, model.getCalls().size(), "Pre-existing call in empty model");
-		assertEquals(0, model.getVariables().size(), "Pre-existing variable in empty model");
+		assertEquals(0, model.getFunctions().size(), "Pre-existing functions field");
+		assertEquals(0, model.getNamespaces().size(), "Pre-existing namespace field");
+		assertEquals(0, model.getUsingNamespaces().size(), "Pre-existing using namespace field");
+		assertEquals(0, model.getCalls().size(), "Pre-existing call field");
+		assertEquals(0, model.getVariables().size(), "Pre-existing variable field");
 
 		// Fill with data.
 		fillNamespaceModel();
 
-		assertEquals(1, model.getFunctions().size(), "Pre-existing functions in empty model");
-		assertEquals(1, model.getNamespaces().size(), "Pre-existing namespace in empty model");
-		assertEquals(1, model.getUsingNamespaces().size(), "Pre-existing using namespace in empty model");
-		assertEquals(1, model.getCalls().size(), "Pre-existing call in empty model");
-		assertEquals(1, model.getVariables().size(), "Pre-existing variable in empty model");
+		assertEquals(1, model.getFunctions().size(), "Empty functions list");
+		assertEquals(1, model.getNamespaces().size(), "Empty namespace list");
+		assertEquals(1, model.getUsingNamespaces().size(), "Empty using namespace list");
+		assertEquals(1, model.getCalls().size(), "Empty call list");
+		assertEquals(1, model.getVariables().size(), "Empty variable list");
 
 		// Try adding objects with illegal types!
 		model.addDataInModel(this);

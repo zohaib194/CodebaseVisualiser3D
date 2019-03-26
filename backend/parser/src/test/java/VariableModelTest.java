@@ -20,13 +20,13 @@ public class VariableModelTest {
 	public void testHasFunctions() {
 		VariableModel model = new VariableModel();
 
-		assertFalse(model.hasType(), "Wrong type: " + model.hasType() + " from empty VariableModel");
-		assertFalse(model.hasName(), "Wrong name: " + model.hasName() + " from empty VariableModel");
+		assertFalse(model.hasType(), "Pre-existing type");
+		assertFalse(model.hasName(), "Pre-existing name");
 
 		model = new VariableModel(varName, varType);
 
-		assertTrue(model.hasType(), "Wrong type: " + model.hasType() + " from filled VariableModel");
-		assertTrue(model.hasName(), "Wrong name: " + model.hasName() + " from filled VariableModel");
+		assertTrue(model.hasType(), "Missing type");
+		assertTrue(model.hasName(), "Missing name");
 	}
 
 	@Test
@@ -35,15 +35,15 @@ public class VariableModelTest {
 
 		JSONObject jsonObj = model.getParsedCode();
 
-		assertNotEquals(varType, jsonObj.getString("type"), "Non empty type for empty VariableModel");
-		assertNotEquals(varType, jsonObj.getString("name"), "Non empty name for empty VariableModel");
+		assertNotEquals(varType, jsonObj.getString("type"), "Pre-existing type");
+		assertNotEquals(varType, jsonObj.getString("name"), "Pre-existing name");
 
 		model = new VariableModel(varName, varType);
 
 		jsonObj = model.getParsedCode();
 
-		assertEquals(varType, jsonObj.getString("type"), "Incorrect type for VariableModel");
-		assertEquals(varName, jsonObj.getString("name"), "Incorrect name for VariableModel");
+		assertEquals(varType, jsonObj.getString("type"), "Incorrect type");
+		assertEquals(varName, jsonObj.getString("name"), "Incorrect name");
 	}
 
 	@Test

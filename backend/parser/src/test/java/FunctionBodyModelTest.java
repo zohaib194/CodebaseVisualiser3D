@@ -40,14 +40,14 @@ public class FunctionBodyModelTest {
 	@Test
 	@ExpectSystemExitWithStatus(1)
 	public void testAddDataInModel() {
-		assertEquals(null, model.getFunctionBody(), "Pre-existing function body in empty model");
-		assertEquals(0, model.getParameters().size(), "Pre-existing parameters in empty model");
+		assertEquals(null, model.getFunctionBody(), "Pre-existing function body");
+		assertEquals(0, model.getParameters().size(), "Pre-existing parameters");
 
 		// Fill with data.
 		fillNamespaceModel();
 
-		assertNotEquals(null, model.getFunctionBody(), "Non-existing function body in empty model");
-		assertEquals(1, model.getParameters().size(), "Non-existing parameters in empty model");
+		assertNotEquals(null, model.getFunctionBody(), "Missing function body");
+		assertEquals(1, model.getParameters().size(), "Missing parameters");
 
 		// Try adding objects with illegal types!
 		model.addDataInModel(this);
@@ -57,8 +57,8 @@ public class FunctionBodyModelTest {
 	public void testGetParsedCode() {
 		JSONObject jsonObj = model.getParsedCode();
 
-		assertFalse(jsonObj.has("function_body"), "Pre-existing function_body field from empty model");
-		assertFalse(jsonObj.has("parameters"), "Pre-existing parameters field from empty model");
+		assertFalse(jsonObj.has("function_body"), "Pre-existing function_body field");
+		assertFalse(jsonObj.has("parameters"), "Pre-existing parameters field");
 
 		// Fill with data.
 		fillNamespaceModel();

@@ -40,16 +40,16 @@ public class FunctionModelTest {
 	@Test
 	@ExpectSystemExitWithStatus(1)
 	public void testAddDataInModel() {
-		assertEquals(null, model.getFunctionBody(), "Pre-existing function body in empty model");
-		assertEquals(0, model.getParameters().size(), "Pre-existing functions in empty model");
+		assertEquals(null, model.getFunctionBody(), "Pre-existing function_body field");
+		assertEquals(0, model.getParameters().size(), "Pre-existing parameters field");
 
 		// Fill with data.
 		fillNamespaceModel();
 
-		assertNotEquals(null, model.getFunctionBody(), "Non-existing function body in empty model");
-		assertEquals(1, model.getParameters().size(), "Non-existing functions in empty model");
+		assertNotEquals(null, model.getFunctionBody(), "Missing function field");
+		assertEquals(1, model.getParameters().size(), "Missing parameters field");
 
-		// Try adding objects with illegal types!
+		// Try adding objects with illegal types, should fail!
 		model.addDataInModel(this);
 	}
 
