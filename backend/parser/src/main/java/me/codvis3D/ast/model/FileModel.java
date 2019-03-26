@@ -98,7 +98,7 @@ public class FileModel extends Model {
 	 *
 	 * @param usingNamespaces The usingNamespaces
 	 */
-	public void setUsingNamespaces(List<NamespaceModel> usingNamespaces) {
+	public void setUsingNamespaces(List<UsingNamespaceModel> usingNamespaces) {
 		this.usingNamespaces = usingNamespaces;
 	}
 
