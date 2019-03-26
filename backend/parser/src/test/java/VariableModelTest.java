@@ -10,37 +10,48 @@ import org.junit.jupiter.api.Test;
 
 import me.codvis.ast.VariableModel;
 
+import com.ginsberg.junit.exit.ExpectSystemExitWithStatus;
+
 public class VariableModelTest {
 	private String varType = "int";
 	private String varName = "i";
 
 	@Test
 	public void testHasFunctions() {
-		VariableModel var = new VariableModel();
+		VariableModel model = new VariableModel();
 
-		assertFalse(var.hasType(), "Wrong type: " + var.hasType() + " from empty VariableModel");
-		assertFalse(var.hasName(), "Wrong name: " + var.hasName() + " from empty VariableModel");
+		assertFalse(model.hasType(), "Wrong type: " + model.hasType() + " from empty VariableModel");
+		assertFalse(model.hasName(), "Wrong name: " + model.hasName() + " from empty VariableModel");
 
-		var = new VariableModel(varName, varType);
+		model = new VariableModel(varName, varType);
 
-		assertTrue(var.hasType(), "Wrong type: " + var.hasType() + " from filled VariableModel");
-		assertTrue(var.hasName(), "Wrong name: " + var.hasName() + " from filled VariableModel");
+		assertTrue(model.hasType(), "Wrong type: " + model.hasType() + " from filled VariableModel");
+		assertTrue(model.hasName(), "Wrong name: " + model.hasName() + " from filled VariableModel");
 	}
 
 	@Test
 	public void testGetParsedCode() {
-		VariableModel var = new VariableModel();
+		VariableModel model = new VariableModel();
 
-		JSONObject jsonObj = var.getParsedCode();
+		JSONObject jsonObj = model.getParsedCode();
 
 		assertNotEquals(varType, jsonObj.getString("type"), "Non empty type for empty VariableModel");
 		assertNotEquals(varType, jsonObj.getString("name"), "Non empty name for empty VariableModel");
 
-		var = new VariableModel(varName, varType);
+		model = new VariableModel(varName, varType);
 
-		jsonObj = var.getParsedCode();
+		jsonObj = model.getParsedCode();
 
 		assertEquals(varType, jsonObj.getString("type"), "Incorrect type for VariableModel");
 		assertEquals(varName, jsonObj.getString("name"), "Incorrect name for VariableModel");
+	}
+
+	@Test
+	@ExpectSystemExitWithStatus(1)
+	public void testAddDataInModel() {
+		VariableModel model = new VariableModel();
+
+		// Try adding objects with illegal types, should exit!
+		model.addDataInModel(this);
 	}
 }
