@@ -107,6 +107,17 @@ func (codeSnippet CodeSnippetController) GetImplementation(w http.ResponseWriter
 			return
 		}
 
+		if startLine < 1 {
+			http.Error(w, "lineStart must be 1 or greater", http.StatusBadRequest)
+			util.TypeLogger.Warn("%s: Requested lineStart was befor start of file: %d", packageName, startLine)
+			return
+		}
+
+		if startLine > endLine {
+			http.Error(w, "Cant give negative interval", http.StatusBadRequest)
+			util.TypeLogger.Warn("%s: startLine vas greater than endLine: %d-%d", packageName, startLine, endLine)
+		}
+
 		// Fetch the content of file.
 		implementation, err := model.CodeSnippetModel{
 			FilePath:  filePath[0],
@@ -116,6 +127,11 @@ func (codeSnippet CodeSnippetController) GetImplementation(w http.ResponseWriter
 		}.FetchLinesOfCode()
 
 		if err != nil {
+			if err.Error() == "StartLine out of range" {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			util.TypeLogger.Error("%s: Failed to get lines of code: %s", packageName, err.Error())
 			return

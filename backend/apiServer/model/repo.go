@@ -50,7 +50,7 @@ func (repo RepoModel) Save(c chan SaveResponse) {
 	util.TypeLogger.Debug("%s: Call to Save", packageName)
 	defer util.TypeLogger.Debug("%s: Ended call to Save", packageName)
 
-	err := DB.add(&repo)
+	err := DB.Add(&repo)
 
 	if err != nil {
 		util.TypeLogger.Error("%s: Failed to add to database: %s", packageName, err.Error())
