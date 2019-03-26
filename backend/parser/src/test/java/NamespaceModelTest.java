@@ -50,20 +50,20 @@ public class NamespaceModelTest {
 	@Test
 	@ExpectSystemExitWithStatus(1)
 	public void testAddDataInModel() {
-		assertEquals(0, model.getFunctions().size(), "Preexisting functions in empty model");
-		assertEquals(0, model.getNamespaces().size(), "Preexisting namespace in empty model");
-		assertEquals(0, model.getUsingNamespaces().size(), "Preexisting using namespace in empty model");
-		assertEquals(0, model.getCalls().size(), "Preexisting call in empty model");
-		assertEquals(0, model.getVariables().size(), "Preexisting variable in empty model");
+		assertEquals(0, model.getFunctions().size(), "Pre-existing functions in empty model");
+		assertEquals(0, model.getNamespaces().size(), "Pre-existing namespace in empty model");
+		assertEquals(0, model.getUsingNamespaces().size(), "Pre-existing using namespace in empty model");
+		assertEquals(0, model.getCalls().size(), "Pre-existing call in empty model");
+		assertEquals(0, model.getVariables().size(), "Pre-existing variable in empty model");
 
 		// Fill with data.
 		fillNamespaceModel();
 
-		assertEquals(1, model.getFunctions().size(), "Preexisting functions in empty model");
-		assertEquals(1, model.getNamespaces().size(), "Preexisting namespace in empty model");
-		assertEquals(1, model.getUsingNamespaces().size(), "Preexisting using namespace in empty model");
-		assertEquals(1, model.getCalls().size(), "Preexisting call in empty model");
-		assertEquals(1, model.getVariables().size(), "Preexisting variable in empty model");
+		assertEquals(1, model.getFunctions().size(), "Pre-existing functions in empty model");
+		assertEquals(1, model.getNamespaces().size(), "Pre-existing namespace in empty model");
+		assertEquals(1, model.getUsingNamespaces().size(), "Pre-existing using namespace in empty model");
+		assertEquals(1, model.getCalls().size(), "Pre-existing call in empty model");
+		assertEquals(1, model.getVariables().size(), "Pre-existing variable in empty model");
 
 		// Try adding objects with illegal types!
 		model.addDataInModel(this);
