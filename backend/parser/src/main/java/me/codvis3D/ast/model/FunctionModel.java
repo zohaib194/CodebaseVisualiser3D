@@ -23,7 +23,7 @@ public class FunctionModel extends Model {
 	FunctionModel(String name) {
 		this.name = name;
 		this.parameters = new ArrayList<>();
-		this.functionBody = new FunctionBodyModel();
+		this.functionBody = null;
 	}
 
 	/**
