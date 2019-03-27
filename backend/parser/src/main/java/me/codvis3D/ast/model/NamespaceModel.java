@@ -17,13 +17,12 @@ public class NamespaceModel extends Model {
 	private List<String> calls;
 	private List<VariableModel> variables;
 
-
 	/**
 	 * Constructs the namespace, setting the name.
 	 *
-	 * @param      name  The name
+	 * @param name The name
 	 */
-	public NamespaceModel(String name){
+	public NamespaceModel(String name) {
 		this.name = name;
 		this.functions = new ArrayList<>();
 		this.namespaces = new ArrayList<>();
@@ -33,116 +32,152 @@ public class NamespaceModel extends Model {
 	}
 
 	/**
-	 * Adds a function.
-	 *
-	 * @param      function  The function
-	 */
-	public void addFunction(FunctionModel function){
-		this.functions.add(function);
-	}
-
-	/**
-	 * Adds a namespace.
-	 *
-	 * @param      namespace  The namespace
-	 */
-	public void addNamespace(NamespaceModel namespace){
-		this.namespaces.add(namespace);
-	}
-
-	/**
-	 * Adds an using namespace.
-	 *
-	 * @param      namespace  The namespace
-	 */
-	public void addUsingNamespace(UsingNamespaceModel namespace){
-		this.usingNamespaces.add(namespace);
-	}
-
-	/**
 	 * Gets the name.
 	 *
-	 * @return     The name.
+	 * @return The name.
 	 */
-	public String getName(){
+	public String getName() {
 		return this.name;
+	}
+
+	/**
+	 * Gets the functions.
+	 *
+	 * @return The functions.
+	 */
+	public List<FunctionModel> getFunctions() {
+		return this.functions;
+	}
+
+	/**
+	 * Gets the namespaces.
+	 *
+	 * @return The namespaces.
+	 */
+	public List<NamespaceModel> getNamespaces() {
+		return this.namespaces;
+	}
+
+	/**
+	 * Gets the usingNamespaces.
+	 *
+	 * @return The usingNamespaces.
+	 */
+	public List<UsingNamespaceModel> getUsingNamespaces() {
+		return this.usingNamespaces;
+	}
+
+	/**
+	 * Gets the calls.
+	 *
+	 * @return The calls.
+	 */
+	public List<String> getCalls() {
+		return this.calls;
+	}
+
+	/**
+	 * Gets the variables.
+	 *
+	 * @return The variables.
+	 */
+	public List<VariableModel> getVariables() {
+		return this.variables;
 	}
 
 	/**
 	 * Sets the functions.
 	 *
-	 * @param      functions  The functions
+	 * @param functions The functions
 	 */
-	public void setFunctions(List<FunctionModel> functions){
+	public void setFunctions(List<FunctionModel> functions) {
 		this.functions = functions;
 	}
 
 	/**
 	 * Sets the inner namespaces.
 	 *
-	 * @param      namespaces  The namespaces
+	 * @param namespaces The namespaces
 	 */
-	public void setNamespaces(List<NamespaceModel> namespaces){
+	public void setNamespaces(List<NamespaceModel> namespaces) {
 		this.namespaces = namespaces;
 	}
 
 	/**
 	 * Sets the inner using namespaces.
 	 *
-	 * @param      namespaces  The namespaces
+	 * @param namespaces The namespaces
 	 */
-	public void setUsingNamespaces(List<UsingNamespaceModel> namespaces){
+	public void setUsingNamespaces(List<UsingNamespaceModel> namespaces) {
 		this.usingNamespaces = namespaces;
+	}
+
+	/**
+	 * Sets the variables.
+	 *
+	 * @param variables The variables
+	 */
+	public void setVariables(List<VariableModel> variables) {
+		this.variables = variables;
+	}
+
+	/**
+	 * Adds a function.
+	 *
+	 * @param function The function
+	 */
+	public void addFunction(FunctionModel function) {
+		this.functions.add(function);
+	}
+
+	/**
+	 * Adds a namespace.
+	 *
+	 * @param namespace The namespace
+	 */
+	public void addNamespace(NamespaceModel namespace) {
+		this.namespaces.add(namespace);
+	}
+
+	/**
+	 * Adds an using namespace.
+	 *
+	 * @param namespace The namespace
+	 */
+	public void addUsingNamespace(UsingNamespaceModel namespace) {
+		this.usingNamespaces.add(namespace);
 	}
 
 	/**
 	 * Adds a call.
 	 *
-	 * @param      functionCall  The function call
+	 * @param functionCall The function call
 	 */
-	public void addCall(String functionCall){
+	public void addCall(String functionCall) {
 		this.calls.add(functionCall);
 	}
 
 	/**
 	 * Adds a variable.
 	 *
-	 * @param      variable  The variable
+	 * @param variable The variable
 	 */
-	public void addVariable(VariableModel variable){
+	public void addVariable(VariableModel variable) {
 		this.variables.add(variable);
-	}
-
-	/**
-	 * Gets the variables.
-	 *
-	 * @return     The variables.
-	 */
-	public List<VariableModel> getVariables(){
-		return this.variables;
-	}
-
-	/**
-	 * Sets the variables.
-	 *
-	 * @param      variables  The variables
-	 */
-	public void setVariables(List<VariableModel> variables){
-		this.variables = variables;
 	}
 
 	/**
 	 * Adds the data in model.
 	 *
-	 * @param      data  The data
+	 * @param data The data
 	 */
 	@Override
-	protected <T> void addDataInModel(T data){
+	protected <T> void addDataInModel(T data) {
 
 		if (data instanceof FunctionModel) {
 			this.addFunction((FunctionModel) data);
 
-		} else if (data instanceof  NamespaceModel) {
+		} else if (data instanceof NamespaceModel) {
 			this.addNamespace((NamespaceModel) data);
 
 		} else if (data instanceof UsingNamespaceModel) {
@@ -151,7 +186,7 @@ public class NamespaceModel extends Model {
 		} else if (data instanceof String) {
 			this.addCall((String) data);
 
-		} else if (data instanceof VariableModel){
+		} else if (data instanceof VariableModel) {
 			this.addVariable((VariableModel) data);
 
 		} else {
@@ -163,10 +198,10 @@ public class NamespaceModel extends Model {
 	/**
 	 * Gets the parsed code as JSONObject.
 	 *
-	 * @return     The parsed code.
+	 * @return The parsed code.
 	 */
 	@Override
-	public JSONObject getParsedCode(){
+	public JSONObject getParsedCode() {
 		JSONObject parsedCode = new JSONObject();
 
 		parsedCode.put("name", this.name);
@@ -191,7 +226,9 @@ public class NamespaceModel extends Model {
 			parsedCode.put("variables", parsedVariables);
 		}
 
-		parsedCode.put("calls", this.calls);
+		if (this.calls.size() > 0) {
+			parsedCode.put("calls", this.calls);
+		}
 
 		return parsedCode;
 	}

@@ -8,14 +8,14 @@ import org.json.JSONObject;
 /**
  * Class for abstracting a variable.
  */
-public class VariableModel extends Model{
+public class VariableModel extends Model {
 	private String name;
 	private String type;
 
 	/**
 	 * Constructs the object.
 	 */
-	VariableModel(){
+	VariableModel() {
 		this.name = "";
 		this.type = "";
 	}
@@ -23,10 +23,10 @@ public class VariableModel extends Model{
 	/**
 	 * Constructs the object.
 	 *
-	 * @param      name  The name
-	 * @param      type  The type
+	 * @param name The name
+	 * @param type The type
 	 */
-	VariableModel(String name, String type){
+	VariableModel(String name, String type) {
 		this.name = name;
 		this.type = type;
 	}
@@ -34,100 +34,100 @@ public class VariableModel extends Model{
 	/**
 	 * Sets the name.
 	 *
-	 * @param      name  The name
+	 * @param name The name
 	 */
-	public void setName(String name){
+	public void setName(String name) {
 		this.name = name;
 	}
 
 	/**
 	 * Sets the type.
 	 *
-	 * @param      type  The type
+	 * @param type The type
 	 */
-	public void setType(String type){
+	public void setType(String type) {
 		this.type = type;
 	}
 
 	/**
 	 * Gets the name.
 	 *
-	 * @return     The name.
+	 * @return The name.
 	 */
-	public String getName(){
+	public String getName() {
 		return this.name;
 	}
 
 	/**
 	 * Gets the type.
 	 *
-	 * @return     The type.
+	 * @return The type.
 	 */
-	public String getType(){
+	public String getType() {
 		return this.type;
 	}
 
 	/**
 	 * Determines if it has type.
 	 *
-	 * @return     True if has type, False otherwise.
+	 * @return True if has type, False otherwise.
 	 */
-	public boolean hasType(){
+	public boolean hasType() {
 		return ((this.type == "") ? false : true);
 	}
 
 	/**
 	 * Determines if it has name.
 	 *
-	 * @return     True if has name, False otherwise.
+	 * @return True if has name, False otherwise.
 	 */
-	public boolean hasName(){
+	public boolean hasName() {
 		return ((this.name == "") ? false : true);
 	}
 
 	/**
 	 * Concatenate type with modifiers.
 	 *
-	 * @param      modifier  The modifier
+	 * @param modifier The modifier
 	 */
-	public void applyModifierOnType(String modifier){
+	public void applyModifierOnType(String modifier) {
 		this.type += modifier + " ";
 	}
 
 	/**
 	 * Concatenate type with primitive type.
 	 *
-	 * @param      type  The type
+	 * @param type The type
 	 */
-	public void applyUnnanTypeOnType(String type){
+	public void applyUnnanTypeOnType(String type) {
 		this.type += type;
 	}
 
 	/**
 	 * Remove whitespace from both start and end.
 	 */
-	public void trimType(){
+	public void trimType() {
 		this.type = this.type.trim();
 	}
 
 	/**
 	 * Adds the data in model.
 	 *
-	 * @param      data  The data
+	 * @param data The data
 	 */
 	@Override
-	protected <T> void addDataInModel(T data){
-		System.out.println("Error variable is currently not a scope as scopeStack indicated" + data.getClass());
+	protected <T> void addDataInModel(T data) {
+		System.out.println("Error variable is currently not a scope as scopeStack indicated " + data.getClass());
 		System.exit(1);
 	}
 
 	/**
 	 * Gets the parsed code as JSONObject.
 	 *
-	 * @return     The parsed code.
+	 * @return The parsed code.
 	 */
 	@Override
-	public JSONObject getParsedCode(){
+	public JSONObject getParsedCode() {
 		JSONObject parsedCode = new JSONObject();
 
 		parsedCode.put("name", this.name);
