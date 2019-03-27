@@ -152,7 +152,7 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 		// Check that valid uri is given and that it is a .git
 		if isValid, err := validateURI(postData["uri"],
 			func(url string) (isValid bool, err error) { return regexp.Match(`\.git$`, []byte(postData["uri"])) }); !isValid || (err != nil) {
-			util.TypeLogger.Error("%s: Received invalid URI to git repository: %s", packageName, err.Error())
+			util.TypeLogger.Error("%s: Received invalid URI to git repository", packageName)
 			reason := WebsocketResponse{
 				StatusText: http.StatusText(http.StatusBadRequest),
 				StatusCode: http.StatusBadRequest,
