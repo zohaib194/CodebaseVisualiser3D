@@ -21,39 +21,28 @@ function getWebSocketResult (apiURL, payload){
 			reject(err)
 		}
 
-		try {
-	        websocket.on('open', function onOpen() {
-		        websocket.send(JSON.stringify(payload));
-		    })
+        websocket.on('open', function onOpen() {
+	        websocket.send(JSON.stringify(payload));
+	    })
 
-		} catch(err){
-			console.log("Error websocket on open: " + err)
-			reject(err)
-		}
 
-		try{
-	        websocket.on('message', function incoming(data) {
-		        var response = JSON.parse(data)
-				messages.push(response)
-		    })
 
-		} catch(err){
-			console.log("Error websocket on message: " + err)
-		}
-		try {
+        websocket.on('message', function incoming(data) {
+	        var response = JSON.parse(data)
+			messages.push(response)
+	    })
 
-		    websocket.on('close', function onClose(code, reason) {
-		        var reason = JSON.parse(reason)
 
-		        websocket.close();
-		    	resolve({
-		    		"messages":messages,
-		    		"closer":reason,
-		    	})
-		    })
-		} catch(err){
-			console.log("Error websocket on close: " + err)
-		}
+	    websocket.on('close', function onClose(code, reason) {
+	        var reason = JSON.parse(reason)
+
+	        websocket.close();
+	    	resolve({
+	    		"messages":messages,
+	    		"closer":reason,
+	    	})
+	    })
+
     });
 }
 
@@ -61,6 +50,7 @@ var testCases =
 [
 	// Valid cases.
 	{
+		name: "Valid - new repo - sendAddRequest",
 		websocketURL: "ws://localhost:8080/repo/add",
 		payload: {
 			uri: "https://github.com/Xillez/ECS.git"
@@ -89,6 +79,7 @@ var testCases =
 		}
 	},
 	{
+		name: "Valid - already existing repo - sendAddRequest",
 		websocketURL: "ws://localhost:8080/repo/add",
 		payload: {
 			uri: "https://github.com/Xillez/ECS.git"
@@ -110,6 +101,7 @@ var testCases =
 
 	// Invalid cases
 	{
+		name: "Invalid - new repo - sendAddRequest",
 		websocketURL: "ws://localhost:8080/repo/add",
 		payload: {
 			uri: "使用非常簡單的語言，因此初學者特別容易使用.git"
@@ -130,56 +122,25 @@ var testCases =
 	},
 ];
 
+for (var i = 0; i <= testCases.length - 1; i++) {
 
+	let index = i
 
-test.serial('Valid - new repo - sendAddRequest', async(t) => {
-	try {
-		var res = await getWebSocketResult(testCases[0].websocketURL, testCases[0].payload)
+	test.serial(testCases[i].name, async(t) => {
 
-		t.is(res.messages.length, testCases[0].wantMessage.length)
+		var res = await getWebSocketResult(testCases[index].websocketURL, testCases[index].payload)
 
-		for (var i = 0; i <= res.messages.length - 1; i++) {
-			t.is(res.messages[i].statustext, testCases[0].wantMessage.messages[i].statustext)
-			t.is(res.messages[i].statuscode, testCases[0].wantMessage.messages[i].statuscode)
-			t.is(res.messages[i].body.status, testCases[0].wantMessage.messages[i].body.status)
+		t.is(res.messages.length, testCases[index].wantMessage.length)
+
+		for (var j = 0; j <= res.messages.length - 1; j++) {
+			t.is(res.messages[j].statustext, testCases[index].wantMessage.messages[j].statustext)
+			t.is(res.messages[j].statuscode, testCases[index].wantMessage.messages[j].statuscode)
+			t.is(res.messages[j].body.status, testCases[index].wantMessage.messages[j].body.status)
 		}
 
-		t.is(res.closer.statuscode, testCases[0].wantCloser.reason.statuscode)
-		t.is(res.closer.statustext, testCases[0].wantCloser.reason.statustext)
-		t.is(res.closer.body.status, testCases[0].wantCloser.reason.body.status)
+		t.is(res.closer.statuscode, testCases[index].wantCloser.reason.statuscode)
+		t.is(res.closer.statustext, testCases[index].wantCloser.reason.statustext)
+		t.is(res.closer.body.status, testCases[index].wantCloser.reason.body.status)
 
-	} catch (err) {
-		t.fail("Error: " + err)
-	}
-
-});
-
-test.serial('Valid - already existing repo - sendAddRequest', async(t) => {
-	try {
-		var res = await getWebSocketResult(testCases[1].websocketURL, testCases[1].payload)
-
-		t.is(res.messages.length, testCases[1].wantMessage.length)
-		t.is(res.closer.statuscode, testCases[1].wantCloser.reason.statuscode)
-		t.is(res.closer.statustext, testCases[1].wantCloser.reason.statustext)
-		t.is(res.closer.body.status, testCases[1].wantCloser.reason.body.status)
-
-	} catch (err) {
-		t.fail("Error: " + err)
-	}
-
-});
-
-test.serial('Invalid - new repo - sendAddRequest', async(t) => {
-	try {
-		var res = await getWebSocketResult(testCases[2].websocketURL, testCases[2].payload)
-
-		t.is(res.messages.length, testCases[2].wantMessage.length)
-		t.is(res.closer.statuscode, testCases[2].wantCloser.reason.statuscode)
-		t.is(res.closer.statustext, testCases[2].wantCloser.reason.statustext)
-		t.is(res.closer.body.status, testCases[2].wantCloser.reason.body.status)
-
-	} catch (err) {
-		t.fail("Error: " + err)
-	}
-});
-
+	});
+}
