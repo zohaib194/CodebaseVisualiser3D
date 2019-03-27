@@ -3,11 +3,12 @@
 package model
 
 import (
-	"log"
+	"errors"
+	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/util"
+	"gopkg.in/mgo.v2/bson"
 	"os/exec"
 	"strconv"
-
-	"gopkg.in/mgo.v2/bson"
+	"strings"
 )
 
 // CodeSnippetModel represents metadata for a file from a git project.
@@ -20,13 +21,36 @@ type CodeSnippetModel struct {
 
 // FetchLinesOfCode fetch loc from specified range.
 func (codeSnippet CodeSnippetModel) FetchLinesOfCode() (string, error) {
+	util.TypeLogger.Info("%s: Received request for implementation", packageName)
+	defer util.TypeLogger.Info("%s: Ended request for implementation", packageName)
 
-	// Command to run sed for fetching file content.
-	cmd := exec.Command("sed", "-n", strconv.Itoa(codeSnippet.StartLine)+","+strconv.Itoa(codeSnippet.EndLine)+"p;", RepoPath+"/"+codeSnippet.FilePath)
+	// Ready  word count command and execute it.
+	cmd := exec.Command("wc", "-l", RepoPath+"/"+codeSnippet.FilePath)
 	output, err := cmd.CombinedOutput()
 
 	if err != nil {
-		log.Println("Error executing sed parser: ", err.Error())
+		util.TypeLogger.Error("%s: Failed to count lines in file: %s", packageName, err.Error())
+		return "", errors.New("Failed to count lines in file")
+	}
+
+	// Split the output on space and grab the first entry (lines in file)
+	linesTotal, err := strconv.Atoi(strings.Split(string(output), " ")[0])
+
+	if codeSnippet.StartLine > linesTotal {
+		util.TypeLogger.Warn("%s: StartLine out of range", packageName)
+		return "", errors.New("StartLine out of range")
+	}
+	if err != nil {
+		util.TypeLogger.Error("%s: Failed to convert string to int: %s", packageName, err.Error())
+		return "", errors.New("Failed to count lines in file")
+	}
+
+	// Command to run sed for fetching file content.
+	cmd = exec.Command("sed", "-n", strconv.Itoa(codeSnippet.StartLine)+","+strconv.Itoa(codeSnippet.EndLine)+"p;", RepoPath+"/"+codeSnippet.FilePath)
+	output, err = cmd.CombinedOutput()
+
+	if err != nil {
+		util.TypeLogger.Error("%s: Error executing sed parser: %s", packageName, err.Error())
 		return "", err
 	}
 
