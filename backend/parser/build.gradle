@@ -20,9 +20,6 @@ apply plugin: 'me.champeau.gradle.antlr4'
 apply plugin: 'jacoco'
 
 jacoco {
-    //reportsDir = file("$buildDir/jacoco/reports")
-    //destinationFile = file("$buildDir/jacoco/jacocoTest.exec")
-    //classDumpDir = file("$buildDir/jacoco/classpathdumps")
     toolVersion = "0.8.2"
 }
 
@@ -43,7 +40,6 @@ test {
     jacoco {
         append = false
         destinationFile = file("$buildDir/jacoco/jacocoTest.exec")
-        //classDumpFile = file("$buildDir/jacoco/classpathdumps")
     }
 }
 
