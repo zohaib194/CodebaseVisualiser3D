@@ -122,7 +122,7 @@ var testCases =
 	},
 ];
 
-for (var i = 0; i <= testCases.length - 1; i++) {
+for (var i = 0; i < testCases.length; i++) {
 
 	let index = i
 
