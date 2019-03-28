@@ -145,7 +145,6 @@ func TestRepoModel_Save(t *testing.T) {
 }
 
 func TestRepoModel_Load(t *testing.T) {
-	log.Println("Load")
 	type fields struct {
 		URI string
 		ID  bson.ObjectId
@@ -237,7 +236,6 @@ func TestRepoModel_Load(t *testing.T) {
 }
 
 func TestRepoModel_GetRepoByID(t *testing.T) {
-	log.Println("GetRepoByID")
 	type fields struct {
 		URI string
 		ID  bson.ObjectId
@@ -252,7 +250,25 @@ func TestRepoModel_GetRepoByID(t *testing.T) {
 		wantRep RepoModel
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Valid ID",
+			args: args{
+				id: validRepo.ID.Hex(),
+			},
+			wantRep: RepoModel{
+				URI: validRepo.URI,
+				ID: validRepo.ID,
+			},
+			wantErr: false,
+
+		},{
+			name: "Invalid ID",
+			args: args{
+				id: strings.Replace(validRepo.ID.Hex(),"","42", 2),
+			},
+			wantRep: RepoModel{},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -278,13 +294,28 @@ func TestRepoModel_GetRepoFiles(t *testing.T) {
 		URI string
 		ID  bson.ObjectId
 	}
+	type want struct{
+		fileCount int
+		subDirectories bool
+	}
 	tests := []struct {
-		name      string
-		fields    fields
-		wantFiles string
-		wantErr   bool
+		name	string
+		fields	fields
+		want	want
+		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Valid repo",
+			fields: fields{
+				URI: validRepo.URI,
+				ID: validRepo.ID,
+			},
+			want: want{
+				fileCount: testFileCount,
+				subDirectories: true,
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -297,8 +328,24 @@ func TestRepoModel_GetRepoFiles(t *testing.T) {
 				t.Errorf("RepoModel.GetRepoFiles() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if gotFiles != tt.wantFiles {
-				t.Errorf("RepoModel.GetRepoFiles() = %v, want %v", gotFiles, tt.wantFiles)
+
+			files := strings.Split(strings.TrimSuffix(gotFiles, "\n"), "\n")
+
+			if len(files) != tt.want.fileCount{
+				t.Errorf("Unexpected number of files: %d, want %d", len(files), tt.want.fileCount)
+			}
+
+			foundSubDirectories := false
+			for i := 0; (i < len(files)) && !foundSubDirectories; i++ {
+
+				file := strings.TrimPrefix(files[i], fmt.Sprintf("/tmp/%s/", validRepo.ID.Hex()))
+				if file != filepath.Base(file){
+					foundSubDirectories = true
+				}
+			}
+
+			if foundSubDirectories != tt.want.subDirectories{
+				t.Errorf("Folder structure incorrect: %t, want %t", foundSubDirectories, tt.want.subDirectories)
 			}
 		})
 	}
@@ -426,7 +473,7 @@ func newCppFile(filepath string) testFile {
 // setup Sets variables used for storing repository files and initialize the database for testing
 func setup() {
 	DB.DatabaseName = "test"
-	RepoPath = "/tmp/"
+	RepoPath = "/tmp"
 	JavaParserPath="/home/Flero/go/src/github.com/zohaib194/CodebaseVisualizer3D/backend/parser/build/classes/java/main"
 
 
@@ -438,13 +485,13 @@ func setup() {
 		log.Fatalf("Could not setup test environment, datbase add error: %s", err.Error())
 	}
 
-	os.Mkdir("/tmp/"+validRepo.ID.Hex(), os.ModePerm)
+	os.Mkdir(fmt.Sprintf("%s/%s", RepoPath, validRepo.ID.Hex()), os.ModePerm)
 
 	var rootFileCount = testFileCount - 2;
 	for i := 0; i < rootFileCount; i++ {
 		newFile := newTestFile(fmt.Sprintf("file%d.test", i+1), fmt.Sprintf("File nr %d out of %d total files in root folder", i+1, rootFileCount))
 		d := []byte(newFile.content)
-		if err := ioutil.WriteFile(fmt.Sprintf("/tmp/%s/%s", validRepo.ID.Hex(), newFile.relativePath), d, 0644); err != nil {
+		if err := ioutil.WriteFile(fmt.Sprintf("%s/%s/%s", RepoPath, validRepo.ID.Hex(), newFile.relativePath), d, 0644); err != nil {
 			log.Printf("Could not setup test environment, error writing file: %s", err.Error())
 
 			tearDown()
@@ -455,7 +502,7 @@ func setup() {
 	os.Mkdir("/tmp/"+validRepo.ID.Hex()+"/subfolder", os.ModePerm)
 	newFile := newTestFile("subfolder/file.test", "File in sub folder")
 	d := []byte(newFile.content)
-	if err := ioutil.WriteFile(fmt.Sprintf("/tmp/%s/%s", validRepo.ID.Hex(), newFile.relativePath), d, 0644); err != nil {
+	if err := ioutil.WriteFile(fmt.Sprintf("%s/%s/%s", RepoPath, validRepo.ID.Hex(), newFile.relativePath), d, 0644); err != nil {
 		log.Printf("Could not setup test environment, error writing file: %s", err.Error())
 
 		tearDown()
@@ -464,7 +511,7 @@ func setup() {
 
 	newCppFile := newCppFile("/subfolder/cppFile.cpp")
 	d = []byte(newCppFile.content)
-	if err := ioutil.WriteFile(fmt.Sprintf("/tmp/%s/%s", validRepo.ID.Hex(), newCppFile.relativePath), d, 0644); err != nil {
+	if err := ioutil.WriteFile(fmt.Sprintf("%s/%s/%s", RepoPath, validRepo.ID.Hex(), newCppFile.relativePath), d, 0644); err != nil {
 		log.Printf("Could not setup test environment, error writing file: %s", err.Error())
 
 		tearDown()
