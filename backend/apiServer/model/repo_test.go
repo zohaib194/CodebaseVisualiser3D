@@ -35,6 +35,57 @@ func TestMain(m *testing.M) {
 	os.Exit(exitCode)
 }
 
+func TestRepoModel_FetchAll(t *testing.T) {
+	type fields struct {
+		URI string
+		ID  bson.ObjectId
+	}
+	tests := []struct {
+		name           string
+		fields         fields
+		wantRepoModels []bson.M
+		wantErr        bool
+	}{
+		{
+			name: "Valid repo",
+			fields: fields{
+				URI: validRepo.URI,
+				ID: validRepo.ID,
+			},
+			wantRepoModels: []bson.M{
+				{"_id":validRepo.ID, "uri":validRepo.URI},
+			},
+			wantErr: false,
+		},{
+			name: "Invalid repo",
+			fields: fields{
+				URI: "invalidUri",
+				ID: bson.NewObjectId(),
+			},
+			wantRepoModels: []bson.M{
+				{"_id":validRepo.ID, "uri":validRepo.URI},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			repo := RepoModel{
+				URI: tt.fields.URI,
+				ID:  tt.fields.ID,
+			}
+			gotRepoModels, err := repo.FetchAll()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("RepoModel.FetchAll() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(gotRepoModels, tt.wantRepoModels) {
+				t.Errorf("RepoModel.FetchAll() = %v, want %v", gotRepoModels, tt.wantRepoModels)
+			}
+		})
+	}
+}
+
 func TestRepoModel_Save(t *testing.T) {
 	type fields struct {
 		URI string
@@ -289,7 +340,6 @@ func TestRepoModel_GetRepoByID(t *testing.T) {
 }
 
 func TestRepoModel_GetRepoFiles(t *testing.T) {
-	log.Println("GetRepoFiles")
 	type fields struct {
 		URI string
 		ID  bson.ObjectId
@@ -352,7 +402,6 @@ func TestRepoModel_GetRepoFiles(t *testing.T) {
 }
 
 func TestRepoModel_SanitizeFilePaths(t *testing.T) {
-	log.Println("SanitizeFilePaths")
 	type fields struct {
 		URI string
 		ID  bson.ObjectId
@@ -361,25 +410,66 @@ func TestRepoModel_SanitizeFilePaths(t *testing.T) {
 		projectModel ProjectModel
 	}
 	tests := []struct {
-		name   string
-		fields fields
-		args   args
+		name	string
+		fields	fields
+		args	args
+		result	string
 	}{
-		// TODO: Add test cases.
+		{
+			name: "File from repository",
+			fields: fields{
+				URI: validRepo.URI,
+				ID: validRepo.ID,
+			},
+			args: args{
+				projectModel: ProjectModel{
+					Files: []FilesModel{
+						FilesModel{
+							File: FileModel{
+								FileName: fmt.Sprintf("%s/%s/file.file", RepoPath, validRepo.ID.Hex()),
+							},
+						},
+					},
+				},
+			},
+			result: fmt.Sprintf("%s/file.file", validRepo.ID.Hex()),
+		},{
+			name: "File from outside repository",
+			fields: fields{
+				URI: validRepo.URI,
+				ID: validRepo.ID,
+			},
+			args: args{
+				projectModel: ProjectModel{
+					Files: []FilesModel{
+						FilesModel{
+							File: FileModel{
+								FileName: "/somewhereElse/file.file",
+							},
+						},
+					},
+				},
+			},
+			result: "/somewhereElse/file.file",
+		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			repo := RepoModel{
 				URI: tt.fields.URI,
 				ID:  tt.fields.ID,
 			}
+
 			repo.SanitizeFilePaths(tt.args.projectModel)
+			if tt.args.projectModel.Files[0].File.FileName != tt.result {
+				t.Errorf("Unexpected result: %s, wanted %s", tt.args.projectModel.Files[0].File.FileName, tt.result)
+			}
 		})
 	}
 }
 
 func TestRepoModel_ParseDataFromFiles(t *testing.T) {
-	log.Println("ParseDataFromFiles")
 	type fields struct {
 		URI string
 		ID  bson.ObjectId
@@ -389,12 +479,111 @@ func TestRepoModel_ParseDataFromFiles(t *testing.T) {
 		responsePerNFiles int
 		c                 chan ParseResponse
 	}
+	type expect struct {
+		responses []ParseResponse
+	}
 	tests := []struct {
 		name   string
 		fields fields
 		args   args
+		expect expect
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Valid repo",
+			fields: fields{
+				URI: validRepo.URI,
+				ID: validRepo.ID,
+			},
+			args: args{
+				files: getFilesString(),
+				responsePerNFiles: 1,
+				c: make(chan ParseResponse),
+			},
+			expect: expect{
+				responses: []ParseResponse{
+					ParseResponse{
+						StatusText: "Parsing",
+						Err: nil,
+						CurrentFile: "file1.test",
+						ParsedFileCount: 0,
+						SkippedFileCount: 1,
+						FileCount: 10,
+					},
+					ParseResponse{
+						StatusText: "Parsing",
+						Err: nil,
+						CurrentFile: "file2.test",
+						ParsedFileCount: 0,
+						SkippedFileCount: 2,
+						FileCount: 10,
+					},
+					ParseResponse{
+						StatusText: "Parsing",
+						Err: nil,
+						CurrentFile: "file3.test",
+						ParsedFileCount: 0,
+						SkippedFileCount: 3,
+						FileCount: 10,
+					},
+					ParseResponse{
+						StatusText: "Parsing",
+						Err: nil,
+						CurrentFile: "file4.test",
+						ParsedFileCount: 0,
+						SkippedFileCount: 4,
+						FileCount: 10,
+					},
+					ParseResponse{
+						StatusText: "Parsing",
+						Err: nil,
+						CurrentFile: "file5.test",
+						ParsedFileCount: 0,
+						SkippedFileCount: 5,
+						FileCount: 10,
+					},
+					ParseResponse{
+						StatusText: "Parsing",
+						Err: nil,
+						CurrentFile: "file6.test",
+						ParsedFileCount: 0,
+						SkippedFileCount: 6,
+						FileCount: 10,
+					},
+					ParseResponse{
+						StatusText: "Parsing",
+						Err: nil,
+						CurrentFile: "file7.test",
+						ParsedFileCount: 0,
+						SkippedFileCount: 7,
+						FileCount: 10,
+					},
+					ParseResponse{
+						StatusText: "Parsing",
+						Err: nil,
+						CurrentFile: "file8.test",
+						ParsedFileCount: 0,
+						SkippedFileCount: 8,
+						FileCount: 10,
+					},
+					ParseResponse{
+						StatusText: "Parsing",
+						Err: nil,
+						CurrentFile: "javaFile.java",
+						ParsedFileCount: 1,
+						SkippedFileCount: 8,
+						FileCount: 10,
+					},
+					ParseResponse{
+						StatusText: "Parsing",
+						Err: nil,
+						CurrentFile: "cppFile.cpp",
+						ParsedFileCount: 2,
+						SkippedFileCount: 8,
+						FileCount: 10,
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -402,42 +591,27 @@ func TestRepoModel_ParseDataFromFiles(t *testing.T) {
 				URI: tt.fields.URI,
 				ID:  tt.fields.ID,
 			}
-			repo.ParseDataFromFiles(tt.args.files, tt.args.responsePerNFiles, tt.args.c)
+
+			go repo.ParseDataFromFiles(tt.args.files, tt.args.responsePerNFiles, tt.args.c)
+
+			var parseResponse ParseResponse
+
+			for i := 0; i < len(tt.expect.responses); i++ {
+				parseResponse = <- tt.args.c
+				if !reflect.DeepEqual(tt.expect.responses[i], parseResponse){
+					t.Errorf("Unexpected response, got %v expected %v", parseResponse, tt.expect.responses[i])
+				}
+
+				if i == len(tt.expect.responses) {
+					if parseResponse.StatusText != "Done"{
+						t.Errorf("Did not get final response when expected")
+					}
+ 				}
+			}
 		})
 	}
 }
 
-func TestRepoModel_FetchAll(t *testing.T) {
-	log.Println("FetchAll")
-	type fields struct {
-		URI string
-		ID  bson.ObjectId
-	}
-	tests := []struct {
-		name           string
-		fields         fields
-		wantRepoModels []bson.M
-		wantErr        bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			repo := RepoModel{
-				URI: tt.fields.URI,
-				ID:  tt.fields.ID,
-			}
-			gotRepoModels, err := repo.FetchAll()
-			if (err != nil) != tt.wantErr {
-				t.Errorf("RepoModel.FetchAll() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(gotRepoModels, tt.wantRepoModels) {
-				t.Errorf("RepoModel.FetchAll() = %v, want %v", gotRepoModels, tt.wantRepoModels)
-			}
-		})
-	}
-}
 
 // newTestFile creates a testfile with description of usecase and lorem ipsum text.
 func newTestFile(filepath string, useCase string) testFile {
@@ -500,7 +674,7 @@ func setup() {
 	}
 
 	os.Mkdir("/tmp/"+validRepo.ID.Hex()+"/subfolder", os.ModePerm)
-	newFile := newTestFile("subfolder/file.test", "File in sub folder")
+	newFile := newTestFile("subfolder/javaFile.java", "File in subfolder with java extention without java content")
 	d := []byte(newFile.content)
 	if err := ioutil.WriteFile(fmt.Sprintf("%s/%s/%s", RepoPath, validRepo.ID.Hex(), newFile.relativePath), d, 0644); err != nil {
 		log.Printf("Could not setup test environment, error writing file: %s", err.Error())
@@ -547,4 +721,12 @@ func getCurrentGitRepoPath() string {
 	}
 
 	return dir[0:index+len("CodebaseVisualizer3D")]
+}
+
+func getFilesString() string {
+	files, err := validRepo.GetRepoFiles()
+	if err != nil{
+		log.Fatal("Could not create ParseData test data")
+	}
+	return files
 }
