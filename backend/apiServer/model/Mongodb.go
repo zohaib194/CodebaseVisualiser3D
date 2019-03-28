@@ -72,6 +72,10 @@ func (db *MongoDB) Add(rm *RepoModel) error {
 	}
 	defer session.Close()
 
+	if rm.URI == "" {
+		return errors.New("URI is empty")
+	}
+
 	exstRepo, err := db.findRepoByURI(rm.URI)
 
 	if err != nil {
@@ -126,7 +130,7 @@ func (db *MongoDB) FindRepoByID(id string) (repo RepoModel, err error) {
 
 	if !bson.IsObjectIdHex(id) {
 		err = errors.New("Invalid id")
-		util.TypeLogger.Fatal("%s: Received incorrect ID", packageName)
+		util.TypeLogger.Error("%s: Received incorrect ID", packageName)
 
 		return RepoModel{}, err
 	}
@@ -174,4 +178,23 @@ func (db *MongoDB) DropDB() (err error) {
 	defer session.Close()
 
 	return session.DB(db.DatabaseName).DropDatabase()
+}
+
+// Count returns number of items in the collection.
+func (db *MongoDB) Count() int {
+	util.TypeLogger.Debug("%s: Call for Count", packageName)
+	defer util.TypeLogger.Debug("%s: Ended Call for Count", packageName)
+
+	session, err := mgo.Dial(db.DatabaseURL)
+	if err != nil {
+		util.TypeLogger.Fatal("%s: Failed to connect to database", packageName)
+	}
+	defer session.Close()
+
+	count, err := session.DB(db.DatabaseName).C(db.RepoColl).Count()
+	if err != nil {
+		util.TypeLogger.Fatal("%s: Failed to get db count", packageName)
+	}
+
+	return count
 }
