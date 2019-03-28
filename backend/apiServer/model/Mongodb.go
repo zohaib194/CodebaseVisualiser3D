@@ -130,7 +130,7 @@ func (db *MongoDB) FindRepoByID(id string) (repo RepoModel, err error) {
 
 	if !bson.IsObjectIdHex(id) {
 		err = errors.New("Invalid id")
-		util.TypeLogger.Fatal("%s: Received incorrect ID", packageName)
+		util.TypeLogger.Error("%s: Received incorrect ID", packageName)
 
 		return RepoModel{}, err
 	}
