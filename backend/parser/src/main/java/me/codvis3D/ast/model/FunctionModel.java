@@ -5,10 +5,13 @@ import java.util.ArrayList;
 import java.util.Stack;
 import org.json.JSONObject;
 
+import me.codvis.ast.FunctionBodyModel;
+import me.codvis.ast.VariableModel;
+
 /**
  * Class for abstracting a code function.
  */
-public class FunctionModel extends Model{
+public class FunctionModel extends Model {
 	private String name;
 	private String declaratorId;
 	private String scope;
@@ -17,134 +20,154 @@ public class FunctionModel extends Model{
 	private List<VariableModel> parameters;
 	private FunctionBodyModel functionBody;
 
-	FunctionModel(String name){
+	FunctionModel(String name) {
 		this.name = name;
 		this.parameters = new ArrayList<>();
-		this.functionBody = new FunctionBodyModel();
+		this.functionBody = null;
 	}
 
 	/**
 	 * Constructs the object, setting the function name.
 	 *
-	 * @param      name  The name
+	 * @param name The name
 	 */
-	FunctionModel(String name, String declarator){
+	FunctionModel(String name, String declarator) {
 		this.name = name;
-		this.scope = "";
 		this.declaratorId = declarator;
+		this.scope = "";
 		this.parameters = new ArrayList<>();
-		this.functionBody = new FunctionBodyModel();
-	}
-
-	/**
-	 * Gets the scope.
-	 *
-	 * @return     The scope.
-	 */
-	public String getScope(){
-		return this.scope;
-	}
-
-	/**
-	 * Sets the scope.
-	 *
-	 * @param      scope  The scope
-	 */
-	public void setScope(String scope){
-		this.scope = scope;
-	}
-
-	/**
-	 * Sets the declarator identifier.
-	 *
-	 * @param      declaratorId  The declarator identifier
-	 */
-	public void setDeclaratorId(String declaratorId){
-		this.declaratorId = declaratorId;
+		this.functionBody = null;
 	}
 
 	/**
 	 * Gets the name.
 	 *
-	 * @return     The name.
+	 * @return The name.
 	 */
-	public String getName(){
+
+	public String getName() {
 		return this.name;
 	}
 
 	/**
-	 * Sets the line start.
+	 * Gets the scope.
 	 *
-	 * @param      lineStart  The line start
+	 * @return The scope.
 	 */
-	public void setLineStart(int lineStart){
-		this.lineStart = lineStart;
+	public String getScope() {
+		return this.scope;
 	}
 
 	/**
 	 * Gets the line start.
 	 *
-	 * @return     The line start.
+	 * @return The line start.
 	 */
-	public int getLineStart(){
+	public int getLineStart() {
 		return this.lineStart;
+	}
+
+	/**
+	 * Gets the line end.
+	 *
+	 * @return The line end.
+	 */
+	public int getLineEnd() {
+		return this.lineEnd;
+	}
+
+	/**
+	 * Gets the parameters.
+	 *
+	 * @return The parameters.
+	 */
+	public List<VariableModel> getParameters() {
+		return this.parameters;
+	}
+
+	/**
+	 * Gets the function body.
+	 *
+	 * @return The function body.
+	 */
+	public FunctionBodyModel getFunctionBody() {
+		return this.functionBody;
+	}
+
+	/**
+	 * Sets the declarator identifier.
+	 *
+	 * @param declaratorId The declarator identifier
+	 */
+	public void setDeclaratorId(String declaratorId) {
+		this.declaratorId = declaratorId;
+	}
+
+	/**
+	 * Sets the scope.
+	 *
+	 * @param scope The scope
+	 */
+	public void setScope(String scope) {
+		this.scope = scope;
+	}
+
+	/**
+	 * Sets the line start.
+	 *
+	 * @param lineStart The line start
+	 */
+	public void setLineStart(int lineStart) {
+		this.lineStart = lineStart;
 	}
 
 	/**
 	 * Sets the line end.
 	 *
-	 * @param      lineEnd  The line end
+	 * @param lineEnd The line end
 	 */
-	public void setLineEnd(int lineEnd){
+	public void setLineEnd(int lineEnd) {
 		this.lineEnd = lineEnd;
-	}
-
-
-	/**
-	 * Gets the line end.
-	 *
-	 * @return     The line end.
-	 */
-	public int getLineEnd(){
-		return this.lineEnd;
-	}
-
-	/**
-	 * Adds a parameter.
-	 *
-	 * @param      parameter  The parameter
-	 */
-	public void addParameter(VariableModel parameter){
-		this.parameters.add(parameter);
 	}
 
 	/**
 	 * Sets the parameters.
 	 *
-	 * @param      parameters  The parameters
+	 * @param parameters The parameters
 	 */
-	public void setParameters(List<VariableModel> parameters){
+	public void setParameters(List<VariableModel> parameters) {
 		this.parameters = parameters;
 	}
 
 	/**
 	 * Sets the function body.
 	 *
-	 * @param      body  The body
+	 * @param body The body
 	 */
-	public void setFunctionBody(FunctionBodyModel body){
+	public void setFunctionBody(FunctionBodyModel body) {
 		this.functionBody = body;
+	}
+
+	/**
+	 * Adds a parameter.
+	 *
+	 * @param parameter The parameter
+	 */
+	public void addParameter(VariableModel parameter) {
+		this.parameters.add(parameter);
 	}
 
 	/**
 	 * Adds the data in model.
 	 *
-	 * @param      data  The data
+	 * @param data The data
 	 */
 	@Override
-	protected <T> void addDataInModel(T data){
-		if(data instanceof FunctionBodyModel){
+	protected <T> void addDataInModel(T data) {
+		if (data instanceof FunctionBodyModel) {
 			this.setFunctionBody((FunctionBodyModel) data);
+		} else if (data instanceof VariableModel) {
+			this.addParameter((VariableModel) data);
 		} else {
 			System.out.println("Error adding data in function model " + data.getClass());
 			System.exit(1);
@@ -154,10 +177,10 @@ public class FunctionModel extends Model{
 	/**
 	 * Gets the parsed code as JSONObject.
 	 *
-	 * @return     The parsed code.
+	 * @return The parsed code.
 	 */
 	@Override
-	public JSONObject getParsedCode(){
+	public JSONObject getParsedCode() {
 		JSONObject parsedCode = new JSONObject();
 
 		parsedCode.put("name", this.name);
@@ -171,7 +194,7 @@ public class FunctionModel extends Model{
 			parsedCode.put("parameters", parsedParameters);
 		}
 
-		if(this.functionBody != null){
+		if (this.functionBody != null) {
 			parsedCode.put("function_body", this.functionBody.getParsedCode());
 		}
 

@@ -15,14 +15,33 @@ buildscript {
     }
 }
 
-
 apply plugin: 'java'
 apply plugin: 'me.champeau.gradle.antlr4'
+apply plugin: 'jacoco'
 
-test {
-    useJUnitPlatform()
+jacoco {
+    toolVersion = "0.8.2"
 }
 
+jacocoTestReport {
+    reports {
+        xml.enabled false
+        csv.enabled false
+        html {
+            enabled true
+            destination file("$buildDir/jacoco/reports")
+        }
+    }
+}
+
+test.finalizedBy jacocoTestReport
+test {
+    useJUnitPlatform()
+    jacoco {
+        append = false
+        destinationFile = file("$buildDir/jacoco/jacocoTest.exec")
+    }
+}
 
 repositories {
     mavenLocal()
@@ -30,11 +49,11 @@ repositories {
     mavenCentral()
 }
 
-
 dependencies {
     // https://mvnrepository.com/artifact/org.json/json
     compile group: 'org.json', name: 'json', version: '20180813'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
+    testImplementation("com.ginsberg:junit5-system-exit:1.0.0")
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
 }
 
@@ -62,3 +81,16 @@ task fatJar(type: Jar) {
     with jar
     exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA'
 }
+
+task release(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'Java-Parser',
+                   'Implementation-Version': '0.0.1'
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+    exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA'
+}
+release.finalizedBy test
+
