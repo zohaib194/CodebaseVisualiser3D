@@ -110,13 +110,9 @@ public class CppParserFacadeTest {
 				"[ERROR] no valid listener attacted.\n"
 			)
 		);
-
-		setup();
 	}
 
-	/**
-	 * Setup the files for each test case.
-	 */
+	@BeforeAll
 	public void setup(){
 		try {
 			testDataDirectory = new File("/tmp/TestData");
@@ -164,8 +160,8 @@ public class CppParserFacadeTest {
 
 	@AfterAll
 	public void deleteTestDataDirectory(){
-		if(testDataDirectory.exists()){
-	        File[] files = testDataDirectory.listFiles();
+		if(this.testDataDirectory.exists()){
+	        File[] files = this.testDataDirectory.listFiles();
 	        if(files != null){
 	            for(int i=0; i<files.length; i++) {
 	            	if (files[i].getPath().contains(".cpp")) {
@@ -174,5 +170,6 @@ public class CppParserFacadeTest {
 	            }
 	        }
 	    }
+	    this.testDataDirectory.delete();
 	}
 }

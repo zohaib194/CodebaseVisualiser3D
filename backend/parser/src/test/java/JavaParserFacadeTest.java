@@ -7,6 +7,7 @@ import me.codvis.ast.parser.Java9BaseListener;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -110,13 +111,9 @@ public class JavaParserFacadeTest {
 				"[ERROR] no valid listener attacted.\n"
 			)
 		);
-
-		setup();
 	}
 
-	/**
-	 * Setup the files for each test case.
-	 */
+	@BeforeAll
 	public void setup(){
 		try {
 			testDataDirectory = new File("/tmp/TestData");
@@ -164,8 +161,8 @@ public class JavaParserFacadeTest {
 
 	@AfterAll
 	public void deleteTestDataDirectory(){
-		if(testDataDirectory.exists()){
-	        File[] files = testDataDirectory.listFiles();
+		if(this.testDataDirectory.exists()){
+	        File[] files = this.testDataDirectory.listFiles();
 	        if(files != null){
 	            for(int i=0; i<files.length; i++) {
 	            	if (files[i].getPath().contains(".java")) {
@@ -174,5 +171,6 @@ public class JavaParserFacadeTest {
 	            }
 	        }
 	    }
+	    this.testDataDirectory.delete();
 	}
 }
