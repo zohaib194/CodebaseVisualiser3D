@@ -51,6 +51,7 @@ repositories {
 
 dependencies {
     // https://mvnrepository.com/artifact/org.json/json
+    testCompile group: 'org.junit.platform', name: 'junit-platform-runner', version: '1.5.0-M1'
     compile group: 'org.json', name: 'json', version: '20180813'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
     testImplementation("com.ginsberg:junit5-system-exit:1.0.0")

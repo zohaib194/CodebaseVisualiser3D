@@ -168,7 +168,7 @@ public class FileModel extends Model {
 			this.addVariable((VariableModel) data);
 
 		} else {
-			System.out.println("Error adding data in file model");
+			System.err.println("Error adding data in file model");
 			System.exit(1);
 		}
 

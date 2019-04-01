@@ -29,7 +29,7 @@ public class JavaParserFacade {
      *
      * @throws     IOException  Input/output exception
      */
-    private static String readFile(File file, Charset encoding) throws IOException {
+    public static String readFile(File file, Charset encoding) throws IOException {
         byte[] encoded = Files.readAllBytes(file.toPath());
         return new String(encoded, encoding);
     }
