@@ -190,7 +190,7 @@ public class NamespaceModel extends Model {
 			this.addVariable((VariableModel) data);
 
 		} else {
-			System.out.println("Error adding data in namespace model");
+			System.err.println("Error adding data in namespace model");
 			System.exit(1);
 		}
 	}
