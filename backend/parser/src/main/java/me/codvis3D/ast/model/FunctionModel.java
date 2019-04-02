@@ -18,8 +18,11 @@ public class FunctionModel extends Model {
 	private List<VariableModel> parameters;
 	private FunctionBodyModel functionBody;
 
-	FunctionModel(String name) {
-		this.name = name;
+	/**
+	 * Constructs the object.
+	 */
+	FunctionModel() {
+		this.name = "";
 		this.parameters = new ArrayList<>();
 		this.functionBody = new FunctionBodyModel();
 	}
@@ -28,6 +31,18 @@ public class FunctionModel extends Model {
 	 * Constructs the object, setting the function name.
 	 *
 	 * @param name The name
+	 */
+	FunctionModel(String name) {
+		this.name = name;
+		this.parameters = new ArrayList<>();
+		this.functionBody = new FunctionBodyModel();
+	}
+
+	/**
+	 * Constructs the object, setting the function name.
+	 * 
+	 * @param name       The name
+	 * @param declarator The declarator
 	 */
 	FunctionModel(String name, String declarator) {
 		this.name = name;
@@ -58,9 +73,9 @@ public class FunctionModel extends Model {
 	/**
 	 * Sets the declarator identifier.
 	 *
-	 * @param      declaratorId  The declarator identifier
+	 * @param declaratorId The declarator identifier
 	 */
-	public void setDeclaratorId(String declaratorId){
+	public void setDeclaratorId(String declaratorId) {
 		this.declaratorId = declaratorId;
 	}
 
@@ -71,6 +86,15 @@ public class FunctionModel extends Model {
 	 */
 	public String getName() {
 		return this.name;
+	}
+
+	/**
+	 * Sets the name.
+	 * 
+	 * @param name The name.
+	 */
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	/**
@@ -130,9 +154,9 @@ public class FunctionModel extends Model {
 	/**
 	 * Sets the function body.
 	 *
-	 * @param      body  The body
+	 * @param body The body
 	 */
-	public void setFunctionBody(FunctionBodyModel body){
+	public void setFunctionBody(FunctionBodyModel body) {
 		this.functionBody = body;
 	}
 
@@ -142,8 +166,8 @@ public class FunctionModel extends Model {
 	 * @param data The data
 	 */
 	@Override
-	protected <T> void addDataInModel(T data){
-		if(data instanceof FunctionBodyModel){
+	protected <T> void addDataInModel(T data) {
+		if (data instanceof FunctionBodyModel) {
 			this.setFunctionBody((FunctionBodyModel) data);
 		} else {
 			System.err.println("Error adding data in function model " + data.getClass());
@@ -171,7 +195,7 @@ public class FunctionModel extends Model {
 			parsedCode.put("parameters", parsedParameters);
 		}
 
-		if(this.functionBody != null){
+		if (this.functionBody != null) {
 			parsedCode.put("function_body", this.functionBody.getParsedCode());
 		}
 
