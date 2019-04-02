@@ -39,6 +39,7 @@ public class CppLstnr_InitialTest {
 
 	@BeforeAll
 	public void setup() {
+
 		ParserTestCase functiondef_basic = new ParserTestCase("functiondefinition", filename, "void test() {}");
 		functiondef_basic.expected.add(
 				"{\"file\":{\"functions\":[{\"function\":{\"declrator_id\":\"test\",\"name\":\"void test()\",\"start_line\":1,\"function_body\":{},\"end_line\":1}}],\"file_name\":\""
@@ -46,26 +47,34 @@ public class CppLstnr_InitialTest {
 
 		ParserTestCase functiondef_basic_cpp17 = new ParserTestCase("functiondefinition", filename,
 				"auto heaven() -> void {}");
-		functiondef_basic.expected.add(
+		functiondef_basic_cpp17.expected.add(
 				"{\"file\":{\"functions\":[{\"function\":{\"declrator_id\":\"heaven\",\"name\":\"auto heaven() -> void\",\"start_line\":1,\"function_body\":{},\"end_line\":1}}],\"file_name\":\""
 						+ filename + "\"}}");
 
-		/*
-		 * ParserTestCase variable_basic = new ParserTestCase("variable_basic",
-		 * filename, "int a;"); variable_basic.expected .add(
-		 * "{\"file\":{\"variables\":[{\"variable\":{\"name\":\"a\",\"type\":\"int\"}}],\"file_name\":\""
-		 * + filename + "\"}}");
-		 * 
-		 * ParserTestCase variable_list = new ParserTestCase("variable_list", filename,
-		 * "int c, d = 1, e, f = 0;"); variable_list.expected.add(
-		 * "{\"file\":{\"variables\":[{\"variable\":{\"name\":\"c\",\"type\":\"int\"}},{\"variable\":{\"name\":\"d\",\"type\":\"int\"}},{\"variable\":{\"name\":\"e\",\"type\":\"int\"}},{\"variable\":{\"name\":\"f\",\"type\":\"int\"}}],\"file_name\":\""
-		 * + filename + "\"}}");
-		 */
+		ParserTestCase originalnamespacedefinition = new ParserTestCase("originalnamespacedefinition", filename,
+				"namespace Hello {}");
+		originalnamespacedefinition.expected.add("{\"file\":{\"file_name\":\"" + filename
+				+ "\",\"namespaces\":[{\"namespace\":{\"name\":\"Hello\"}}]}}");
 
-		// cases.add(variable_basic);
-		// cases.add(variable_list);
+		ParserTestCase usingdirective = new ParserTestCase("usingdirective", filename, "using namespace Hello;");
+		usingdirective.expected.add("{\"file\":{\"file_name\":\"" + filename
+				+ "\",\"using_namespaces\":[{\"namespace\":{\"line_number\":1,\"name\":\"Hello\"}}]}}");
+
+		ParserTestCase usingdirectiveNested = new ParserTestCase("usingdirective", filename,
+				"using namespace Hello::Hi::Bonjour;");
+		usingdirectiveNested.expected.add("{\"file\":{\"file_name\":\"" + filename
+				+ "\",\"using_namespaces\":[{\"namespace\":{\"line_number\":1,\"name\":\"Hello::Hi::Bonjour\"}}]}}");
+
+		ParserTestCase expressionstatement = new ParserTestCase("expressionstatement", filename, "void test() {f();}");
+		expressionstatement.expected.add("{\"file\":{\"file_name\":\"" + filename
+				+ "\",\"using_namespaces\":[{\"namespace\":{\"line_number\":1,\"name\":\"Hello::Hi::Bonjour\"}}]}}");
+
 		cases.add(functiondef_basic);
 		cases.add(functiondef_basic_cpp17);
+		cases.add(originalnamespacedefinition);
+		cases.add(usingdirective);
+		cases.add(usingdirectiveNested);
+		cases.add(expressionstatement);
 	}
 
 	@Test
@@ -98,6 +107,8 @@ public class CppLstnr_InitialTest {
 			walker.walk(listener, (ParseTree) tree);
 
 			for (String expected : caseData.expected) {
+				System.out.println(caseData.input);
+				System.out.println(expected);
 				assertEquals(expected, listener.getParsedCode().toString(), "Not equal");
 			}
 
@@ -107,22 +118,3 @@ public class CppLstnr_InitialTest {
 		}
 	}
 }
-
-// {\"file\":{\"variables\":[{\"variable\":{\"variable\":{\"name\":\"a\",\"type\":\"int\"}}],\"file_name\":\""
-// + filename + "\"}}
-// {\"file\":{\"variables\":[{\"variable\":{\"variable\":{\"name\":\"b\",\"type\":\"int\"}}],\"file_name\":\""
-// + filename + "\"}}
-// {\"file\":{\"variables\":[{\"variable\":{\"name\":\"c\",\"type\":\"int\"}},{\"variable\":{\"name\":\"d\",\"type\":\"int\"}},{\"variable\":{\"name\":\"e\",\"type\":\"int\"}},{\"variable\":{\"name\":\"f\",\"type\":\"int\"}}],\"file_name\":\""
-// + filename + "\"}}
-// {"file":{"variables":[{"variable":{"name":"list","type":"std::vector<int>"}}],\"file_name\":\""
-// + filename + "\"}}
-// {"file":{"variables":[{"variable":{"name":"a","type":"int"}},{"variable":{"name":"b","type":"int"}},{"variable":{"name":"c","type":"int"}},{"variable":{"name":"d","type":"int"}},{"variable":{"name":"e","type":"int"}},{"variable":{"name":"f","type":"int"}},{"variable":{"name":"list","type":"std::vector<int>"}}],"file_name":"./../../../../src/test/java/variable.cpp"}}
-// {"file":{"variables":[{"variable":{"name":"a","type":"int"}},{"variable":{"name":"b","type":"int"}},{"variable":{"name":"c","type":"int"}},{"variable":{"name":"d","type":"int"}},{"variable":{"name":"e","type":"int"}},{"variable":{"name":"f","type":"int"}},{"variable":{"name":"list","type":"std::vector<int>"}}],"file_name":"./../../../../src/test/java/variable.cpp"}}
-// {"file":{"variables":[{"variable":{"name":"a","type":"int"}},{"variable":{"name":"b","type":"int"}},{"variable":{"name":"c","type":"int"}},{"variable":{"name":"d","type":"int"}},{"variable":{"name":"e","type":"int"}},{"variable":{"name":"f","type":"int"}},{"variable":{"name":"list","type":"std::vector<int>"}}],"file_name":"./../../../../src/test/java/variable.cpp"}}
-// {"file":{"variables":[{"variable":{"name":"a","type":"int"}},{"variable":{"name":"b","type":"int"}},{"variable":{"name":"c","type":"int"}},{"variable":{"name":"d","type":"int"}},{"variable":{"name":"e","type":"int"}},{"variable":{"name":"f","type":"int"}},{"variable":{"name":"list","type":"std::vector<int>"}}],"file_name":"./../../../../src/test/java/variable.cpp"}}
-// {"file":{"variables":[{"variable":{"name":"a","type":"int"}},{"variable":{"name":"b","type":"int"}},{"variable":{"name":"c","type":"int"}},{"variable":{"name":"d","type":"int"}},{"variable":{"name":"e","type":"int"}},{"variable":{"name":"f","type":"int"}},{"variable":{"name":"list","type":"std::vector<int>"}}],"file_name":"./../../../../src/test/java/variable.cpp"}}
-// {"file":{"variables":[{"variable":{"name":"a","type":"int"}},{"variable":{"name":"b","type":"int"}},{"variable":{"name":"c","type":"int"}},{"variable":{"name":"d","type":"int"}},{"variable":{"name":"e","type":"int"}},{"variable":{"name":"f","type":"int"}},{"variable":{"name":"list","type":"std::vector<int>"}}],"file_name":"./../../../../src/test/java/variable.cpp"}}
-// {"file":{"variables":[{"variable":{"name":"a","type":"int"}},{"variable":{"name":"b","type":"int"}},{"variable":{"name":"c","type":"int"}},{"variable":{"name":"d","type":"int"}},{"variable":{"name":"e","type":"int"}},{"variable":{"name":"f","type":"int"}},{"variable":{"name":"list","type":"std::vector<int>"}}],"file_name":"./../../../../src/test/java/variable.cpp"}}
-// {"file":{"variables":[{"variable":{"name":"a","type":"int"}},{"variable":{"name":"b","type":"int"}},{"variable":{"name":"c","type":"int"}},{"variable":{"name":"d","type":"int"}},{"variable":{"name":"e","type":"int"}},{"variable":{"name":"f","type":"int"}},{"variable":{"name":"list","type":"std::vector<int>"}}],"file_name":"./../../../../src/test/java/variable.cpp"}}
-// {"file":{"variables":[{"variable":{"name":"a","type":"int"}},{"variable":{"name":"b","type":"int"}},{"variable":{"name":"c","type":"int"}},{"variable":{"name":"d","type":"int"}},{"variable":{"name":"e","type":"int"}},{"variable":{"name":"f","type":"int"}},{"variable":{"name":"list","type":"std::vector<int>"}}],"file_name":"./../../../../src/test/java/variable.cpp"}}
-// {"file":{"variables":[{"variable":{"name":"a","type":"int"}},{"variable":{"name":"b","type":"int"}},{"variable":{"name":"c","type":"int"}},{"variable":{"name":"d","type":"int"}},{"variable":{"name":"e","type":"int"}},{"variable":{"name":"f","type":"int"}},{"variable":{"name":"list","type":"std::vector<int>"}}],"file_name":"./../../../../src/test/java/variable.cpp"}}
