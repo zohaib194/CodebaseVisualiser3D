@@ -5,7 +5,7 @@
 int singleLineGlobalVar;
 int globalVariable, globalVariable1 = 0;
 
-int a = 1, *p = NULL, f(), (*pf)(double);
+int a = 1, *p = NULL, f(), g(), m(), (*pf)(double);
 
 void (*signal(int, void (*fp)(int)))(int);
 using namespace std;
@@ -13,25 +13,26 @@ class helloworld
 {
 	class hei
 	{
-		int sfdgnfggggdn;
+		double sfdgnfggggdn;
 	public:
 		hei();
 		~hei() {};
 	private:
-		int EEEEEEEEEEEEELLLLLLLLLLLLLLOOOOOOOOOOOO;
+		float EEEEEEEEEEEEELLLLLLLLLLLLLLOOOOOOOOOOOO;
 		int* getMeSomethingNice(int trell, float troll);
 	public:
 		int j, k, l, m = 0, o;
-		int aoo();
-		int boo();
+		int a(), b(), c();
+		double aoo();
+		float boo();
 		int coo();
-		int doo();
+		double doo();
 	protected:
 		int a;
-		int eoo();
-		int foo();
+		double eoo();
+		float foo();
 		int goo();
-		int hoo();
+		double hoo();
 	private:
 		int ioo();
 	};
