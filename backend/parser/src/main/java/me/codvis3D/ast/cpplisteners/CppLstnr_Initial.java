@@ -285,7 +285,13 @@ public class CppLstnr_Initial extends CppExtendedListener {
 		//this.scopeStack.peek().addDataInModel(ctx.getText());
 
 	}
-
+	/**
+	 * Listener for exiting the current scope.
+	 *
+	 * TODO: Function call in combination with "=" is not captured. e.g. HelloWorld* hw = new HelloWorld();
+	 *
+	 * @param      ctx   The context
+	 */
 	@Override
 	public void exitExpressionstatement(CPP14Parser.ExpressionstatementContext ctx) {
 		CallModel call = (CallModel) this.exitScope();

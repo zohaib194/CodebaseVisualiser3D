@@ -131,8 +131,61 @@ public class JavaLstnr_Initial extends JavaExtendedListener {
 	 */
 	@Override
 	public void enterMethodInvocation(Java9Parser.MethodInvocationContext ctx) {
-	    this.scopeStack.peek().addDataInModel(ctx.getText());
+		this.enterScope(new CallModel());
+	    //this.scopeStack.peek().addDataInModel(ctx.getText());
+
 	}
+
+	@Override
+	public void exitMethodInvocation(Java9Parser.MethodInvocationContext ctx) {
+		CallModel call = (CallModel) this.exitScope();
+
+ 	    String context = ctx.getText();
+		int countParantheses = 0;
+		int startParantheses = 0;
+		int endParantheses = 0;
+
+		for(int i = context.length() - 1; i >= 0; i--) {
+			char character = context.charAt(i);
+
+			if(character == ')'){
+				countParantheses++;
+				if(endParantheses == 0) {
+					endParantheses = i;
+				}
+
+			} else if(character == '('){
+				countParantheses--;
+				if(countParantheses == 0){
+					startParantheses = i;
+
+					break;
+				}
+			}
+		}
+
+		CharSequence parameterList = context.subSequence(startParantheses, endParantheses + 1);
+
+		context = context.replace(parameterList, "");
+
+		String[] splitContext = context.split("\\.");
+
+
+		for (int i = 0; i < splitContext.length - 1; i++ ) {
+			call.addScopeIdentifier(splitContext[i]);
+		}
+		if(parameterList != null){
+			call.setIdentifier(splitContext[splitContext.length - 1] + parameterList);
+		}
+
+		if(this.scopeStack.peek() instanceof FunctionBodyModel){
+			this.scopeStack.peek().addDataInModel(call);
+		} else {
+			System.err.println("Could not understand parent model for expression statement.");
+		}
+
+	}
+
 
 	/**
 	 * Listener for adding local variables in to the scope.
