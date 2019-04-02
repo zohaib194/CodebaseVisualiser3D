@@ -305,18 +305,18 @@ public class CppLstnr_Initial extends CppExtendedListener {
 		String context = ctx.getText();
 		int countParantheses = 0;
 		int startParantheses = 0;
-		int endParanthese = 0;
+		int endParantheses = 0;
 
 		for(int i = context.length() - 1; i >= 0; i--) {
 			char character = context.charAt(i);
 
-			if(character == ")"){
+			if(character == ')'){
 				countParantheses++;
-				if(endParantheses = 0) {
+				if(endParantheses == 0) {
 					endParantheses = i;
 				}
 
-			} else if(character == "("){
+			} else if(character == '('){
 				countParantheses--;
 				if(countParantheses == 0){
 					startParantheses = i;
@@ -326,26 +326,45 @@ public class CppLstnr_Initial extends CppExtendedListener {
 			}
 		}
 
-		Stirng parameterList = context.subSequence(startParantheses, endParantheses);
+		if(startParantheses != endParantheses){
 
-		context = context.replace(parameterList, "");
+			if(!context.subSequence(startParantheses, endParantheses + 2).toString().contains("=") && !ctx.getText().contains("=")){
 
-		String[] splitContext = scopeContext.split("::|->|\.")
+				CharSequence parameterList = context.subSequence(startParantheses, endParantheses + 2);
 
-		if(this.scopeStack.peek() instanceof FunctionBodyModel){
-			this.scopeStack.peek().addDataInModel(call);
+				context = context.replace(parameterList, "");
+				System.out.println("Replaced Context: " + context);
+
+				String[] splitContext = context.split("(::)|(->)|(\\.)");
+
+				System.out.println("Length of scopeArray:" + splitContext.length);
+
+				for (int i = 0; i < splitContext.length - 1; i++ ) {
+					System.out.println("Scope: " + splitContext[i]);
+					call.addScopeIdentifier(splitContext[i]);
+				}
+				if(parameterList != null){
+					call.setIdentifier(splitContext[splitContext.length - 1] + parameterList);
+				}
+
+				if(this.scopeStack.peek() instanceof FunctionBodyModel){
+					this.scopeStack.peek().addDataInModel(call);
+				} else {
+					System.err.println("Could not understand parent model for expression statement.");
+				}
+			}
 		}
 	}
 
 
-
+/*
 	@Override
 	public void enterPostfixexpression(CPP14Parser.PostfixexpressionContext ctx) {
 		if(this.scopeStack.peek() instanceof CallModel){
 			CallModel callModel = (CallModel) this.scopeStack.pop();
 
 			if(ctx.postfixexpression() != null && ctx.idexpression() != null){
-				callModel.setIdentifier(ctx.idexpression().getText());
+				//callModel.setIdentifier(ctx.idexpression().getText());
 
 				//callModel.addScopeIdentifier(ctx.postfixexpression().getText());
 
@@ -353,11 +372,11 @@ public class CppLstnr_Initial extends CppExtendedListener {
 
 			} else if(ctx.simpletypespecifier() != null) {
 				System.out.println("\n\n" + "PostfixexpressionContext/simpletypespecifier: "+ctx.getText() + " " + ctx.start.getLine());
-				//callModel.setIdentifier(ctx.getText());
+				callModel.setIdentifier(ctx.getText());
 
 			} else if(ctx.postfixexpression() != null) {
 				System.out.println("\n\n" + "PostfixexpressionContext/postfixexpression: "+ctx.getText() + " " + ctx.start.getLine());
-				callModel.setIdentifier(ctx.getText());
+				//callModel.setIdentifier(ctx.getText());
 
 			} else if(ctx.typenamespecifier() != null){
 				System.out.println("\n\n" + "PostfixexpressionContext/typenamespecifier: "+ctx.getText() + " " + ctx.start.getLine());
@@ -373,7 +392,7 @@ public class CppLstnr_Initial extends CppExtendedListener {
 		}
 	}
 
-/*
+
 	@Override
 	public void enterSimpletypespecifier(CPP14Parser.SimpletypespecifierContext ctx) {
 		if(this.scopeStack.peek() instanceof CallModel){

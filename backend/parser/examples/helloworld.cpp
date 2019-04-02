@@ -71,10 +71,10 @@ int main(int argc, char** argv)
 
 	j = 3;
 	i *= 2;
-    helloworld hello = helloworld();
-    helloworld* hello1 = new helloworld();
-    helloworld* hello2;
-    hello2 = new helloworld();
+	helloworld hello = helloworld();
+	helloworld* hello1 = new helloworld();
+	helloworld* hello2;
+	hello2 = new helloworld();
 
 	hello.print();
 	hello.hei.aoo();
@@ -82,19 +82,19 @@ int main(int argc, char** argv)
 	lolasdasdasd();
 	outerOuterNamespace::outerNamespace::hello::objectInNamespace.print();
 
-    std::cout << "Hello World!";
+	std::cout << "Hello World!";
 
-    return 0;
+	return 0;
 }
 
 // Function pointers are not parsed in current implementation.
 
 auto hell(helloworld* hey) -> bool {
-    return true;
+	return true;
 }
 
 auto heaven() -> bool {
-    return false;
+	return false;
 }
 
 int lolasdasdasd(int i, int j, bool istrue, float normalFloat){
@@ -129,9 +129,9 @@ namespace hello{
 
 	void foo();
 	void foo(int i);
-    void foo1(int i){
+	void foo1(int i){
 
-    }
+	}
 	void boo(){
 		foo();
 		foo(1);
@@ -140,7 +140,7 @@ namespace hello{
 	}
 
 	auto hoo() -> bool {
-	    return false;
+		return false;
 	}
 }
 
@@ -149,7 +149,7 @@ void hello::foo(){
 }
 
 void hello::foo(int i){
-    lol();
+	lol();
 }
 
 void helloworld::print() {
