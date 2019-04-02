@@ -94,7 +94,7 @@ public class AccessSpecifierModel extends Model {
 		} else if (data instanceof VariableModel) {
 			this.addVariable((VariableModel) data);
 		} else {
-			System.out.println("Error adding data in accessspecifier model");
+			System.err.println("Error adding data in accessspecifier model");
 			System.exit(1);
 		}
 

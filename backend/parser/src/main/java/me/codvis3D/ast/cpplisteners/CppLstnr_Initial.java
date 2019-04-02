@@ -10,11 +10,16 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Stack;
 import java.util.*;
+import java.lang.Class;
+import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 import org.json.JSONObject;
 
@@ -39,7 +44,6 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 * Listener for parsing a class declaration. Appends class model.
 	 *
 	 * @param ctx The parsing context
-	 */
 	@Override
 	public void enterClassspecifier(CPP14Parser.ClassspecifierContext ctx) {
 
@@ -64,7 +68,6 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 * entered by enterClassspecifier.
 	 *
 	 * @param ctx The parsing context
-	 */
 	@Override
 	public void exitClassspecifier(CPP14Parser.ClassspecifierContext ctx) {
 		// IS there an access specfier, exit it.
@@ -80,7 +83,6 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 * Listener for parsing a class declaration. Appends class model.
 	 *
 	 * @param ctx The parsing context
-	 */
 	@Override
 	public void enterAccessspecifier(CPP14Parser.AccessspecifierContext ctx) {
 		String name = ctx.getText();
@@ -114,7 +116,6 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 * entered by enterClassspecifier.
 	 *
 	 * @param ctx The parsing context
-	 */
 	@Override
 	public void exitAccessspecifier(CPP14Parser.AccessspecifierContext ctx) {
 		//
@@ -124,7 +125,6 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 * Listener for parsing a class head name. Adds name to class scope.
 	 *
 	 * @param ctx The parsing context
-	 */
 	@Override
 	public void enterClassname(CPP14Parser.ClassnameContext ctx) {
 		String className = "";
@@ -154,7 +154,6 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 * entered by enterClassname.
 	 *
 	 * @param ctx The parsing context
-	 */
 	@Override
 	public void exitClassname(CPP14Parser.ClassnameContext ctx) {
 		//
@@ -164,7 +163,6 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 * Listener for parsing a class member declaration.
 	 *
 	 * @param ctx The parsing context
-	 */
 	@Override
 	public void enterMemberdeclaration(CPP14Parser.MemberdeclarationContext ctx) {
 		//
@@ -175,7 +173,6 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 * entered by enterMemberdeclaration.
 	 *
 	 * @param ctx The parsing context
-	 */
 	@Override
 	public void exitMemberdeclaration(CPP14Parser.MemberdeclarationContext ctx) {
 		//
@@ -185,7 +182,6 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 * Listener for parsing a class member declaration.
 	 *
 	 * @param ctx The parsing context
-	 */
 	@Override
 	public void enterMemberdeclarator(CPP14Parser.MemberdeclaratorContext ctx) {
 		//
@@ -196,11 +192,11 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 * entered by enterMemberdeclarator.
 	 *
 	 * @param ctx The parsing context
-	 */
 	@Override
 	public void exitMemberdeclarator(CPP14Parser.MemberdeclaratorContext ctx) {
 		//
 	}
+	*/
 
 	@Override
 	public void enterFunctiondefinition(CPP14Parser.FunctiondefinitionContext ctx) {
@@ -285,8 +281,168 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 */
 	@Override
 	public void enterExpressionstatement(CPP14Parser.ExpressionstatementContext ctx) {
-		this.scopeStack.peek().addDataInModel(ctx.getText());
+		this.enterScope(new CallModel());
+		//this.scopeStack.peek().addDataInModel(ctx.getText());
+
 	}
+	/**
+	 * Listener for exiting the current scope.
+	 *
+	 * TODO: Function call in combination with "=" is not captured. e.g. HelloWorld* hw = new HelloWorld();
+	 *
+	 * @param      ctx   The context
+	 */
+	@Override
+	public void exitExpressionstatement(CPP14Parser.ExpressionstatementContext ctx) {
+		CallModel call = (CallModel) this.exitScope();
+
+		String context = ctx.getText();
+		int countParantheses = 0;
+		int startParantheses = 0;
+		int endParantheses = 0;
+
+		for(int i = context.length() - 1; i >= 0; i--) {
+			char character = context.charAt(i);
+
+			if(character == ')'){
+				countParantheses++;
+				if(endParantheses == 0) {
+					endParantheses = i;
+				}
+
+			} else if(character == '('){
+				countParantheses--;
+				if(countParantheses == 0){
+					startParantheses = i;
+
+					break;
+				}
+			}
+		}
+
+		if(startParantheses != endParantheses){
+
+			if(!context.subSequence(startParantheses, endParantheses + 2).toString().contains("=") && !ctx.getText().contains("=")){
+
+				CharSequence parameterList = context.subSequence(startParantheses, endParantheses + 2);
+
+				context = context.replace(parameterList, "");
+
+				String[] splitContext = context.split("(::)|(->)|(\\.)");
+
+
+				for (int i = 0; i < splitContext.length - 1; i++ ) {
+					call.addScopeIdentifier(splitContext[i]);
+				}
+				if(parameterList != null){
+					call.setIdentifier(splitContext[splitContext.length - 1] + parameterList);
+				}
+
+				if(this.scopeStack.peek() instanceof FunctionBodyModel){
+					this.scopeStack.peek().addDataInModel(call);
+				} else {
+					System.err.println("Could not understand parent model for expression statement.");
+				}
+			}
+		}
+	}
+
+
+/*
+	@Override
+	public void enterPostfixexpression(CPP14Parser.PostfixexpressionContext ctx) {
+		if(this.scopeStack.peek() instanceof CallModel){
+			CallModel callModel = (CallModel) this.scopeStack.pop();
+
+			if(ctx.postfixexpression() != null && ctx.idexpression() != null){
+				//callModel.setIdentifier(ctx.idexpression().getText());
+
+				//callModel.addScopeIdentifier(ctx.postfixexpression().getText());
+
+				System.out.println("\n\n" + "PostfixexpressionContext/idexpression: "+ctx.getText() + " " + ctx.start.getLine());
+
+			} else if(ctx.simpletypespecifier() != null) {
+				System.out.println("\n\n" + "PostfixexpressionContext/simpletypespecifier: "+ctx.getText() + " " + ctx.start.getLine());
+				callModel.setIdentifier(ctx.getText());
+
+			} else if(ctx.postfixexpression() != null) {
+				System.out.println("\n\n" + "PostfixexpressionContext/postfixexpression: "+ctx.getText() + " " + ctx.start.getLine());
+				//callModel.setIdentifier(ctx.getText());
+
+			} else if(ctx.typenamespecifier() != null){
+				System.out.println("\n\n" + "PostfixexpressionContext/typenamespecifier: "+ctx.getText() + " " + ctx.start.getLine());
+
+			}
+
+			if(ctx.primaryexpression() != null){
+				System.out.println("\n\n" + "PostfixexpressionContext/primaryexpression: "+ctx.getText() + " " + ctx.start.getLine());
+
+			}
+			this.enterScope(callModel);
+
+		}
+	}
+
+
+	@Override
+	public void enterSimpletypespecifier(CPP14Parser.SimpletypespecifierContext ctx) {
+		if(this.scopeStack.peek() instanceof CallModel){
+			CallModel callModel = (CallModel) this.scopeStack.pop();
+			if(ctx.nestednamespecifier() != null){
+				//System.out.println("\n\n" + "SimpletypespecifierContext/nestednamespecifier: "+ctx.getText() + " " + ctx.start.getLine());
+
+				callModel.addScopeIdentifier(ctx.nestednamespecifier().getText());
+				callModel.setIdentifier(ctx.thetypename().getText());
+			} else if(ctx.thetypename() != null) {
+				callModel.setIdentifier(ctx.thetypename().getText());
+
+				if(ctx.nestednamespecifier() != null){
+					callModel.addScopeIdentifier(ctx.nestednamespecifier().getText());
+				}
+
+			} else {
+				//System.out.println("\n\n" + "SimpletypespecifierContext: "+ctx.getText() + " " + ctx.start.getLine());
+				callModel.addScopeIdentifier(ctx.getText());
+			}
+			this.enterScope(callModel);
+		}
+	}
+*/
+/**
+
+	@Override
+	public void enterLiteral(CPP14Parser.LiteralContext ctx) {
+
+		System.out.println("LiteralContext: "+ctx.getText() + " " + ctx.start.getLine());
+	}
+
+
+	@Override
+	public void enterPostfixexpression(CPP14Parser.PostfixexpressionContext ctx) {
+		//if(ctx.primaryexpression() != null){
+			System.out.println("PostfixexpressionContext: "+ctx.getText() + " " + ctx.start.getLine());
+		//}
+
+	}
+
+
+	@Override
+	public void enterMultiplicativeexpression(CPP14Parser.MultiplicativeexpressionContext ctx) {
+			System.out.println("\nMultiplicativeexpressionContext: "+ctx.getText() + " " + ctx.start.getLine());
+
+	}
+	@Override
+	public void enterAssignmentexpression(CPP14Parser.AssignmentexpressionContext ctx) {
+		if(ctx.conditionalexpression() != null){
+			System.out.println("conditionalexpression: "+ctx.getText() + " " + ctx.start.getLine());
+		} else if(ctx.logicalorexpression() != null && isPtrVariable(ctx.initializerclause())){
+			System.out.println("\n\nlogicalorexpression: "+ctx.logicalorexpression().getText() + " " + ctx.start.getLine());
+			System.out.println("\n\nlogicalorexpression: "+ctx.getText() + " " + ctx.start.getLine());
+		} else if(ctx.throwexpression() != null){
+			System.out.println("throwexpression: "+ctx.getText() + " " + ctx.start.getLine());
+		}
+	}
+**/
 
 	/**
 	 * Listener for adding variable declaration into the scope.
@@ -295,11 +451,56 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 */
 	@Override
 	public void enterSimpledeclaration(CPP14Parser.SimpledeclarationContext ctx) {
+
 		if (!ctx.getText().contains("class") && !ctx.getText().contains("union") && !ctx.getText().contains("struct")) {
 			this.enterScope(new DeclaratorListModel());
 		}
 	}
+/*
+	@Override
+	public void enterPostfixexpression(CPP14Parser.PostfixexpressionContext ctx) {
+		System.out.println("PostfixexpressionContext: "+ctx.getText() + " " + ctx.start.getLine());
+	}
 
+	public boolean isPtrVariable(CPP14Parser.InitializerclauseContext ctx){
+		if(ctx.assignmentexpression() != null) {
+			return true;
+		}
+
+		return false;
+	}
+	@Override
+	public void enterExpression(CPP14Parser.ExpressionContext ctx) {
+		if(ctx.unaryexpression() != null){
+			System.out.println("\n\n" + "ExpressionContext: " + ctx.getText() + "\n\n");
+
+		}
+	}
+*/
+
+/*
+	@Override
+	public void enterMultiplicativeexpression(CPP14Parser.MultiplicativeexpressionContext ctx) {
+		if(ctx.multiplicativeexpression() != null && ctx.pmexpression() != null){
+			if(ctx.pmexpression().castexpression() != null){
+				if(ctx.pmexpression().castexpression().unaryexpression() != null){
+					if(ctx.pmexpression().castexpression().unaryexpression().postfixexpression() != null){
+						if(ctx.pmexpression().castexpression().unaryexpression().postfixexpression().primaryexpression() != null){
+							if(ctx.pmexpression().castexpression().unaryexpression().postfixexpression().primaryexpression().idexpression() != null){
+								if(ctx.pmexpression().castexpression().unaryexpression().postfixexpression().primaryexpression().idexpression().unqualifiedid() != null){
+									if(ctx.pmexpression().castexpression().unaryexpression().postfixexpression().primaryexpression().idexpression().unqualifiedid().Identifier() != null){
+										System.out.println("\nMultiplicativeexpressionContext: " + ctx.getText() + "\n");
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+*/
 	/**
 	 * Listener for exiting the current scope, and add data in model parent scope.
 	 *
@@ -483,7 +684,7 @@ public class CppLstnr_Initial extends CppExtendedListener {
 		} else if (this.scopeStack.peek() instanceof DeclaratorListModel) {
 			this.scopeStack.peek().addDataInModel(ctx.getText());
 		} else {
-			System.err.println("Could not understand parent model for variable modifier.");
+			System.err.println("Could not understand parent model for variable modifier. " + ctx.getStart().getLine());
 		}
 	}
 
@@ -517,9 +718,9 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	/**
 	 * Gets the file model.
 	 *
-	 * @return The file model.
+	 * @return     The file model.
 	 */
-	public FileModel getFileModel() {
+	public FileModel getFileModel(){
 		return this.fileModel;
 	}
-}
+ }

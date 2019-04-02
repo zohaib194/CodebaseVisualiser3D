@@ -63,7 +63,7 @@ public class DeclaratorListModel extends Model {
 		if (data instanceof String) {
 			this.setType((String) data);
 		} else {
-			System.out.println("Error adding data in DeclaratorList Model " + data.getClass().getName());
+			System.err.println("Error adding data in DeclaratorList Model " + data.getClass().getName());
 			System.exit(1);
 		}
 

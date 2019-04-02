@@ -11,7 +11,7 @@ import org.json.JSONArray;
  * Class for abstracting a code function.
  */
 public class FunctionBodyModel extends Model {
-	private List<String> calls;
+	private List<CallModel> calls;
 	private List<VariableModel> variables;
 
 	FunctionBodyModel() {
@@ -24,7 +24,7 @@ public class FunctionBodyModel extends Model {
 	 *
 	 * @param call The call
 	 */
-	private void addCall(String call) {
+	private void addCall(CallModel call) {
 		this.calls.add(call);
 	}
 
@@ -54,14 +54,18 @@ public class FunctionBodyModel extends Model {
 	@Override
 	protected <T> void addDataInModel(T data) {
 
-		if (data instanceof String) {
-			this.addCall((String) data);
+		if (data instanceof CallModel) {
+			CallModel call = ((CallModel) data);
+			if(call.getIdentifier() == "" && call.getScopeIdentifier().size() == 0){
+				return ;
+			}
 
+			this.addCall((CallModel) data);
 		} else if (data instanceof VariableModel) {
 			this.addVariable((VariableModel) data);
 
 		} else {
-			System.out.println("Error adding data in function model: " + data.getClass());
+			System.err.println("Error adding data in function body model: " + data.getClass());
 			System.exit(1);
 
 		}
@@ -77,7 +81,10 @@ public class FunctionBodyModel extends Model {
 	public JSONObject getParsedCode() {
 		JSONObject parsedCode = new JSONObject();
 
-		parsedCode.put("calls", this.calls);
+		JSONArray parsedCalls = this.convertClassListJsonObjectList(this.calls);
+		if (parsedCalls != null) {
+			parsedCode.put("calls", parsedCalls);
+		}
 
 		JSONArray parsedVariables = this.convertClassListJsonObjectList(this.variables);
 		if (parsedVariables != null) {

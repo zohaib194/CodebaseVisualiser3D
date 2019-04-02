@@ -1,5 +1,6 @@
 var indexStack = new Array();
 var functionModels = new Map();
+var indexToFunctionMap = new Map();
 
 var fileCount = 0;
 var parsedFileCount = 0;
@@ -32,13 +33,51 @@ function linkElements() {
     // If I have a parent, add attractive link between us.
     if (indexStack.length >= 2) {
         fdg.addLink(
-            indexStack[indexStack.length - 2], 
-            indexStack[indexStack.length - 1], 
+            indexStack[indexStack.length - 2],
+            indexStack[indexStack.length - 1],
             new LinkProperties(1)
         );
     } else {    // Missing parrent, state so.
         console.log(LOCALE.getSentence("fdg_link_missing_parent"));
     }
+}
+
+/**
+ * Links function calls.
+ */
+function linkFunctionCalls(){
+    indexToFunctionMap.forEach( function(callerIndex, callerFuncName) {
+
+        // Get the function caller.
+        funcModel = functionModels.get(callerFuncName);
+        // Check the calls length.
+        if(funcModel.getCalls().length == 0){
+            return;
+        }
+
+        console.log("Caller: ", callerIndex, callerFuncName);
+
+        // Loop through calls
+        funcModel.getCalls().forEach( function(calleeFuncName, index) {
+
+            calleeIndex = indexToFunctionMap.get(calleeFuncName)
+            console.log("Callee: ", calleeIndex, calleeFuncName);
+
+
+
+           /* if(functionModels.has(funcName)){
+
+                fdg.addLink(
+                    indexStack[callerIndex],
+                    indexStack[calleeIndex],
+                    new LinkProperties(1)
+                );
+
+            }
+            */
+        });
+
+    });
 }
 
 /**
@@ -51,8 +90,8 @@ function handleClassData(classData, filename) {
     indexStack.push(
         fdg.addNode(
             new Node(
-                randomPosition(), 
-                classData.Class.name, 
+                randomPosition(),
+                classData.Class.name,
                 "class"
             )
         )
@@ -77,8 +116,8 @@ function handleNamespaceData(namespaceData, filename) {
     indexStack.push(
         fdg.addNode(
             new Node(
-                randomPosition(), 
-                namespaceData.namespace.name, 
+                randomPosition(),
+                namespaceData.namespace.name,
                 "namespace"
             )
         )
@@ -102,21 +141,28 @@ function handleNamespaceData(namespaceData, filename) {
  */
 function handleFunctionData(functionData, filename) {
     // Add node and save index to stack.
-    indexStack.push(
-        fdg.addNode(
+    index = fdg.addNode(
             new Node(
-                randomPosition(), 
-                functionData.function.name, 
+                randomPosition(),
+                functionData.function.name,
                 "function"
             )
-        )
-    );
+        );
+
+    // Push current node to index stack.
+    indexStack.push(index);
+
+    // Map current node to the index.
+    indexToFunctionMap.set(functionData.function.name, index);
+
     // Save the function data in function model.
     functionModels.set(
         functionData.function.name,
-        new FunctionMetaData( 
+        new FunctionMetaData(
             filename,
-            functionData.function.start_line, 
+            functionData.function.calls,
+            functionData.function.declrator_id,
+            functionData.function.start_line,
             functionData.function.end_line
         )
     );
@@ -169,12 +215,12 @@ function handleProjectData(projectData) {
     // Handle every file given.
     projectData.files.forEach((file) => {
 
-        // If file is not parsed, skip it 
+        // If file is not parsed, skip it
         // ("return" returns from lambda not forEach).
         if (file.file.parsed != true) {
             return;
         }
-    
+
         // File is parsed correctly, process it.
         lineCount += file.file.linesInFile;
         handleCodeData(file.file, file.file.file_name);
@@ -184,4 +230,6 @@ function handleProjectData(projectData) {
     windowMgr.setClassCount(classCount);
     windowMgr.setNamespaceCount(namespaceCount);
     windowMgr.setLineCount(lineCount);
+
+    linkFunctionCalls();
 }
