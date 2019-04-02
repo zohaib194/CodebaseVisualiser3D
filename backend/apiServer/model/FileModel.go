@@ -1,7 +1,7 @@
 package model
 
-// FilesModel is a wrapper for FileModel for json parsing
-type FilesModel struct {
+// FileWrapperModel is a wrapper for FileModel for json parsing
+type FileWrapperModel struct {
 	File FileModel `json:"file"`
 }
 
@@ -9,9 +9,9 @@ type FilesModel struct {
 type FileModel struct {
 	Parsed      bool              `json:"parsed"`
 	FileName    string            `json:"file_name"`
-	Functions   []FunctionsModel  `json:"functions"`
-	Namespaces  []NamespacesModel `json:"namespaces"`
-	Classes     []ClassesModel    `json:"classes"`
-	Variables   []VariablesModel  `json:"variables"`
+	Functions   []FunctionModel  `json:"functions, omitempty"`
+	Namespaces  []NamespaceModel `json:"namespaces, omitempty"`
+	Classes     []ClassModel    `json:"classes, omitempty"`
+	Variables   []VariableModel  `json:"variables, omitempty"`
 	LinesInFile int               `json:"linesInFile"`
 }

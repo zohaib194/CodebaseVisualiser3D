@@ -44,7 +44,6 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 * Listener for parsing a class declaration. Appends class model.
 	 *
 	 * @param ctx The parsing context
-	 */
 	@Override
 	public void enterClassspecifier(CPP14Parser.ClassspecifierContext ctx) {
 
@@ -69,7 +68,6 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 * entered by enterClassspecifier.
 	 *
 	 * @param ctx The parsing context
-	 */
 	@Override
 	public void exitClassspecifier(CPP14Parser.ClassspecifierContext ctx) {
 		// IS there an access specfier, exit it.
@@ -85,7 +83,6 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 * Listener for parsing a class declaration. Appends class model.
 	 *
 	 * @param ctx The parsing context
-	 */
 	@Override
 	public void enterAccessspecifier(CPP14Parser.AccessspecifierContext ctx) {
 		String name = ctx.getText();
@@ -119,7 +116,6 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 * entered by enterClassspecifier.
 	 *
 	 * @param ctx The parsing context
-	 */
 	@Override
 	public void exitAccessspecifier(CPP14Parser.AccessspecifierContext ctx) {
 		//
@@ -129,7 +125,6 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 * Listener for parsing a class head name. Adds name to class scope.
 	 *
 	 * @param ctx The parsing context
-	 */
 	@Override
 	public void enterClassname(CPP14Parser.ClassnameContext ctx) {
 		String className = "";
@@ -159,7 +154,6 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 * entered by enterClassname.
 	 *
 	 * @param ctx The parsing context
-	 */
 	@Override
 	public void exitClassname(CPP14Parser.ClassnameContext ctx) {
 		//
@@ -169,7 +163,6 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 * Listener for parsing a class member declaration.
 	 *
 	 * @param ctx The parsing context
-	 */
 	@Override
 	public void enterMemberdeclaration(CPP14Parser.MemberdeclarationContext ctx) {
 		//
@@ -180,7 +173,6 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 * entered by enterMemberdeclaration.
 	 *
 	 * @param ctx The parsing context
-	 */
 	@Override
 	public void exitMemberdeclaration(CPP14Parser.MemberdeclarationContext ctx) {
 		//
@@ -190,7 +182,6 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 * Listener for parsing a class member declaration.
 	 *
 	 * @param ctx The parsing context
-	 */
 	@Override
 	public void enterMemberdeclarator(CPP14Parser.MemberdeclaratorContext ctx) {
 		//
@@ -201,11 +192,11 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 * entered by enterMemberdeclarator.
 	 *
 	 * @param ctx The parsing context
-	 */
 	@Override
 	public void exitMemberdeclarator(CPP14Parser.MemberdeclaratorContext ctx) {
 		//
 	}
+	*/
 
 	@Override
 	public void enterFunctiondefinition(CPP14Parser.FunctiondefinitionContext ctx) {
@@ -290,7 +281,6 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 */
 	@Override
 	public void enterExpressionstatement(CPP14Parser.ExpressionstatementContext ctx) {
-		System.out.println("Entered ExpressionstatementContext");
 		this.enterScope(new CallModel());
 		//this.scopeStack.peek().addDataInModel(ctx.getText());
 
@@ -298,8 +288,6 @@ public class CppLstnr_Initial extends CppExtendedListener {
 
 	@Override
 	public void exitExpressionstatement(CPP14Parser.ExpressionstatementContext ctx) {
-		System.out.println("\n\n" + "ExpressionstatementContext: "+ctx.getText() + " " + ctx.start.getLine());
-		System.out.println("Exited ExpressionstatementContext");
 		CallModel call = (CallModel) this.exitScope();
 
 		String context = ctx.getText();
@@ -333,14 +321,11 @@ public class CppLstnr_Initial extends CppExtendedListener {
 				CharSequence parameterList = context.subSequence(startParantheses, endParantheses + 2);
 
 				context = context.replace(parameterList, "");
-				System.out.println("Replaced Context: " + context);
 
 				String[] splitContext = context.split("(::)|(->)|(\\.)");
 
-				System.out.println("Length of scopeArray:" + splitContext.length);
 
 				for (int i = 0; i < splitContext.length - 1; i++ ) {
-					System.out.println("Scope: " + splitContext[i]);
 					call.addScopeIdentifier(splitContext[i]);
 				}
 				if(parameterList != null){
@@ -608,7 +593,6 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 */
 	@Override
 	public void enterQualifiedid(CPP14Parser.QualifiedidContext ctx) {
-		System.out.println("\n\n" + "QualifiedidContext: "+ctx.nestednamespecifier().getText() + " " + ctx.start.getLine());
 		if (ctx.nestednamespecifier() != null) {
 			Model model = this.exitScope();
 			if (model instanceof FunctionModel) {
@@ -683,7 +667,6 @@ public class CppLstnr_Initial extends CppExtendedListener {
 
 	@Override
 	public void enterDeclspecifier(CPP14Parser.DeclspecifierContext ctx) {
-		System.out.println("\n\n" + "DeclspecifierContext: "+ctx.getText() + " " + ctx.start.getLine());
 		if (this.scopeStack.peek() instanceof VariableModel) {
 			VariableModel vm = (VariableModel) this.exitScope();
 			vm.applyModifierOnType(ctx.getText());
@@ -695,7 +678,7 @@ public class CppLstnr_Initial extends CppExtendedListener {
 		} else if (this.scopeStack.peek() instanceof DeclaratorListModel) {
 			this.scopeStack.peek().addDataInModel(ctx.getText());
 		} else {
-			System.err.println("Could not understand parent model for variable modifier.");
+			System.err.println("Could not understand parent model for variable modifier. " + ctx.getStart().getLine());
 		}
 	}
 

@@ -146,7 +146,7 @@ public class FunctionModel extends Model {
 		if(data instanceof FunctionBodyModel){
 			this.setFunctionBody((FunctionBodyModel) data);
 		} else {
-			System.out.println("Error adding data in function model " + data.getClass());
+			System.err.println("Error adding data in function model " + data.getClass());
 			System.exit(1);
 		}
 	}
@@ -174,7 +174,7 @@ public class FunctionModel extends Model {
 		if(this.functionBody != null){
 			parsedCode.put("function_body", this.functionBody.getParsedCode());
 		}
-		
+
 		return parsedCode;
 	}
 }

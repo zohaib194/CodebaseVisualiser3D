@@ -180,8 +180,7 @@ public class FileModel extends Model {
 			this.addClass((ClassModel) data);
 
 		} else {
-			System.out.println(data);
-			System.out.println("Error adding data in file model");
+			System.err.println("Error adding data in file model");
 			System.exit(1);
 		}
 

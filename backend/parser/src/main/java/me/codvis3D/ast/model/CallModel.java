@@ -74,7 +74,7 @@ public class CallModel extends Model{
 	 */
 	@Override
 	protected <T> void addDataInModel(T data){
-		System.out.println("Error adding data in call model");
+		System.err.println("Error adding data in call model");
 		System.exit(1);
 
 	}
@@ -90,7 +90,7 @@ public class CallModel extends Model{
 
 		parsedCode.put("identifier", this.identifier);
 
-		parsedCode.put("Scope", this.scopeIdentifier);
+		parsedCode.put("scopes", this.scopeIdentifier);
 		return parsedCode;
 	}
 

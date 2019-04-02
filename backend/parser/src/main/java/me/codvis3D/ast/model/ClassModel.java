@@ -78,7 +78,7 @@ public class ClassModel extends Model {
 		} else if (data instanceof String) {
 			this.setName((String) data);
 		} else {
-			System.out.println("Error adding data in class model");
+			System.err.println("Error adding data in class model");
 			System.exit(1);
 		}
 	}

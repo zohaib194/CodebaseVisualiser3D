@@ -19,7 +19,7 @@ public class Model {
 	 * @param data The data
 	 */
 	protected <T> void addDataInModel(T data) {
-		System.out.println("addDataInModel not implemented");
+		System.err.println("addDataInModel not implemented");
 		System.exit(1);
 	}
 
