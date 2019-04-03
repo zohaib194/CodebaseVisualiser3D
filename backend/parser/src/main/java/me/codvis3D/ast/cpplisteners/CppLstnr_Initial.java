@@ -92,12 +92,11 @@ public class CppLstnr_Initial extends CppExtendedListener {
 
 	@Override
 	public void enterAccessspecifier(CPP14Parser.AccessspecifierContext ctx) {
-		String name = ctx.getText(); // Currently in AccessSpecifierModel.
-		if (this.scopeStack.peek() instanceof AccessSpecifierModel) { // Found a different specifier than the current
-																		// one.
-			if (((AccessSpecifierModel) this.scopeStack.peek()).getName() != name) { // Exit it!
+		String name = ctx.getText();
+		if (this.scopeStack.peek() instanceof AccessSpecifierModel) {
+			// Found a different specifier than the current one.
+			if (((AccessSpecifierModel) this.scopeStack.peek()).getName() != name) {
 				this.exitScope();
-				// Within a class model.
 				if (this.scopeStack.peek() instanceof ClassModel) {
 					ClassModel classModel = (ClassModel) this.scopeStack.peek();
 					// Get exsiting access specifier model with name
@@ -132,15 +131,14 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	@Override
 	public void enterClassname(CPP14Parser.ClassnameContext ctx) {
 		String className = "";
-		// Get name of class.
 		if (ctx.Identifier() != null) {
 			className = ctx.Identifier().getText();
 		} else if (ctx.simpletemplateid() != null) {
 			className = ctx.simpletemplateid().getText();
 		} else {
-			// Couldn't find name of class.
 			System.err.println("Couldn't find name of class!");
 		}
+
 		// Inside AccessSpecifierModel, update ClassModel underneath if existant.
 		if (this.scopeStack.peek() instanceof AccessSpecifierModel && className != "") {
 			AccessSpecifierModel asm = (AccessSpecifierModel) this.exitScope();
@@ -169,6 +167,7 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	 */
 	@Override
 	public void enterMemberdeclaration(CPP14Parser.MemberdeclarationContext ctx) {
+
 		if (ctx.declspecifierseq() != null && ctx.memberdeclaratorlist() != null) {
 
 			if (ctx.memberdeclaratorlist().memberdeclaratorlist() == null) {
@@ -207,7 +206,6 @@ public class CppLstnr_Initial extends CppExtendedListener {
 					this.scopeStack.peek().addDataInModel(vm);
 				}
 
-				System.out.println("Functions list size: " + declaratorList.getFunctions().size());
 				for (Iterator<String> i = declaratorList.getFunctions().iterator(); i.hasNext();) {
 					String functionName = i.next();
 					FunctionModel func = new FunctionModel(declaratorList.getType() + " " + functionName);
@@ -305,8 +303,6 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	@Override
 	public void enterExpressionstatement(CPP14Parser.ExpressionstatementContext ctx) {
 		this.enterScope(new CallModel());
-		// this.scopeStack.peek().addDataInModel(ctx.getText());
-
 	}
 
 	/**
@@ -549,7 +545,6 @@ public class CppLstnr_Initial extends CppExtendedListener {
 			if (isVariable(ctx)) {
 				declaratorList.addVariable(ctx.getText());
 			} else {
-				System.out.println("Function name: " + ctx.getText());
 				declaratorList.addFunction(ctx.getText());
 			}
 			this.enterScope(declaratorList);
@@ -565,7 +560,6 @@ public class CppLstnr_Initial extends CppExtendedListener {
 	@Override
 	public void enterDeclspecifier(CPP14Parser.DeclspecifierContext ctx) {
 		if (this.scopeStack.peek() instanceof VariableModel) {
-			System.out.println(ctx.getText() + " | LineNr: " + ctx.getStart().getLine());
 			VariableModel vm = (VariableModel) this.exitScope();
 			vm.applyModifierOnType(ctx.getText());
 			this.enterScope(vm);

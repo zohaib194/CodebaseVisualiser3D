@@ -10,11 +10,13 @@ import me.codvis.ast.AccessSpecifierModel;
 
 public class ClassModel extends Model {
 	private String name;
+	private List<String> parents;
 	List<AccessSpecifierModel> accessSpecifiers;
 
 	ClassModel() {
 		this.name = "";
 		this.accessSpecifiers = new ArrayList<>();
+		this.parents = new ArrayList<>();
 	}
 
 	public String getName() {
@@ -23,6 +25,18 @@ public class ClassModel extends Model {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public List<String> getParents() {
+		return this.parents;
+	}
+
+	public void setParents(List<String> parents) {
+		this.parents = parents;
+	}
+
+	public void addParent(String name) {
+		this.parents.add(name);
 	}
 
 	public AccessSpecifierModel getAccessSpecifier(String name) {
@@ -63,6 +77,10 @@ public class ClassModel extends Model {
 		if (parsedAccessSpecifiers != null) {
 			parsedCode.put("access_specifiers", parsedAccessSpecifiers);
 		}
+
+		if (this.parents.size() > 0) {
+			parsedCode.put("parents", this.parents);
+		}
 		return parsedCode;
 	}
 
@@ -78,7 +96,7 @@ public class ClassModel extends Model {
 		} else if (data instanceof String) {
 			this.setName((String) data);
 		} else {
-			System.err.println("Error adding data in class model");
+			System.err.println("Error adding data in class model: " + data.getClass().getName());
 			System.exit(1);
 		}
 	}

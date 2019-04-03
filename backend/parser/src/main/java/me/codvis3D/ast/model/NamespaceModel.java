@@ -1,11 +1,10 @@
 package me.codvis.ast;
 
-import java.util.Stack;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
-import org.json.JSONObject;
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * Class for abstracting a code namespace.
@@ -17,6 +16,7 @@ public class NamespaceModel extends Model {
 	private List<UsingNamespaceModel> usingNamespaces;
 	private List<String> calls;
 	private List<VariableModel> variables;
+	private List<ClassModel> classes;
 
 	/**
 	 * Constructs the namespace, setting the name.
@@ -30,6 +30,7 @@ public class NamespaceModel extends Model {
 		this.usingNamespaces = new ArrayList<>();
 		this.calls = new ArrayList<>();
 		this.variables = new ArrayList<>();
+		this.classes = new ArrayList<>();
 	}
 
 	/**
@@ -57,6 +58,15 @@ public class NamespaceModel extends Model {
 	 */
 	public void addUsingNamespace(UsingNamespaceModel namespace) {
 		this.usingNamespaces.add(namespace);
+	}
+
+	/**
+	 * Adds an class.
+	 *
+	 * @param class The class
+	 */
+	public void addClass(ClassModel clazz) {
+		this.classes.add(clazz);
 	}
 
 	/**
@@ -96,6 +106,15 @@ public class NamespaceModel extends Model {
 	}
 
 	/**
+	 * Sets the classes list.
+	 *
+	 * @param classes The classes
+	 */
+	public void setClasses(List<ClassModel> classes) {
+		this.classes = classes;
+	}
+
+	/**
 	 * Adds a call.
 	 *
 	 * @param functionCall The function call
@@ -107,27 +126,27 @@ public class NamespaceModel extends Model {
 	/**
 	 * Adds a variable.
 	 *
-	 * @param      variable  The variable
+	 * @param variable The variable
 	 */
-	public void addVariable(VariableModel variable){
+	public void addVariable(VariableModel variable) {
 		this.variables.add(variable);
 	}
 
 	/**
 	 * Gets the variables.
 	 *
-	 * @return     The variables.
+	 * @return The variables.
 	 */
-	public List<VariableModel> getVariables(){
+	public List<VariableModel> getVariables() {
 		return this.variables;
 	}
 
 	/**
 	 * Sets the variables.
 	 *
-	 * @param      variables  The variables
+	 * @param variables The variables
 	 */
-	public void setVariables(List<VariableModel> variables){
+	public void setVariables(List<VariableModel> variables) {
 		this.variables = variables;
 	}
 
@@ -142,7 +161,7 @@ public class NamespaceModel extends Model {
 		if (data instanceof FunctionModel) {
 			this.addFunction((FunctionModel) data);
 
-		} else if (data instanceof  NamespaceModel) {
+		} else if (data instanceof NamespaceModel) {
 			this.addNamespace((NamespaceModel) data);
 
 		} else if (data instanceof UsingNamespaceModel) {
@@ -151,8 +170,11 @@ public class NamespaceModel extends Model {
 		} else if (data instanceof String) {
 			this.addCall((String) data);
 
-		} else if (data instanceof VariableModel){
+		} else if (data instanceof VariableModel) {
 			this.addVariable((VariableModel) data);
+
+		} else if (data instanceof ClassModel) {
+			this.addClass((ClassModel) data);
 
 		} else {
 			System.err.println("Error adding data in namespace model: " + data.getClass().getName());
@@ -189,6 +211,11 @@ public class NamespaceModel extends Model {
 		JSONArray parsedVariables = this.convertClassListJsonObjectList(this.variables);
 		if (parsedVariables != null) {
 			parsedCode.put("variables", parsedVariables);
+		}
+
+		JSONArray parsedClasses = this.convertClassListJsonObjectList(this.classes);
+		if (parsedClasses != null) {
+			parsedCode.put("classes", parsedClasses);
 		}
 
 		parsedCode.put("calls", this.calls);
