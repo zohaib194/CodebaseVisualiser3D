@@ -173,7 +173,6 @@ public class CppLstnr_Initial extends CppExtendedListener {
 
 			if (ctx.memberdeclaratorlist().memberdeclaratorlist() == null) {
 				if (ctx.getText().contains("(") && ctx.getText().contains(")")) {
-					System.out.print("Function List: " + ctx.getText());
 					FunctionModel functionModel = new FunctionModel("");
 					functionModel.setLineStart(ctx.getStart().getLine());
 					functionModel.setLineEnd(ctx.getStop().getLine());
@@ -220,36 +219,6 @@ public class CppLstnr_Initial extends CppExtendedListener {
 				this.scopeStack.peek().addDataInModel(model);
 			}
 		}
-	}
-
-	/**
-	 * Listener for parsing a class member declaration.
-	 *
-	 * @param ctx The parsing context
-	 */
-	@Override
-	public void enterMemberdeclarator(CPP14Parser.MemberdeclaratorContext ctx) {
-		/*
-		 * if (ctx.getText().contains("(") && ctx.getText().contains(")")) {
-		 * FunctionModel functionModel = new FunctionModel("");
-		 * functionModel.setLineStart(ctx.getStart().getLine());
-		 * functionModel.setLineEnd(ctx.getStop().getLine());
-		 * this.enterScope(functionModel); } else { this.enterScope(new
-		 * VariableModel()); }
-		 */
-	}
-
-	/**
-	 * Listener for exiting the current scope, expecting that scope to be one
-	 * entered by enterMemberdeclarator.
-	 *
-	 * @param ctx The parsing context
-	 */
-	@Override
-	public void exitMemberdeclarator(CPP14Parser.MemberdeclaratorContext ctx) {
-		/*
-		 * Model model = this.exitScope(); this.scopeStack.peek().addDataInModel(model);
-		 */
 	}
 
 	@Override
