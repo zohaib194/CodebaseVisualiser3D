@@ -87,7 +87,13 @@ function linkFunctionCalls(){
  * @param {JSONObject} classData - Data about a class.
  */
 function handleClassData(classData, filename) {
-    var children = handleCodeData(classData.Class, filename);
+    var children = [];
+    if (typeof classData.access_specifiers !== "undefined") {
+        // Handle all functions
+        classData.access_specifiers.forEach( (object) => {
+            children = children.concat(handleAccessSpecifiers(object, filename));
+        });
+    }
     var position = randomPosition({x:0, y:0, z:0}, 5);
     var size = 5;
 
@@ -98,7 +104,7 @@ function handleClassData(classData, filename) {
     // Add node and save index.
     nodeSelf = new Node(
         position,
-        classData.Class.name,
+        classData.name,
         size,
         "class"
     );
@@ -114,12 +120,26 @@ function handleClassData(classData, filename) {
 }
 
 /**
+ * Function for handling access specifiers.
+ * @param {JSONObject} accessData - Data about a access rights.
+ */
+function handleAccessSpecifiers(accessData, filename) {
+    var children = handleCodeData(accessData, filename);
+
+    children.forEach( function(child, index) {
+        child.access = accessData.name;
+    });
+
+    return children;
+}
+
+/**
  * Function for handling namespace data in JSONObject.
  * @param {JSONObject} namespaceData - Data about namespace.
  */
 function handleNamespaceData(namespaceData, filename) {
     // Handle any children.
-    var children = handleCodeData(namespaceData.namespace, filename);
+    var children = handleCodeData(namespaceData, filename);
     var position = randomPosition({x:0, y:0, z:0}, 5);
     var size = 5;
 
@@ -129,7 +149,7 @@ function handleNamespaceData(namespaceData, filename) {
 
     nodeSelf = new Node(
         position,
-        namespaceData.namespace.name,
+        namespaceData.name,
         size,
         "namespace"
     )
@@ -150,13 +170,13 @@ function handleNamespaceData(namespaceData, filename) {
  */
 function handleFunctionData(functionData, filename) {
     // Handle any children.
-    var children = handleCodeData(functionData.function, filename);
+    var children = handleCodeData(functionData, filename);
     var position = randomPosition({x:0, y:0, z:0}, 5);
     var size = 5;
 
     nodeSelf = new Node(
         position,
-        functionData.function.name,
+        functionData.name,
         size,
         "function"
     );
@@ -166,13 +186,13 @@ function handleFunctionData(functionData, filename) {
 
     // Save the function data in function model.
     functionModels.set(
-        functionData.function.name,
+        functionData.name,
         new FunctionMetaData(
             filename,
-            functionData.function.calls,
-            functionData.function.declrator_id,
-            functionData.function.start_line,
-            functionData.function.end_line
+            functionData.calls,
+            functionData.declrator_id,
+            functionData.start_line,
+            functionData.end_line
         )
     );
 
@@ -193,19 +213,19 @@ function handleFunctionData(functionData, filename) {
  */
 function handleCodeData(codeData, filename) {
     var children = new Array();
-    if (codeData.namespaces != null) {
+    if (typeof codeData.namespaces !== "undefined") {
         // Handle all namespaces
         codeData.namespaces.forEach((object) => {
            children.push(handleNamespaceData(object, filename));
         });
     }
-    if (codeData.classes != null) {
+    if (typeof codeData.classes !== "undefined") {
         // Handle all classes
-        codeData.classes.forEach((object, filename) => {
+        codeData.classes.forEach((object) => {
            children.push(handleClassData(object, filename));
         });
     }
-    if (codeData.functions != null) {
+    if (typeof codeData.functions !== "undefined") {
         // Handle all functions
         codeData.functions.forEach((object) => {
            children.push(handleFunctionData(object, filename));
@@ -238,13 +258,13 @@ function handleProjectData(projectData) {
 
         // If file is not parsed, skip it
         // ("return" returns from lambda not forEach).
-        if (file.file.parsed != true) {
+        if (file.parsed != true) {
             return;
         }
 
         // File is parsed correctly, process it.
-        lineCount += file.file.linesInFile;
-        var children = handleCodeData(file.file, file.file.file_name);
+        lineCount += file.linesInFile;
+        var children = handleCodeData(file, file.file_name);
 
         children.forEach( function(child, index) {
             root.addChild(child);
