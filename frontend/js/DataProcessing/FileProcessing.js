@@ -1,5 +1,6 @@
 var indexStack = new Array();
 var functionModels = new Map();
+var indexToFunctionMap = new Map();
 
 var fileCount = 0;
 var parsedFileCount = 0;
@@ -41,6 +42,44 @@ function linkElements() {
     } else {    // Missing parrent, state so.
         console.log(LOCALE.getSentence("fdg_link_missing_parent"));
     }
+}
+
+/**
+ * Links function calls.
+ */
+function linkFunctionCalls(){
+    indexToFunctionMap.forEach( function(callerIndex, callerFuncName) {
+
+        // Get the function caller.
+        funcModel = functionModels.get(callerFuncName);
+        // Check the calls length.
+        if(funcModel.getCalls().length == 0){
+            return;
+        }
+
+        console.log("Caller: ", callerIndex, callerFuncName);
+
+        // Loop through calls
+        funcModel.getCalls().forEach( function(calleeFuncName, index) {
+
+            calleeIndex = indexToFunctionMap.get(calleeFuncName)
+            console.log("Callee: ", calleeIndex, calleeFuncName);
+
+
+
+           /* if(functionModels.has(funcName)){
+
+                fdg.addLink(
+                    indexStack[callerIndex],
+                    indexStack[calleeIndex],
+                    new LinkProperties(1)
+                );
+
+            }
+            */
+        });
+
+    });
 }
 
 /**
@@ -122,11 +161,16 @@ function handleFunctionData(functionData, filename) {
         "function"
     );
 
+    // Map current node to the index.
+    //indexToFunctionMap.set(functionData.function.name, index);
+
     // Save the function data in function model.
     functionModels.set(
         functionData.function.name,
         new FunctionMetaData(
             filename,
+            functionData.function.calls,
+            functionData.function.declrator_id,
             functionData.function.start_line,
             functionData.function.end_line
         )
@@ -215,4 +259,6 @@ function handleProjectData(projectData) {
     windowMgr.setClassCount(classCount);
     windowMgr.setNamespaceCount(namespaceCount);
     windowMgr.setLineCount(lineCount);
+
+    linkFunctionCalls();
 }

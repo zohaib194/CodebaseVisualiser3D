@@ -1,6 +1,6 @@
 package hello.world;
 
-public class HelloWorld {
+public class HelloWorld extends Ello implements Hei, Yo, Bonjour {
 	private String l;
 	public class Yes {
 		public void no(int i, int j, int z){
