@@ -53,11 +53,11 @@ var STYLE = (function() {
                 },
                 drawables: {
                     function: {
-                        shape: "cube",
+                        shape: "dodecahedron",
                         color: 0xf92472
                     },
                     class: {
-                        shape: "cylinder",
+                        shape: "dodecahedron",
                         color: 0x67d8ef
                     },
                     namespace: {

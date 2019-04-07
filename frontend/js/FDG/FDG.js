@@ -49,6 +49,15 @@ var FDG = (function FDG(
         }
 
         /**
+         * Gets the root.
+         *
+         * @return     {Object}  The root.
+         */
+        var getRoot = function() {
+            return tree.root;
+        }
+
+        /**
          * Sets the maximum size.
          *
          * @param {float} maxSize - The maximum size of the graph
@@ -74,21 +83,21 @@ var FDG = (function FDG(
         var addLink = function(indexFrom, indexTo, linkProp) {
             nodeFrom = tree.root.getNode(indexFrom, 0);
             nodeTo = tree.root.getNode(indexTo, 0);
-            //console.log("From: " + nodeFrom);
-            //console.log("To: " + nodeTo);
             // Nodes doesn't exists, nodes are the same,
             // or both nodes has a link to eachother, abort linking!
+            // console.log("from("+indexFrom+"): ", nodeFrom, "To("+indexTo+"): ", nodeTo);
             if (
                 nodeFrom === null ||
                 nodeTo === null ||
+                typeof nodeFrom === "undefined" ||
+                typeof nodeTo === "undefined" ||
                 indexFrom === indexTo ||
                 (nodeFrom.getLinks().has(indexTo) &&
-                nodesTo.getLinks().has(indexFrom))
+                nodeTo.getLinks().has(indexFrom))
             ) {
-                console.log("Can not link nodes, either null, same or already connected");
+                console.log("Can not link nodes, either null, same or already connected", "from/to: ("+ indexFrom +"/"+ indexTo+")");
                 return;
             }
-
             // Add bi-directional links.
             nodeFrom.setLink(indexTo, linkProp);
             nodeTo.setLink(indexFrom, linkProp);
@@ -99,7 +108,7 @@ var FDG = (function FDG(
          * @param {int} iterations - How many iterations the graph should run.
          */
         var execute = function(iterations) {
-            executeSubTree(iterations, tree.root, 0);
+            executeSubTree(iterations, tree.root, 0, 0);
         }
 
         /**
@@ -109,27 +118,28 @@ var FDG = (function FDG(
          * @param {object}  subtree       - The tree
          * @param {number}  subtreeOffset - Global index offset from local
          */
-        var executeSubTree = function(iterations, subtree, subtreeOffset){
+        var executeSubTree = function(iterations, subtree, subtreeOffset, level){
             var children = subtree.getChildren();
             var nodes = new Map();
+
             // recursivly run force directed graph
             var indexOffset = subtreeOffset;
             children.forEach( function(child, index) {
-                executeSubTree(iterations, child, indexOffset);
+                executeSubTree(iterations, child, indexOffset, level+1);
                 indexOffset += child.getIndex();
                 nodes.set(indexOffset, child);
             });
 
             // Run though every node per every iteration.
             for (i = 0; i < iterations; i++) {
-                for (x = 0; x < nodes.length; x++) {
+                nodes.forEach( function(node, index) {
                     // Calculate new position of node and update node.
                     var xNewPos = new THREE.Vector3(0, 0, 0);
                         xNewPos.addVectors(
-                            nodes[x].getPosition(),
-                            nodes[x].getTotalForce(
+                            node.getPosition(),
+                            node.getTotalForce(
                                 // Send a deep copy of array!
-                                [...nodes],
+                                nodes,
                                 subtreeOffset,
                                 minDistance,
                                 maxDistance,
@@ -137,8 +147,8 @@ var FDG = (function FDG(
                                 gravityCenter
                             )
                         );
-                        nodes[x].setPosition(xNewPos);
-                }
+                        node.setPosition(xNewPos);
+                });
             }
         }
 
@@ -147,6 +157,7 @@ var FDG = (function FDG(
             getNodeIndex: getNodeIndex,
             getNodes: getNodes,
             getMaxSize: getMaxSize,
+            getProjectRoot: getRoot,
             setMaxSize: setMaxSize,
             setTree: setTree,
             addLink: addLink,

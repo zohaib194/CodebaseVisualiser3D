@@ -33,7 +33,7 @@ var Node = (function(pos, name, size, type) {
         leftIndex,
         minDistance,
         maxDistance,
-        gravityForce = 0,
+        gravityForce = 0.7,
         gravityCenter = new THREE.Vector3(0, 0, 0)
     ) {
 
@@ -49,43 +49,33 @@ var Node = (function(pos, name, size, type) {
         var indexRange = {min: null, max: null};
 
         // Run though every link
-        links.forEach(function(link, nodeIndex) {
+        nodes.forEach(function(node, nodeIndex) {
             //Check if connected node is in same scope
-            var node = nodes.get[nodeIndex];
-            if (typeof node !== "unidentified") {
+            var link = links[nodeIndex];
 
-                // Get the attractive force vector.
-                diff.subVectors(
-                    node.getPosition(),
-                    position
-                );
+            // Get the attractive force vector.
+            diff.subVectors(
+                node.getPosition(),
+                position
+            );
 
-                // Take length before normalization.
-                dist = diff.length();
-                diff.normalize();
-
-                // Choose physical rule based on attractive force.
-                // Positive = attractive, negative = repulsive.
-                if (link.attraction >= 0) {
-                    // Attractive forces are based on logarithmic spring strenghts.
-                    forceScalar = (
-                        link.attraction * Math.log10(
-                            dist / (minDistance + size + 5000 + node.getSize())
-                        )
-                    );
-                } else {    // Repulsive force.
-                    // Repulsive forces are based on Hookes law (inverse square law).
-                    forceScalar = (link.attraction *
-                        (
-                            (maxDistance + size + 5000 + node.getSize()) /
-                            Math.pow(dist, 2)
-                        )
-                    );
-                }
-
-                // Sum attractive and repulsive forces to total force
-                force.add(diff.multiplyScalar(forceScalar));
+            // Take length before normalization.
+            dist = diff.length();
+            if (dist == 0) {
+                dist =0.1;
             }
+            diff.normalize();
+
+
+            if (typeof link !== "undefined") {
+                // Attractive forces are based on logarithmic spring strenghts.
+                forceScalar = (link.attraction * Math.log10(dist / minDistance));
+            } else {    // Repulsive force.
+                // Repulsive forces are based on Hookes law (inverse square law).
+                forceScalar = (-1 * (maxDistance / Math.pow(dist, 2)));
+            }
+            // Sum attractive and repulsive forces to total force
+            force.add(diff.multiplyScalar(forceScalar));
         });
 
         // Add gravitational force to center graph
@@ -109,14 +99,7 @@ var Node = (function(pos, name, size, type) {
      * @return     {Three.Vector3}  The position.
      */
     var getPosition = function() {
-        if (parent != null && parent.isNode()) {
-            var pos = new THREE.Vector3(0, 0, 0);
-            pos.addVectors(parent.getPosition(), position);
-            return pos;
-        }
-        else{
             return position;
-        }
     };
 
 
@@ -240,23 +223,25 @@ var Node = (function(pos, name, size, type) {
      * @return {object} The node.
      */
     var getNode = function(requestedIndex, level){
-        //console.log("\t".repeat(level) + index + " ("+requestedIndex+")");
+        //console.log("\t".repeat(level) + "request: " + requestedIndex + ", node: (" + metadata.name + ") " + index);
         var localOffset = 0;                                // Used to calculate relative index.
         var requestedNode = null;
-        if (index-1 == requestedIndex) {                    // Check if self in requested node.
-            //console.log("found");
+        if (typeof index !== "undefined" && (index-1 === requestedIndex)) {                    // Check if self is requested node.
+            //console.log("\t".repeat(level) + "found: ", this);
             return this
         }
-
-        children.forEach( function(child, i) {              // Check if children is requested node.
+        children.every( function(child, i) {              // Check if children is requested node.
             localIndex = child.getIndex();
-            if ((localIndex-1)+localOffset > requestedIndex){// Check if requested is within childs range.
+            //console.log("("+ (localIndex-1) +") +", localOffset, "<=" ,requestedIndex)
+            //console.log((localIndex-1)+localOffset > requestedIndex);
+            if ((localIndex-1)+localOffset < requestedIndex){// Check if requested is within childs range.
                 localOffset += localIndex;
             }else {
                 // Child cointain range with requested node.
                 requestedNode = child.getNode(requestedIndex - localOffset);
-                return;
+                return false;
             }
+            return true;
         });
         return requestedNode;                               // indicate that node was not found
     }
@@ -281,7 +266,15 @@ var Node = (function(pos, name, size, type) {
      * @param {number} newIndex - The new index.
      */
     var setIndex = function(){
-        index = subTreeSize() +1;
+        var subSize = subTreeSize();
+
+        if (typeof subSize  === "undefined") {
+            index = 1;
+
+        }else{
+            index = subSize +1;
+
+        }
     }
 
     /**
@@ -302,6 +295,7 @@ var Node = (function(pos, name, size, type) {
      */
     var setPosition = function(pos) {
         position.set(pos.x, pos.y, pos.z);
+        //console.log("new position: ", position, " name: ", metadata.name);
     };
 
     /**
@@ -321,8 +315,8 @@ var Node = (function(pos, name, size, type) {
     /**
      * Getter for link.
      */
-    var setLink = function(key, value) {
-        links.set(key, value);
+    var setLink = function(linkToIndex, strength) {
+        links.set(linkToIndex, strength);
     };
 
     var setParent = function(newParent){

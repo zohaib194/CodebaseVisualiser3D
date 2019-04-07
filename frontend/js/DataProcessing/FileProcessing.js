@@ -23,9 +23,9 @@ var namespaceCount = 0;
 function randomPosition(center, radius) {
     return new THREE.Vector3(
         // Gets a number between center - radius and center + radis
-        Math.random() * (2 * radius) + (center.x - radius),
-        Math.random() * (2 * radius) + (center.y - radius),
-        Math.random() * (2 * radius) + (center.z - radius)
+        Math.random() * (2 * radius) + center.x - radius,
+        Math.random() * (2 * radius) + center.y - radius,
+        Math.random() * (2 * radius) + center.z - radius
     );
 }
 /**
