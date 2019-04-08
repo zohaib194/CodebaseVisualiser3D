@@ -23,6 +23,7 @@ var JavaParserPath string
 type RepoModel struct {
 	URI string        `json:"uri"`                     // Where the repository was found
 	ID  bson.ObjectId `json:"id" bson:"_id,omitempty"` // Folder name where repo is stored
+	ParsedRepo	ProjectModel  `json:"parsedrepo,omitempty"` 	// Parsed repository in json format
 }
 
 // SaveResponse is used by save function to update channel used by go rutine to indicate
@@ -45,7 +46,7 @@ type ParseResponse struct {
 	Result           ProjectModel
 }
 
-// Save is expected to run as a go rutine writing to a c.
+// Save is expected to run assa a go rutine writing to a c.
 func (repo RepoModel) Save(c chan SaveResponse) {
 	util.TypeLogger.Debug("%s: Call to Save", packageName)
 	defer util.TypeLogger.Debug("%s: Ended call to Save", packageName)
@@ -160,6 +161,21 @@ func (repo RepoModel) GetRepoFiles() (files string, err error) {
 	return string(bytes), nil
 }
 
+// UpdateRepo updates the repo model with repo in db.
+func (repo RepoModel) UpdateRepo() error {
+	util.TypeLogger.Debug("%s: Call to UpdateRepoByID", packageName)
+	defer util.TypeLogger.Debug("%s: Ended call to UpdateRepoByID", packageName)
+
+	err := DB.Update(&repo)
+
+	if err != nil {
+		util.TypeLogger.Error("%s: Failed to update database: %s", packageName, err.Error())
+		return err
+	}
+
+	return nil
+}
+
 // SanitizeFilePaths removes the repopath from the filepaths.
 func (repo RepoModel) SanitizeFilePaths(projectModel ProjectModel) {
 	util.TypeLogger.Debug("%s: Call to SanitizeFilePaths", packageName)
@@ -221,6 +237,9 @@ func (repo RepoModel) ParseDataFromFiles(files string, responsePerNFiles int, c 
 	}
 
 	repo.SanitizeFilePaths(projectModel)
+
+	repo.ParsedRepo = projectModel
+	repo.UpdateRepo()
 
 	response.StatusText = "Done"
 	response.Result = projectModel

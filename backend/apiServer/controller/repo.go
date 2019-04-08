@@ -481,6 +481,39 @@ func (repo RepoController) ParseInitial(w http.ResponseWriter, r *http.Request) 
 			return
 		}
 
+		if len(exstRepo.ParsedRepo.Files) > 0 {
+			util.TypeLogger.Error("%v",exstRepo.ParsedRepo)
+			// Respond with message
+			reason := WebsocketResponse{
+				StatusText: http.StatusText(http.StatusOK),
+				StatusCode: http.StatusOK,
+				Body: map[string]interface{}{
+					"id":               vars["repoId"],
+					"status":           "Done",
+					"parsedFileCount":  0,
+					"skippedFileCount": 0,
+					"fileCount":        0,
+					"result":           exstRepo.ParsedRepo,
+				},
+			}
+			if err := conn.WriteJSON(reason); err != nil {
+				util.TypeLogger.Error("%s: Failed to write final webSocket message: %s", packageName, err.Error())
+				return
+			}
+			// close after response
+			err = conn.WriteMessage(
+				websocket.CloseMessage,
+				websocket.FormatCloseMessage(
+					websocket.CloseNormalClosure,
+					"Done",
+				),
+			)
+			if err != nil {
+				util.TypeLogger.Error("%s: Failed to write webSocket closer: %s", packageName, err.Error())
+			}
+			return
+		}
+
 		// List all files in the repository directory.
 		files, err := exstRepo.GetRepoFiles()
 
