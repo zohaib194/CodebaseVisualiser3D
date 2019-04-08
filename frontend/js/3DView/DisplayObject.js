@@ -60,9 +60,9 @@ var Drawable = (function (
         pos,
         color,
         name,
-        geometry
+        geometry,
+        parent
     ) {
-
     if (typeof geometry === "undefined") {
         console.log(
             name + ": " + LOCALE.getSentence("geometry_missing_type")
@@ -75,7 +75,7 @@ var Drawable = (function (
     // Position THREE.js drawable.
     mesh.position.set(pos.x, pos.y, pos.z);
     mesh.name = name;
-    scene.add(mesh);
+    parent.add(mesh);
 
     // Drawable's edge highlight setup.
     var edgeGeometry = new THREE.EdgesGeometry(mesh.geometry);
@@ -87,7 +87,7 @@ var Drawable = (function (
     wireframe.name = mesh.name + " | Wireframe";
     // Position wireframe.
     wireframe.position.set(pos.x, pos.y, pos.z);
-    scene.add(wireframe);
+    parent.add(wireframe);
 
     /**
      * Function for drawing drawable object.
@@ -103,7 +103,7 @@ var Drawable = (function (
         var cameraForward = new THREE.Vector3(0, 0, 0);
         cameraForward.subVectors(controls.target, camera.position);
 
-        // Calc vector from camrea to object.
+        // Calc vector from camera to object.
         var cameraToObject = new THREE.Vector3(0, 0, 0);
         cameraToObject.subVectors(mesh.position, camera.position);
 
@@ -136,8 +136,18 @@ var Drawable = (function (
         }
     };
 
+    /**
+     * Gets the mesh.
+     *
+     * @return     {Object}  The mesh.
+     */
+    var getMesh = function() {
+        return mesh;
+    }
+
     // Expose private functions for global use.
     return {
-        draw: draw
+        draw: draw,
+        getMesh: getMesh,
     }
 });

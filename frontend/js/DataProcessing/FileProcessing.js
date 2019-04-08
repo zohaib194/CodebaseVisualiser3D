@@ -98,7 +98,7 @@ function handleClassData(classData, filename) {
     var size = 5;
 
     children.forEach( function(child, index) {
-        size += child.getSize() * 5;
+        size += child.getSize();
     });
 
     // Add node and save index.
@@ -144,7 +144,7 @@ function handleNamespaceData(namespaceData, filename) {
     var size = 5;
 
     children.forEach( function(child, index) {
-        size += child.getSize() * 5;
+        size += child.getSize();
     });
 
     nodeSelf = new Node(
@@ -198,7 +198,6 @@ function handleFunctionData(functionData, filename) {
 
     functionCount++;
 
-
     children.forEach( function(child, index) {
         nodeSelf.addChild(child);
         child.setParent(nodeSelf);
@@ -245,6 +244,7 @@ function handleProjectData(projectData) {
     functionCount = 0;
     namespaceCount = 0;
     lineCount = 0;
+    var size = 5;
 
     var root = new Node(
         new THREE.Vector3(0,0,0),
@@ -269,10 +269,11 @@ function handleProjectData(projectData) {
         children.forEach( function(child, index) {
             root.addChild(child);
             child.setParent(root);
+            size += child.getSize();
         });
 
     });
-
+    root.setSize(size);
     fdg.setTree(root);
 
     windowMgr.setFunctionCount(functionCount);

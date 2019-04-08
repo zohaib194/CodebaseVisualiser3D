@@ -56,7 +56,7 @@ scene.add(originCube);
 var displayMgr = new DisplayManager();
 
 // Force-Directed-Graph for managing object grouping.
-var fdg = new FDG(1, 1, 0.1, 100, new THREE.Vector3(0, 0, 0));
+var fdg = new FDG(1, 1, 0.1, new THREE.Vector3(0, 0, 0));
 
 // Window manager
 var windowMgr = new WindowManager();
@@ -117,7 +117,7 @@ function runFDGOnJSONData(data) {
     // Run for 100 iterations shifting the position of nodes.
     document.getElementById("status").innerHTML =
         LOCALE.getSentence("userinfo_organization");
-    fdg.execute(2);
+    fdg.execute(50000);
 
     // Draw nodes using display manager.
     document.getElementById("status").innerHTML =
@@ -125,7 +125,7 @@ function runFDGOnJSONData(data) {
 
 
     var projectTree = fdg.getProjectRoot()
-    displayMgr.setSceneGraph(projectTree);
+    displayMgr.setSceneGraph(projectTree, scene);
 }
 
 // ########## Mouse events functions ##########

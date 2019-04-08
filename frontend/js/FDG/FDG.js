@@ -8,7 +8,6 @@
 var FDG = (function FDG(
     minDistance,
     maxDistance,
-    maxSize,
     gravityForce,
     gravityCenter = new THREE.Vector3(0, 0, 0)
     ) {
@@ -58,20 +57,12 @@ var FDG = (function FDG(
         }
 
         /**
-         * Sets the maximum size.
-         *
-         * @param {float} maxSize - The maximum size of the graph
-         */
-        var setMaxSize = function(maxSize) {
-            maxSize = maxSize;
-        }
-
-        /**
          * Function for setting the tree for creating the fdg graph.
          * @param {Node} newRoot - Root node of the fdg problem.
          */
         var setTree = function(newRoot) {
            tree.root = newRoot;
+           maxSize = tree.root.getSize();
         }
 
         /**
@@ -108,7 +99,7 @@ var FDG = (function FDG(
          * @param {int} iterations - How many iterations the graph should run.
          */
         var execute = function(iterations) {
-            executeSubTree(iterations, tree.root, 0, 0);
+            executeSubTree(iterations, tree.root, 0);
         }
 
         /**
@@ -118,14 +109,15 @@ var FDG = (function FDG(
          * @param {object}  subtree       - The tree
          * @param {number}  subtreeOffset - Global index offset from local
          */
-        var executeSubTree = function(iterations, subtree, subtreeOffset, level){
+        var executeSubTree = function(iterations, subtree, subtreeOffset){
             var children = subtree.getChildren();
+            var size = subtree.getSize();
             var nodes = new Map();
 
             // recursivly run force directed graph
             var indexOffset = subtreeOffset;
             children.forEach( function(child, index) {
-                executeSubTree(iterations, child, indexOffset, level+1);
+                executeSubTree(iterations, child, indexOffset);
                 indexOffset += child.getIndex();
                 nodes.set(indexOffset, child);
             });
@@ -138,11 +130,11 @@ var FDG = (function FDG(
                         xNewPos.addVectors(
                             node.getPosition(),
                             node.getTotalForce(
-                                // Send a deep copy of array!
                                 nodes,
                                 subtreeOffset,
                                 minDistance,
                                 maxDistance,
+                                size,
                                 gravityForce,
                                 gravityCenter
                             )
@@ -158,7 +150,6 @@ var FDG = (function FDG(
             getNodes: getNodes,
             getMaxSize: getMaxSize,
             getProjectRoot: getRoot,
-            setMaxSize: setMaxSize,
             setTree: setTree,
             addLink: addLink,
             execute: execute

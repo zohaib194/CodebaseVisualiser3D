@@ -33,6 +33,7 @@ var Node = (function(pos, name, size, type) {
         leftIndex,
         minDistance,
         maxDistance,
+        maxSize,
         gravityForce = 0.7,
         gravityCenter = new THREE.Vector3(0, 0, 0)
     ) {
@@ -62,22 +63,37 @@ var Node = (function(pos, name, size, type) {
             // Take length before normalization.
             dist = diff.length();
             if (dist == 0) {
-                dist =0.1;
+                dist = 0.1;
             }
+
             diff.normalize();
 
 
             if (typeof link !== "undefined") {
                 // Attractive forces are based on logarithmic spring strenghts.
-                forceScalar = (link.attraction * Math.log10(dist / minDistance));
+                forceScalar = (
+                    link.attraction * Math.log10(
+                        dist / (minDistance + size + node.getSize())
+                    )
+                );
+
             } else {    // Repulsive force.
                 // Repulsive forces are based on Hookes law (inverse square law).
-                forceScalar = (-1 * (maxDistance / Math.pow(dist, 2)));
+                forceScalar = (-1 *
+                    (
+                        (maxDistance + size + node.getSize()) /
+                        Math.pow(dist, 2)
+                    )
+                );
+
             }
+
             // Sum attractive and repulsive forces to total force
             force.add(diff.multiplyScalar(forceScalar));
         });
 
+        // Force the nodes to be within the maximum distance of center.
+        // The force grows stronger the further away from center they are.
         // Add gravitational force to center graph
         // on gravitational center.
         var gravity = new THREE.Vector3(0,0,0).subVectors(
@@ -85,6 +101,15 @@ var Node = (function(pos, name, size, type) {
             position
         );
 
+        // Assure node is within boundaries.
+        var distanceFromOrigin = gravity.length();
+        if ( distanceFromOrigin > maxSize) {
+            gravity.normalize().multiplyScalar(maxSize-0.1);
+        }
+
+        //console.log(leftIndex, minDistance, maxDistance, maxSize, gravityForce, gravityCenter);
+        //console.log(dist, maxSize, maxDistance, gravityForce);
+        gravityForce = (Math.log10(distanceFromOrigin + maxSize) - Math.log10(maxSize - distanceFromOrigin)) * gravityForce;
         // Return force with added gravity.
         return force.add(gravity.normalize().multiplyScalar(gravityForce));
     }
@@ -99,7 +124,7 @@ var Node = (function(pos, name, size, type) {
      * @return     {Three.Vector3}  The position.
      */
     var getPosition = function() {
-            return position;
+        return position;
     };
 
 
@@ -223,17 +248,13 @@ var Node = (function(pos, name, size, type) {
      * @return {object} The node.
      */
     var getNode = function(requestedIndex, level){
-        //console.log("\t".repeat(level) + "request: " + requestedIndex + ", node: (" + metadata.name + ") " + index);
         var localOffset = 0;                                // Used to calculate relative index.
         var requestedNode = null;
         if (typeof index !== "undefined" && (index-1 === requestedIndex)) {                    // Check if self is requested node.
-            //console.log("\t".repeat(level) + "found: ", this);
             return this
         }
         children.every( function(child, i) {              // Check if children is requested node.
             localIndex = child.getIndex();
-            //console.log("("+ (localIndex-1) +") +", localOffset, "<=" ,requestedIndex)
-            //console.log((localIndex-1)+localOffset > requestedIndex);
             if ((localIndex-1)+localOffset < requestedIndex){// Check if requested is within childs range.
                 localOffset += localIndex;
             }else {
@@ -320,7 +341,11 @@ var Node = (function(pos, name, size, type) {
     };
 
     var setParent = function(newParent){
-        parent = newParent
+        parent = newParent;
+    }
+
+    var setSize = function(newSize){
+        size = newSize;
     }
 
     // Expose private functions for global use.
@@ -345,6 +370,7 @@ var Node = (function(pos, name, size, type) {
         setParent: setParent,
         setName: setName,
         setType: setType,
-        setLink: setLink
+        setLink: setLink,
+        setSize: setSize
     };
 });
