@@ -116,8 +116,9 @@ public class VariableModel extends Model {
 	 * @param data The data
 	 */
 	@Override
-	protected <T> void addDataInModel(T data) {
-		System.err.println("Error variable is currently not a scope as scopeStack indicated");
+
+	protected <T> void addDataInModel(T data){
+		System.err.println("Error variable is currently not a scope as scopeStack indicated" + data.getClass());
 		System.exit(1);
 	}
 

@@ -72,12 +72,12 @@ func (repo RepoModel) Save(c chan SaveResponse) {
 }
 
 // Load loads java application to parse a specified file.
-func (repo RepoModel) Load(file string, target string) (data FilesModel, err error) {
+func (repo RepoModel) Load(file string, target string) (data FileModel, err error) {
 	util.TypeLogger.Debug("%s: Call to Load", packageName)
 	defer util.TypeLogger.Debug("%s: Ended call to Load", packageName)
 
-	data.File.Parsed = false
-	data.File.FileName = file
+	data.Parsed = false
+	data.FileName = file
 
 	// Ready  word count command and execute it.
 	cmd := exec.Command("wc", "-l", file)
@@ -97,6 +97,8 @@ func (repo RepoModel) Load(file string, target string) (data FilesModel, err err
 		return data, err
 	}
 
+	util.TypeLogger.Debug("Parsing file: %s", file)
+
 	// Setup the command to parse the file.
 	cmd = exec.Command("java", "me.codvis.ast.Main", "-f", file, "-t", target, "-c", "Initial")
 	cmd.Dir = JavaParserPath
@@ -112,20 +114,22 @@ func (repo RepoModel) Load(file string, target string) (data FilesModel, err err
 		return data, err
 	}
 
-	if err := json.NewDecoder(stdout).Decode(&data); err != nil {
+	fileWrapper := FileWrapperModel{File: data}
+
+	if err := json.NewDecoder(stdout).Decode(&fileWrapper); err != nil {
 		util.TypeLogger.Error("%s: Failed to decode json: %s", packageName, err.Error())
-		return data, err
+		return fileWrapper.File, err
 	}
 
 	if err := cmd.Wait(); err != nil {
 		util.TypeLogger.Error("%s: Failed to exit the command for java parser : %s", packageName, err.Error())
-		return data, err
+		return fileWrapper.File, err
 	}
 
-	data.File.LinesInFile = linesOfCode
-	data.File.Parsed = true
+	fileWrapper.File.LinesInFile = linesOfCode
+	fileWrapper.File.Parsed = true
 
-	return data, nil
+	return fileWrapper.File, nil
 }
 
 // GetRepoByID finds repo in database and returns.
@@ -182,7 +186,7 @@ func (repo RepoModel) SanitizeFilePaths(projectModel ProjectModel) {
 	defer util.TypeLogger.Debug("%s: Ended call to SanitizeFilePaths", packageName)
 
 	for index, file := range projectModel.Files {
-		projectModel.Files[index].File.FileName = strings.Replace(file.File.FileName, RepoPath+"/", "", -1)
+		projectModel.Files[index].FileName = strings.Replace(file.FileName, RepoPath+"/", "", -1)
 	}
 }
 
@@ -201,7 +205,7 @@ func (repo RepoModel) ParseDataFromFiles(files string, responsePerNFiles int, c 
 	for n, sourceFile := range filesList {
 		// Search for cpp files
 		var err error
-		var data FilesModel
+		var data FileModel
 
 		response.CurrentFile = path.Base(sourceFile)
 
@@ -219,16 +223,16 @@ func (repo RepoModel) ParseDataFromFiles(files string, responsePerNFiles int, c 
 			response.ParsedFileCount++
 
 		default:
-			data = FilesModel{File: FileModel{Parsed: false, FileName: sourceFile}}
+			data = FileModel{Parsed: false, FileName: sourceFile}
 			response.SkippedFileCount++
 		}
 
 		if err != nil {
 			util.TypeLogger.Error("%s: Failed to parse file: %s", packageName, err.Error())
-			data = FilesModel{File: FileModel{Parsed: false, FileName: sourceFile}}
+			data = FileModel{Parsed: false, FileName: sourceFile}
 
 		}
-
+		util.TypeLogger.Debug("%v", data);
 		projectModel.Files = append(projectModel.Files, data)
 		if n%responsePerNFiles == 0 {
 			c <- response

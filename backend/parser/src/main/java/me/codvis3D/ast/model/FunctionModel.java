@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Stack;
 import org.json.JSONObject;
+import org.json.JSONArray;
 
 import me.codvis.ast.FunctionBodyModel;
 import me.codvis.ast.VariableModel;
@@ -20,8 +21,11 @@ public class FunctionModel extends Model {
 	private List<VariableModel> parameters;
 	private FunctionBodyModel functionBody;
 
-	FunctionModel(String name) {
-		this.name = name;
+	/**
+	 * Constructs the object.
+	 */
+	FunctionModel() {
+		this.name = "";
 		this.parameters = new ArrayList<>();
 		this.functionBody = null;
 	}
@@ -30,6 +34,18 @@ public class FunctionModel extends Model {
 	 * Constructs the object, setting the function name.
 	 *
 	 * @param name The name
+	 */
+	FunctionModel(String name) {
+		this.name = name;
+		this.parameters = new ArrayList<>();
+		this.functionBody = new FunctionBodyModel();
+	}
+
+	/**
+	 * Constructs the object, setting the function name and declarator.
+	 *
+	 * @param name       The name
+	 * @param declarator The declarator
 	 */
 	FunctionModel(String name, String declarator) {
 		this.name = name;
@@ -59,57 +75,30 @@ public class FunctionModel extends Model {
 	}
 
 	/**
-	 * Gets the line start.
+	 * Sets the scope.
 	 *
-	 * @return The line start.
+	 * @param      scope  The scope
 	 */
-	public int getLineStart() {
-		return this.lineStart;
-	}
-
-	/**
-	 * Gets the line end.
-	 *
-	 * @return The line end.
-	 */
-	public int getLineEnd() {
-		return this.lineEnd;
-	}
-
-	/**
-	 * Gets the parameters.
-	 *
-	 * @return The parameters.
-	 */
-	public List<VariableModel> getParameters() {
-		return this.parameters;
-	}
-
-	/**
-	 * Gets the function body.
-	 *
-	 * @return The function body.
-	 */
-	public FunctionBodyModel getFunctionBody() {
-		return this.functionBody;
+	public void setScope(String scope) {
+		this.scope = scope;
 	}
 
 	/**
 	 * Sets the declarator identifier.
 	 *
-	 * @param declaratorId The declarator identifier
+	 * @param      declaratorId  The declarator identifier
 	 */
 	public void setDeclaratorId(String declaratorId) {
 		this.declaratorId = declaratorId;
 	}
 
 	/**
-	 * Sets the scope.
+	 * Sets the name.
 	 *
-	 * @param scope The scope
+	 * @param name The name.
 	 */
-	public void setScope(String scope) {
-		this.scope = scope;
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	/**
@@ -122,12 +111,30 @@ public class FunctionModel extends Model {
 	}
 
 	/**
+	 * Gets the line start.
+	 *
+	 * @return     The line start.
+	 */
+	public int getLineStart() {
+		return this.lineStart;
+	}
+
+	/**
 	 * Sets the line end.
 	 *
-	 * @param lineEnd The line end
+	 * @param      lineEnd  The line end
 	 */
 	public void setLineEnd(int lineEnd) {
 		this.lineEnd = lineEnd;
+	}
+
+	/**
+	 * Gets the line end.
+	 *
+	 * @return     The line end.
+	 */
+	public int getLineEnd() {
+		return this.lineEnd;
 	}
 
 	/**
@@ -189,7 +196,7 @@ public class FunctionModel extends Model {
 		parsedCode.put("start_line", this.lineStart);
 		parsedCode.put("end_line", this.lineEnd);
 
-		List<JSONObject> parsedParameters = this.convertClassListJsonObjectList(this.parameters, "parameter");
+		JSONArray parsedParameters = this.convertClassListJsonObjectList(this.parameters);
 		if (parsedParameters != null) {
 			parsedCode.put("parameters", parsedParameters);
 		}

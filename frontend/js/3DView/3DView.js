@@ -47,7 +47,7 @@ renderer.render(scene, camera);
 
 // Cube marking origin of world.
 var originGeometry = new THREE.CubeGeometry(0.05, 0.05, 0.05);
-var originMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+var originMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.5});
 var originCube = new THREE.Mesh(originGeometry, originMaterial);
 originCube.position.set(0, 0, 0);
 scene.add(originCube);
@@ -112,119 +112,19 @@ function runFDGOnJSONData(data) {
     handleProjectData(data);
 
     // Apply negative links on those who aren't related
-    for (i = 0; i < fdg.getNodes().length; i++) {
-        for (j = 0; j < fdg.getNodes().length; j++) {
-            fdg.addLink(i, j, new LinkProperties(-1));
-        }
-    }
+    var nodesforLinking = fdg.getNodes();
 
     // Run for 100 iterations shifting the position of nodes.
     document.getElementById("status").innerHTML =
         LOCALE.getSentence("userinfo_organization");
-    fdg.execute(100);
+    fdg.execute(50000);
 
     // Draw nodes using display manager.
     document.getElementById("status").innerHTML =
         LOCALE.getSentence("userinfo_structure_visualization_assigment");
-    fdg.getNodes().forEach((node) => {
-        /**
-         * Function for selecting proper type from configuration.
-         * @param {string} type - The type of node.
-         */
-        let getDrawableGeometry = (function(type) {
-            switch(type) {
-                case "cube":
-                    return new THREE.BoxGeometry(0.1, 0.1, 0.1);
-                case "sphere":
-                    return new THREE.SphereGeometry(0.1, 32, 16);
-                case "cylinder":
-                    return new THREE.CylinderGeometry(0.05, 0.05, 0.1, 16);
-                case "cone":
-                    return new THREE.ConeGeometry(0.05, 0.1, 16);
-                case "dodecahedron":
-                    return new THREE.DodecahedronGeometry(0.05);
-                case "icosahedron":
-                    return new THREE.IcosahedronGeometry(0.05);
-                case "octahedron":
-                    return new THREE.OctahedronGeometry(0.05);
-                case "tetrahedron":
-                    return new THREE.TetrahedronGeometry(0.05);
-            }
-        });
 
-        var nodeType = node.getType();
-        var supportedType = false;
-        var drawableGeometry;
-        var drawableColor;
-
-        // Select shape and color based on node type.
-        switch (nodeType) {
-            case "function": {
-                drawableColor = STYLE.getDrawables().function.color;
-                drawableGeometry = getDrawableGeometry(
-                    STYLE.getDrawables().function.shape
-                );
-                supportedType = true;
-                break;
-            }
-            case "class": {
-                drawableGeometry = getDrawableGeometry(
-                    STYLE.getDrawables().class.shape
-                );
-                drawableColor = STYLE.getDrawables().class.color;
-                supportedType = true;
-                break;
-            }
-            case "namespace": {
-                drawableGeometry = getDrawableGeometry(
-                    STYLE.getDrawables().namespace.shape
-                );
-                drawableColor = STYLE.getDrawables().namespace.color;
-                supportedType = true;
-                break;
-            }
-            default: {   // Unsupported node type, mention this!
-                console.log(
-                    LOCALE.getSentence("geometry_invalid_type") + ": " + node.getType()
-                );
-                break;
-            }
-        }
-
-        // Found a supported type.
-        document.getElementById("status").innerHTML =
-            LOCALE.getSentence("userinfo_ready_display");
-        if (supportedType) {
-            // Add it for display.
-            displayMgr.addObject(
-                node.getType(),
-                new Drawable(
-                    node.getPosition(),
-                    drawableColor,
-                    node.getName(),
-                    drawableGeometry
-                )
-            );
-
-            // Draw nodes links with three.js
-            node.getLinks().forEach((link, otherIndex) => {
-                if (link.attraction > 0) {
-                    var material = new THREE.LineBasicMaterial({
-                        color: STYLE.getDrawables().link.color
-                    });
-
-                    var geometry = new THREE.Geometry();
-                    geometry.vertices.push(
-                        node.getPosition(),
-                        fdg.getNodes()[otherIndex].getPosition()
-                    );
-
-                    var line = new THREE.Line(geometry, material);
-                    scene.add(line);
-                }
-            });
-        }
-    });
+    var projectTree = fdg.getProjectRoot()
+    displayMgr.setSceneGraph(projectTree, scene);
 }
 
 // ########## Mouse events functions ##########
