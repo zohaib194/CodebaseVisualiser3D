@@ -196,6 +196,14 @@ public class JavaLstnr_Initial extends JavaExtendedListener {
 		this.scopeStack.peek().addDataInModel(functionBody);
 	}
 
+	@Override
+	public void enterResult(Java9Parser.ResultContext ctx){
+		FunctionModel functionModel = (FunctionModel) this.exitScope();
+		functionModel.setReturnType(ctx.getText());
+		this.enterScope(functionModel);
+	}
+
+
 	/**
 	 * Listener for parsing a package/namespace declaration. Adding package name to
 	 * filemodel.
@@ -295,7 +303,7 @@ public class JavaLstnr_Initial extends JavaExtendedListener {
 		String[] splitContext = context.split("\\.");
 
 		for (int i = 0; i < splitContext.length - 1; i++) {
-			call.addScopeIdentifier(splitContext[i]);
+			call.addScope(new ScopeModel(splitContext[i], "class"));
 		}
 		if (parameterList != null) {
 			call.setIdentifier(splitContext[splitContext.length - 1] + parameterList);

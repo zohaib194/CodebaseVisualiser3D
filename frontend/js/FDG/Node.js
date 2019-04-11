@@ -9,6 +9,7 @@
  */
 var Node = (function(pos, name, size, type) {
     var index;
+    var finalizedIndex = -1;
     var position = pos;
     var size = size;
     var children = Array();
@@ -17,6 +18,8 @@ var Node = (function(pos, name, size, type) {
         name: name,
         type: type
     };
+    var modelSpecificMetaData = null;
+    var drawableIndex = -1;
 
     var links = new Map();
 
@@ -193,6 +196,29 @@ var Node = (function(pos, name, size, type) {
         return children;
     }
 
+    var getChildByNameAndType = function(name, type){
+        var requestedChild = null;
+        children.every(function(child, index){
+
+            if(child.getName() === name && (child.getType() === type ||
+                (type ==="class" && child.getType() === "variable"))){
+                requestedChild = child;
+                return false;
+            }
+            return true;
+        });
+
+        if(requestedChild != null && requestedChild.getType() != "variable"){
+            // check if is variable
+            if (requestedChild.getModelSpecificMetaData() != null) {
+                var className = requestedChild.getModelSpecificMetaData().type;
+                requestedChild = getChildByNameAndType(className, "class");
+            }
+        }
+
+        return requestedChild;
+    }
+
     /**
      * Gets the all sucessors.
      */
@@ -265,6 +291,29 @@ var Node = (function(pos, name, size, type) {
             return true;
         });
         return requestedNode;                               // indicate that node was not found
+    }
+
+    var getFinalizedIndex = function(){
+        return finalizedIndex;
+    }
+
+    var getDrawableIndex = function(){
+        return drawableIndex;
+    }
+
+    var getModelSpecificMetaData = function(){
+        return modelSpecificMetaData;
+    }
+
+    var getEncapsulatingClass = function(){
+        if( metadata.type === "class" ){
+            return this;
+        }else{
+            return parent.getEncapsulatingClass();
+        }
+    }
+    var setModelSpecificMetaData = function(newModelSpecificMetaData){
+        modelSpecificMetaData = newModelSpecificMetaData;
     }
 
     /**
@@ -348,6 +397,14 @@ var Node = (function(pos, name, size, type) {
         size = newSize;
     }
 
+    var setFinalizedIndex = function(index){
+        finalizedIndex = index;
+    }
+
+    var setDrawableIndex = function(newDrawableIndex){
+        drawableIndex = newDrawableIndex;
+    }
+
     // Expose private functions for global use.
     return {
         isNode: isNode,
@@ -361,16 +418,24 @@ var Node = (function(pos, name, size, type) {
         getLinks: getLinks,
         getParent: getParent,
         getChildren: getChildren,
+        getChildByNameAndType: getChildByNameAndType,
         getSiblings: getSiblings,
         getSuccessors: getSuccessors,
         getNodeIndex: getNodeIndex,
+        getDrawableIndex: getDrawableIndex,
+        getFinalizedIndex: getFinalizedIndex,
+        getModelSpecificMetaData: getModelSpecificMetaData,
+        getEncapsulatingClass: getEncapsulatingClass,
         addChild: addChild,
+        setModelSpecificMetaData: setModelSpecificMetaData,
         setIndex: setIndex,
         setPosition: setPosition,
         setParent: setParent,
         setName: setName,
         setType: setType,
         setLink: setLink,
-        setSize: setSize
+        setSize: setSize,
+        setFinalizedIndex: setFinalizedIndex,
+        setDrawableIndex: setDrawableIndex
     };
 });

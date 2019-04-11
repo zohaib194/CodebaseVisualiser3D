@@ -75,6 +75,7 @@ var Drawable = (function (
     // Position THREE.js drawable.
     mesh.position.set(pos.x, pos.y, pos.z);
     mesh.name = name;
+    mesh.frustumCulled = false;
     parent.add(mesh);
 
     // Drawable's edge highlight setup.

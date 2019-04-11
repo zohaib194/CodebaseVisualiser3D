@@ -482,7 +482,7 @@ func (repo RepoController) ParseInitial(w http.ResponseWriter, r *http.Request) 
 		}
 
 		if len(exstRepo.ParsedRepo.Files) > 0 {
-			util.TypeLogger.Error("%v",exstRepo.ParsedRepo)
+			util.TypeLogger.Error("%v", exstRepo.ParsedRepo)
 			// Respond with message
 			reason := WebsocketResponse{
 				StatusText: http.StatusText(http.StatusOK),

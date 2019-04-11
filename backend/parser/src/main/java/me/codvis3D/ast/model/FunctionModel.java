@@ -16,6 +16,7 @@ public class FunctionModel extends Model {
 	private String name;
 	private String declaratorId;
 	private String scope;
+	private String returnType;
 	private int lineStart;
 	private int lineEnd;
 	private List<VariableModel> parameters;
@@ -74,6 +75,16 @@ public class FunctionModel extends Model {
 		return this.scope;
 	}
 
+	/**
+	 * Gets the return type.
+	 */
+	public String getReturnType(){
+		return this.returnType;
+	}
+
+	public void setReturnType(String returnType){
+		this.returnType = returnType;
+	}
 	/**
 	 * Sets the scope.
 	 *
@@ -193,6 +204,7 @@ public class FunctionModel extends Model {
 		parsedCode.put("name", this.name);
 		parsedCode.put("declrator_id", this.declaratorId);
 		parsedCode.put("scope", this.scope);
+		parsedCode.put("return_type", this.returnType);
 		parsedCode.put("start_line", this.lineStart);
 		parsedCode.put("end_line", this.lineEnd);
 

@@ -1,5 +1,11 @@
 package hello.world;
 
+import my.ass;
+import your.ass;
+import his.her.it.ass;
+import thier.ass;
+import te.ass;
+
 public class HelloWorld extends Ello implements Hei, Yo, Bonjour {
 	private String l;
 	public class Yes {

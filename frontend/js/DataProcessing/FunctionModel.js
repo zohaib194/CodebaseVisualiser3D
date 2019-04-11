@@ -6,9 +6,10 @@
  * @param      {String}  funcEndLine    The function end line
  * @return     {Object}  object containing get functions.
  */
-var FunctionMetaData = (function(file, calls, declrator_id, funcStartLine, funcEndLine) {
+var FunctionMetaData = (function(file, calls, returnType, declrator_id, funcStartLine, funcEndLine) {
 	var fileName = file;
 	var calls = calls;
+	var returnType = returnType;
 	var declratorID = declrator_id;
 	var startLine = funcStartLine;
 	var endLine = funcEndLine;

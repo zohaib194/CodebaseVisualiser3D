@@ -1,7 +1,7 @@
 package model
 
-// VariableModel represents a variable from code.
+// CallModel represents a function call from code.
 type CallModel struct {
-	Identifier string   `json:"identifier"`
-	Scope      []string `json:"scopes,omitempty"`
+	Identifier string       `json:"identifier"`
+	Scope      []ScopeModel `json:"scopes,omitempty"`
 }

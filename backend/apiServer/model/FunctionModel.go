@@ -4,6 +4,7 @@ package model
 type FunctionModel struct {
 	Name         string            `json:"name"`
 	DeclID       string            `json:"declrator_id"`
+	ReturnType   string            `json:"return_type,omitempty"`
 	FunctionBody FunctionBodyModel `json:"function_body,omitempty"`
 	Parameters   []ParameterModel  `json:"parameters,omitempty"`
 	Scope        string            `json:"scope,omitempty"`

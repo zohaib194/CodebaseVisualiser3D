@@ -63,6 +63,7 @@ var FDG = (function FDG(
         var setTree = function(newRoot) {
            tree.root = newRoot;
            maxSize = tree.root.getSize();
+           finalize();
         }
 
         /**
@@ -144,6 +145,11 @@ var FDG = (function FDG(
             }
         }
 
+        var finalize = function(){
+            getNodes().forEach( function(node, index) {
+                node.setFinalizedIndex(index);
+            });
+        }
         // Expose private functions for global use.
         return {
             getNodeIndex: getNodeIndex,

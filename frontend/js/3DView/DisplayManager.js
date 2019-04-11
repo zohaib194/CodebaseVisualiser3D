@@ -20,6 +20,7 @@ var DisplayManager = (function() {
             // Add new object to "type" list.
             Array.prototype.push.apply(drawables.get(type), [object]);
         }
+        return drawables.get(type).length-1;
     };
 
     /**
@@ -105,6 +106,15 @@ var DisplayManager = (function() {
                     supportedType = true;
                     break;
                 }
+                case "variable": {
+                    drawableGeometry = getDrawableGeometry(
+                        STYLE.getDrawables().variable.shape,
+                        tree.getSize()
+                    );
+                    drawableColor = STYLE.getDrawables().variable.color;
+                    supportedType = true;
+                    break;
+                }
                 default: {   // Unsupported node type, mention this!
                     console.log(
                         LOCALE.getSentence("geometry_invalid_type") + ": " + tree.getType()
@@ -131,26 +141,12 @@ var DisplayManager = (function() {
 
             if (supportedType) {
                 // Add it for display.
-                displayMgr.addObject(
+                var drawableIndex = displayMgr.addObject(
                     tree.getType(),
                     selfDrawable
                 );
+                tree.setDrawableIndex(drawableIndex);
 
-                // Draw nodes links with three.js
-                tree.getLinks().forEach((link, otherIndex) => {
-                    var material = new THREE.LineBasicMaterial({
-                        color: STYLE.getDrawables().link.color
-                    });
-
-                    var geometry = new THREE.Geometry();
-                    geometry.vertices.push(
-                        tree.getPosition(),
-                        fdg.getNodes()[otherIndex].getPosition()
-                    );
-
-                    var line = new THREE.Line(geometry, material);
-                    scene.add(line);
-                });
             }
             children = tree.getChildren();
             children.forEach( function(subTree, index) {
@@ -166,10 +162,42 @@ var DisplayManager = (function() {
         }
     };
 
+    var setLinks = function(tree, scene){
+        scene.updateMatrixWorld();
+        var nodes = tree.getSuccessors();
+
+        nodes.forEach( function(node, index) {
+
+            if (node.getDrawableIndex() != -1) {
+
+                node.getLinks().forEach((strength, otherIndex) => {
+
+                    if (nodes[otherIndex].getDrawableIndex() != -1) {
+
+                        var material = new THREE.LineBasicMaterial({
+                            color: STYLE.getDrawables().link.color
+                        });
+
+                        var geometry = new THREE.Geometry();
+
+                        geometry.vertices.push(
+                            new THREE.Vector3().setFromMatrixPosition(drawables.get(node.getType())[node.getDrawableIndex()].getMesh().matrixWorld),
+                            new THREE.Vector3().setFromMatrixPosition(drawables.get(nodes[otherIndex].getType())[nodes[otherIndex].getDrawableIndex()].getMesh().matrixWorld)
+                        );
+
+                        var line = new THREE.Line(geometry, material);
+                        scene.add(line);
+                    }
+                });
+            }
+        });
+    }
+
     // Expose private functions for global use.
     return {
         addObject: addObject,
         setSceneGraph: setSceneGraph,
+        setLinks: setLinks,
         draw: draw
     }
 });

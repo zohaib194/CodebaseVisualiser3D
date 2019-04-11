@@ -5,6 +5,7 @@ var canvas = document.getElementById("output");
 var renderer = new THREE.WebGLRenderer({ canvas: canvas });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setClearColor(STYLE.getColors().background, 1);
+renderer.setFaceCulling(THREE.CullFaceNone)
 
 // Make scene to render.
 const scene = new THREE.Scene();
@@ -117,7 +118,7 @@ function runFDGOnJSONData(data) {
     // Run for 100 iterations shifting the position of nodes.
     document.getElementById("status").innerHTML =
         LOCALE.getSentence("userinfo_organization");
-    fdg.execute(50000);
+    fdg.execute(5000);
 
     // Draw nodes using display manager.
     document.getElementById("status").innerHTML =
@@ -125,6 +126,7 @@ function runFDGOnJSONData(data) {
 
     var projectTree = fdg.getProjectRoot()
     displayMgr.setSceneGraph(projectTree, scene);
+    displayMgr.setLinks(projectTree, scene);
 }
 
 // ########## Mouse events functions ##########
@@ -283,7 +285,6 @@ function sendInitialRequest() {
                 document.getElementById("status").innerHTML =
                     LOCALE.getSentence("userinfo_websocket_initial_message_status_finished");
 
-                console.log(response.body.result);
                 // Continue with parsing.
                 runFDGOnJSONData(response.body.result);
                 break;

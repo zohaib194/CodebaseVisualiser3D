@@ -59,7 +59,7 @@ public class FunctionBodyModel extends Model {
 
 		if (data instanceof CallModel) {
 			CallModel call = ((CallModel) data);
-			if(call.getIdentifier() == "" && call.getScopeIdentifier().size() == 0){
+			if(call.getIdentifier() == "" && call.getScopes().size() == 0){
 				return ;
 			}
 

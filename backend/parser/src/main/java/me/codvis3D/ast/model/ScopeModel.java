@@ -6,21 +6,20 @@ import java.util.ArrayList;
 import java.util.Stack;
 
 import org.json.JSONObject;
-import org.json.JSONArray;
 
 /**
  * Class for call model.
  */
-public class CallModel extends Model{
+public class ScopeModel extends Model{
 	private String identifier;
-	private List<ScopeModel> scopes;
+	private String type;
 
 	/**
 	 * Constructs the object.
 	 */
-	CallModel(){
-		this.identifier = "";
-		this.scopes = new ArrayList<>();
+	ScopeModel(String identifier, String type){
+		this.identifier = identifier;
+		this.type = type;
 	}
 
 	/**
@@ -33,12 +32,12 @@ public class CallModel extends Model{
 	}
 
 	/**
-	 * Gets the scopes.
+	 * Gets the type.
 	 *
-	 * @return     The scopes.
+	 * @return     The type.
 	 */
-	public List<ScopeModel> getScopes(){
-		return this.scopes;
+	public String getType(){
+		return this.type;
 	}
 
 	/**
@@ -51,23 +50,13 @@ public class CallModel extends Model{
 	}
 
 	/**
-	 * Sets the scopes.
+	 * Sets the type.
 	 *
-	 * @param      scopes  The scopes
+	 * @param      type  The type
 	 */
-	public void setScopes(List<ScopeModel> scopes){
-		this.scopes = scopes;
+	public void setType(String type){
+		this.type = type;
 	}
-
-	/**
-	 * Adds a scope.
-	 *
-	 * @param      scope  The scope
-	 */
-	public void addScope(ScopeModel scope){
-		this.scopes.add(scope);
-	}
-
 	/**
 	 * Adds the data in model.
 	 *
@@ -75,7 +64,7 @@ public class CallModel extends Model{
 	 */
 	@Override
 	protected <T> void addDataInModel(T data){
-		System.err.println("Error adding data in call model");
+		System.err.println("Error adding data in scope model");
 		System.exit(1);
 
 	}
@@ -91,11 +80,7 @@ public class CallModel extends Model{
 
 		parsedCode.put("identifier", this.identifier);
 
-		JSONArray parsedScopes = this.convertClassListJsonObjectList(this.scopes);
-		if (parsedScopes != null) {
-			parsedCode.put("scopes", parsedScopes);
-		}
-
+		parsedCode.put("type", this.type);
 		return parsedCode;
 	}
 

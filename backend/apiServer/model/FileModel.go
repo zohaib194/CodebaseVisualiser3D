@@ -11,6 +11,7 @@ type FileModel struct {
 	FileName    string           `json:"file_name"`
 	Functions   []FunctionModel  `json:"functions,omitempty"`
 	Namespaces  []NamespaceModel `json:"namespaces,omitempty"`
+	Using_Namespaces  []UsingNamespaceModel `json:"using_namespaces,omitempty"`
 	Classes     []ClassModel     `json:"classes,omitempty"`
 	Variables   []VariableModel  `json:"variables,omitempty"`
 	LinesInFile int              `json:"linesInFile"`

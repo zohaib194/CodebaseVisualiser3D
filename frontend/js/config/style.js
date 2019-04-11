@@ -64,6 +64,10 @@ var STYLE = (function() {
                         shape: "dodecahedron",
                         color: 0xac80ff
                     },
+                    variable: {
+                        shape: "cube",
+                        color: 0xfff000
+                    },
                     link: {
                         shape: null,
                         color: 0xffffff
@@ -95,6 +99,10 @@ var STYLE = (function() {
                         shape: "cone",
                         color: 0xad208e
                     },
+                    variable: {
+                        shape: "cube",
+                        color: 0xad208e
+                    },
                     link: {
                         shape: null,
                         color: 0x552988
@@ -110,7 +118,7 @@ var STYLE = (function() {
             camera: {
                 fov: 45,
                 nearPlane: 0.1,
-                farPlane: 1000
+                farPlane: 9001
             }
         }
     };

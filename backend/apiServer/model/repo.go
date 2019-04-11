@@ -21,9 +21,9 @@ var JavaParserPath string
 
 // RepoModel represents metadata for a git repository.
 type RepoModel struct {
-	URI string        `json:"uri"`                     // Where the repository was found
-	ID  bson.ObjectId `json:"id" bson:"_id,omitempty"` // Folder name where repo is stored
-	ParsedRepo	ProjectModel  `json:"parsedrepo,omitempty"` 	// Parsed repository in json format
+	URI        string        `json:"uri"`                     // Where the repository was found
+	ID         bson.ObjectId `json:"id" bson:"_id,omitempty"` // Folder name where repo is stored
+	ParsedRepo ProjectModel  `json:"parsedrepo,omitempty"`    // Parsed repository in json format
 }
 
 // SaveResponse is used by save function to update channel used by go rutine to indicate
@@ -232,7 +232,7 @@ func (repo RepoModel) ParseDataFromFiles(files string, responsePerNFiles int, c 
 			data = FileModel{Parsed: false, FileName: sourceFile}
 
 		}
-		util.TypeLogger.Debug("%v", data);
+		util.TypeLogger.Debug("%v", data)
 		projectModel.Files = append(projectModel.Files, data)
 		if n%responsePerNFiles == 0 {
 			c <- response

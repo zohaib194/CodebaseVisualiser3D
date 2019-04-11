@@ -252,6 +252,10 @@ public class CppLstnr_Initial extends CppExtendedListener {
 		}
 	}
 
+	@Override
+	public void enterDir(CPP14Parser.DirContext ctx) {
+		System.out.println("Found it!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!:  " + ctx.getText());
+	}
 	/**
 	 * Listener for parsing a namespace declaration. Adding namespace to filemodel.
 	 *
@@ -346,17 +350,26 @@ public class CppLstnr_Initial extends CppExtendedListener {
 			if (!context.subSequence(startParantheses, endParantheses + 2).toString().contains("=")
 					&& !ctx.getText().contains("=")) {
 
-				CharSequence parameterList = context.subSequence(startParantheses, endParantheses + 2);
+				CharSequence parameterList = context.subSequence(startParantheses, endParantheses + 1);
 
 				context = context.replace(parameterList, "");
 
-				String[] splitContext = context.split("(::)|(->)|(\\.)");
+				String[] splitContext = context.split("(?<=(::))|(?<=(->))|(?<=\\.)");
 
 				for (int i = 0; i < splitContext.length - 1; i++) {
-					call.addScopeIdentifier(splitContext[i]);
+					if(splitContext[i].contains("::")){
+						call.addScope(new ScopeModel(splitContext[i].substring(0, splitContext[i].length() - 2), "namespace"));
+					} else if(splitContext[i].contains("->")) {
+						call.addScope(new ScopeModel(splitContext[i].substring(0, splitContext[i].length() - 2), "class"));
+					} else if(splitContext[i].contains(".")){
+						call.addScope(new ScopeModel(splitContext[i].substring(0, splitContext[i].length() - 1), "class"));
+					} else {
+						System.err.println("Could not understand scope from splited context.");
+					}
 				}
+
 				if (parameterList != null) {
-					call.setIdentifier(splitContext[splitContext.length - 1] + parameterList);
+					call.setIdentifier(splitContext[splitContext.length - 1].replace(";", "") + parameterList);
 				}
 
 				if (this.scopeStack.peek() instanceof FunctionBodyModel) {
@@ -524,6 +537,16 @@ public class CppLstnr_Initial extends CppExtendedListener {
 			System.err.println("Could not understand parent model for parameter declaration.");
 		}
 	}
+
+	@Override
+	public void enterDeclspecifierseq(CPP14Parser.DeclspecifierseqContext ctx){
+		if(this.scopeStack.peek() instanceof FunctionModel){
+			FunctionModel functionModel = (FunctionModel) this.exitScope();
+			functionModel.setReturnType(ctx.getText());
+			this.enterScope(functionModel);
+		}
+	}
+
 
 	/**
 	 * Listener for parsing declarators.
