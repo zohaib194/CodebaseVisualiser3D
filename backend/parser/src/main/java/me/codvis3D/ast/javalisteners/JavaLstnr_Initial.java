@@ -231,30 +231,26 @@ public class JavaLstnr_Initial extends JavaExtendedListener {
 		Java9Parser.SingleTypeImportDeclarationContext importSingleType = ctx.singleTypeImportDeclaration();
 		Java9Parser.TypeImportOnDemandDeclarationContext importTypeOnDemand = ctx.typeImportOnDemandDeclaration();
 
-		UsingNamespaceModel usingNamespaceModel;
+		String importName;
 
 		if (importSingle != null) {
-			usingNamespaceModel = new UsingNamespaceModel(importSingle.typeName().getText(),
-					importSingle.typeName().getStart().getLine());
+			importName = importSingle.typeName().getText();
 
 		} else if (importOnDemand != null) {
-			usingNamespaceModel = new UsingNamespaceModel(importOnDemand.typeName().getText(),
-					importOnDemand.typeName().getStart().getLine());
+			importName = importOnDemand.typeName().getText();
 
 		} else if (importSingleType != null) {
-			usingNamespaceModel = new UsingNamespaceModel(importSingleType.typeName().getText(),
-					importSingleType.typeName().getStart().getLine());
+			importName = importSingleType.typeName().getText();
 
 		} else if (importTypeOnDemand != null) {
-			usingNamespaceModel = new UsingNamespaceModel(importTypeOnDemand.packageOrTypeName().getText(),
-					importTypeOnDemand.packageOrTypeName().getStart().getLine());
+			importName = importTypeOnDemand.packageOrTypeName().getText();
 
 		} else {
 			System.err.println("Unhandeled using dirctive");
 			return;
 		}
 
-		this.scopeStack.peek().addDataInModel(usingNamespaceModel);
+		this.scopeStack.peek().addDataInModel(importName);
 	}
 
 	/**

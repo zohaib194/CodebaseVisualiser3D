@@ -252,10 +252,6 @@ public class CppLstnr_Initial extends CppExtendedListener {
 		}
 	}
 
-	@Override
-	public void enterDir(CPP14Parser.DirContext ctx) {
-		System.out.println("Found it!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!:  " + ctx.getText());
-	}
 	/**
 	 * Listener for parsing a namespace declaration. Adding namespace to filemodel.
 	 *

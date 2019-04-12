@@ -22,6 +22,7 @@ public class FileModel extends Model {
 	private List<FunctionModel> functions;
 	private List<NamespaceModel> namespaces;
 	private List<UsingNamespaceModel> usingNamespaces;
+	private List<String> includes;
 	private List<VariableModel> variables;
 	private List<ClassModel> classes;
 
@@ -35,6 +36,7 @@ public class FileModel extends Model {
 		this.functions = new ArrayList<>();
 		this.namespaces = new ArrayList<>();
 		this.usingNamespaces = new ArrayList<>();
+		this.includes = new ArrayList<>();
 		this.variables = new ArrayList<>();
 		this.classes = new ArrayList<>();
 	}
@@ -82,6 +84,15 @@ public class FileModel extends Model {
 	 */
 	public void addClass(ClassModel clazz) {
 		this.classes.add(clazz);
+	}
+
+	/**
+	 * Adds an include.
+	 *
+	 * @param      include  The include
+	 */
+	public void addInclude(String include){
+		this.includes.add(include);
 	}
 
 	/**
@@ -179,7 +190,9 @@ public class FileModel extends Model {
 		} else if (data instanceof ClassModel) {
 			this.addClass((ClassModel) data);
 
-		} else {
+		} else if (data instanceof String){
+			this.addInclude((String) data);
+		} else{
 			System.err.println("Error adding data in file model");
 			System.exit(1);
 		}
@@ -222,6 +235,9 @@ public class FileModel extends Model {
 			parsedCode.put("classes", parsedClasses);
 		}
 
+		if (this.includes.size() > 0 ) {
+			parsedCode.put("Includes", this.includes);
+		}
 		return parsedCode;
 	}
 

@@ -1,10 +1,7 @@
 package hello.world;
 
-import my.ass;
-import your.ass;
-import his.her.it.ass;
-import thier.ass;
-import te.ass;
+import java.util.ArrayList;
+import java.util.List;
 
 public class HelloWorld extends Ello implements Hei, Yo, Bonjour {
 	private String l;

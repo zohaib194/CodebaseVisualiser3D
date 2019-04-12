@@ -14,10 +14,9 @@ public class NamespaceModel extends Model {
 	private List<FunctionModel> functions;
 	private List<NamespaceModel> namespaces;
 	private List<UsingNamespaceModel> usingNamespaces;
-	private List<String> calls;
 	private List<VariableModel> variables;
 	private List<ClassModel> classes;
-
+	private List<String> includes;
 	/**
 	 * Constructs the namespace, setting the name.
 	 *
@@ -28,9 +27,9 @@ public class NamespaceModel extends Model {
 		this.functions = new ArrayList<>();
 		this.namespaces = new ArrayList<>();
 		this.usingNamespaces = new ArrayList<>();
-		this.calls = new ArrayList<>();
 		this.variables = new ArrayList<>();
 		this.classes = new ArrayList<>();
+		this.includes = new ArrayList<>();
 	}
 
 	/**
@@ -115,21 +114,21 @@ public class NamespaceModel extends Model {
 	}
 
 	/**
-	 * Adds a call.
-	 *
-	 * @param functionCall The function call
-	 */
-	public void addCall(String functionCall) {
-		this.calls.add(functionCall);
-	}
-
-	/**
 	 * Adds a function.
 	 *
 	 * @param variable The variable
 	 */
 	public void addVariable(VariableModel variable) {
 		this.variables.add(variable);
+	}
+
+	/**
+	 * Adds an include.
+	 *
+	 * @param      variable  The variable
+	 */
+	public void addInclude(String include) {
+		this.includes.add(include);
 	}
 
 	/**
@@ -167,14 +166,14 @@ public class NamespaceModel extends Model {
 		} else if (data instanceof UsingNamespaceModel) {
 			this.addUsingNamespace((UsingNamespaceModel) data);
 
-		} else if (data instanceof String) {
-			this.addCall((String) data);
-
 		} else if (data instanceof VariableModel) {
 			this.addVariable((VariableModel) data);
 
 		} else if (data instanceof ClassModel) {
 			this.addClass((ClassModel) data);
+
+		} else if (data instanceof String){
+			this.addInclude((String) data);
 
 		} else {
 
@@ -219,7 +218,9 @@ public class NamespaceModel extends Model {
 			parsedCode.put("classes", parsedClasses);
 		}
 
-		parsedCode.put("calls", this.calls);
+		if (this.includes.size() > 0 ) {
+			parsedCode.put("Includes", this.includes);
+		}
 
 		return parsedCode;
 	}
