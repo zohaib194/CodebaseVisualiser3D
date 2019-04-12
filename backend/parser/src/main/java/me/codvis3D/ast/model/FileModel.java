@@ -236,7 +236,7 @@ public class FileModel extends Model {
 		}
 
 		if (this.includes.size() > 0 ) {
-			parsedCode.put("Includes", this.includes);
+			parsedCode.put("includes", this.includes);
 		}
 		return parsedCode;
 	}

@@ -93,7 +93,7 @@ func checkSubstrings(str string, subs []string) (bool, int) {
 
 	for _, sub := range subs {
 		if strings.Contains(str, sub) {
-			matches += 1
+			matches++
 		} else {
 			isCompleteMatch = false
 		}
