@@ -82,9 +82,15 @@ public class FunctionModel extends Model {
 		return this.returnType;
 	}
 
+	/**
+	 * Sets the return type.
+	 *
+	 * @param      returnType  The return type
+	 */
 	public void setReturnType(String returnType){
 		this.returnType = returnType;
 	}
+
 	/**
 	 * Sets the scope.
 	 *
@@ -130,6 +136,16 @@ public class FunctionModel extends Model {
 		return this.lineStart;
 	}
 
+
+	/**
+	 * Gets the parameters.
+	 *
+	 * @return     The parameters.
+	 */
+	public List<VariableModel> getParameters() {
+		return this.parameters;
+	}
+
 	/**
 	 * Sets the line end.
 	 *
@@ -146,6 +162,15 @@ public class FunctionModel extends Model {
 	 */
 	public int getLineEnd() {
 		return this.lineEnd;
+	}
+
+	/**
+	 * Gets the function body.
+	 *
+	 * @return     The function body.
+	 */
+	public FunctionBodyModel getFunctionBody() {
+		return this.functionBody;
 	}
 
 	/**

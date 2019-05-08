@@ -78,6 +78,33 @@ public class NamespaceModel extends Model {
 	}
 
 	/**
+	 * Gets the functions.
+	 *
+	 * @return     The functions.
+	 */
+	public List<FunctionModel> getFunctions(){
+		return this.functions;
+	}
+
+	/**
+	 * Gets the namespaces.
+	 *
+	 * @return     The namespaces.
+	 */
+	public List<NamespaceModel> getNamespaces(){
+		return this.namespaces;
+	}
+
+	/**
+	 * Gets the using namespaces.
+	 *
+	 * @return     The using namespaces.
+	 */
+	public List<UsingNamespaceModel> getUsingNamespaces(){
+		return this.usingNamespaces;
+	}
+
+	/**
 	 * Sets the functions.
 	 *
 	 * @param functions The functions

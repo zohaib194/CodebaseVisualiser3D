@@ -48,9 +48,11 @@ public class JavaParserFacadeTest {
 				"ValidFunctionTest.java",
 				"Initial",
 				"public class HelloWorld {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println(\"Hello, World\");\t}}",
-				"{\"file\":{\"functions\":[{\"function\":{\"declrator_id\":\"main\",\"scope\":\"\",\"name\":\"void main(String[] args)\"" +
-				",\"start_line\":2,\"function_body\":{\"calls\":[\"System.out.println(\\\"Hello, World\\\")\"]},\"parameters\":[{\"parameter\":" +
-				"{\"name\":\"args\",\"type\":\"String[]\"}}],\"end_line\":3}}],\"file_name\":\"/tmp/TestData/ValidFunctionTest.java\"}}\n"
+				"{\"file\":{\"file_name\":\"/tmp/TestData/ValidFunctionTest.java\",\"classes\":[{\"access_specifiers\":[{\"functions\":"+
+				"[{\"return_type\":\"void\",\"declrator_id\":\"main\",\"scope\":\"\",\"name\":\"void main(String[] args)\","+
+				"\"start_line\":2,\"function_body\":{\"calls\":[{\"identifier\":\"println(\\\"Hello, World\\\")\",\"scopes\":"+
+				"[{\"identifier\":\"System\",\"type\":\"class\"},{\"identifier\":\"out\",\"type\":\"class\"}]}]},\"parameters\""+
+				":[{\"name\":\"args\",\"type\":\"String[]\"}],\"end_line\":3}],\"name\":\"private\"}],\"name\":\"HelloWorld\"}]}}\n"
 			)
 		);
 
@@ -63,12 +65,12 @@ public class JavaParserFacadeTest {
 				"public static final void boo (final String lol){\n\tif(true) {\n\treturn;\n\t}\n}\n" +
 				"public static final void foo(){\n" + "\t boolean isOk; \n" + "\t}\n}" ,
 
-				"{\"file\":{\"functions\":[{\"function\":{\"declrator_id\":\"boo\",\"scope\":\"\",\"name\":" +
-				"\"void boo (final String lol)\",\"start_line\":2,\"function_body\":{},\"parameters\":[{\"parameter\"" +
-				":{\"name\":\"lol\",\"type\":\"final String\"}}],\"end_line\":6}},{\"function\":{\"declrator_id\":" +
-				"\"foo\",\"scope\":\"\",\"name\":\"void foo()\",\"start_line\":7,\"function_body\":{\"variables\":" +
-				"[{\"variable\":{\"name\":\"isOk\",\"type\":\"boolean\"}}]},\"end_line\":9}}],\"file_name\":" +
-				"\"/tmp/TestData/ValidTwoFunctionsTest.java\"}}\n"
+				"{\"file\":{\"file_name\":\"/tmp/TestData/ValidTwoFunctionsTest.java\",\"classes\":[{\"access_specifiers\":[{\"functions\":"+
+				"[{\"return_type\":\"void\",\"declrator_id\":\"boo\",\"scope\":\"\",\"name\":\"void boo (final String lol)\","+
+				"\"start_line\":2,\"function_body\":{},\"parameters\":[{\"name\":\"lol\",\"type\":\"final String\"}],\"end_line\":"+
+				"6},{\"return_type\":\"void\",\"declrator_id\":\"foo\",\"scope\":\"\",\"name\":\"void foo()\",\"start_line\":7,"+
+				"\"function_body\":{\"variables\":[{\"name\":\"isOk\",\"type\":\"boolean\"}]},\"end_line\":9}],\"name\":"+
+				"\"private\"}],\"name\":\"HelloWorld\"}]}}\n"
 			)
 		);
 
