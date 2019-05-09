@@ -9,6 +9,10 @@ backend/parser/.project
 backend/parser/.classpath
 
 backend/parser/.vscode/
+
+backend/parser/src/test/java/funcitondefinition.cpp
+backend/parser/src/test/java/functiondeclaration.cpp
+backend/parser/src/test/java/variable.cpp
 ### Linux ###
 *~
 
