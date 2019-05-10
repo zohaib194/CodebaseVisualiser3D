@@ -132,7 +132,7 @@ body{
     background: linear-gradient(135deg, white, white 40em, $color_background_primary 10em, $color_background_secondary 120em);
 }
 
-header{ 
+header{
     grid-area: header;
     background-color: mix($color_background_primary, white, 65%);
     box-shadow: 3px 5px #333;
@@ -140,7 +140,7 @@ header{
     border: 1px solid black;
 }
 
-main { 
+main {
     grid-area: main;
     padding-top: 2em;
 
@@ -150,10 +150,10 @@ main {
         opacity: 10%;
         margin-bottom: 1em;
     }
-    
+
 }
 
-footer { 
+footer {
     border-top: 1px solid black;
     margin-top: 1em;
     padding-top: 1em;
@@ -182,13 +182,13 @@ table{
     .partial{
         text-align: center;
         border: 1px solid black;
-        background: repeating-linear-gradient(45deg, limegreen, mix(limegreen, crimson, 50%) 10px, crimson 10px, mix(crimson, limegreen, 50%) 20px);
+        background: repeating-linear-gradient(45deg, limegreen, mix(limegreen, #ff7272, 50%) 10px, #ff7272 10px, mix(#ff7272, limegreen, 50%) 20px);
         background-color: purple;
     }
     .non{
         text-align: center;
         border: 1px solid black;
-        background-color: crimson;
+        background-color: #ff7272;
     }
 
 }
