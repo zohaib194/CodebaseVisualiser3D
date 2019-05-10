@@ -42,32 +42,31 @@ public class CppLstnr_InitialTest {
 
 		ParserTestCase functiondef_basic = new ParserTestCase("functiondefinition", filename, "void test() {}");
 		functiondef_basic.expected.add(
-				"{\"file\":{\"functions\":[{\"function\":{\"declrator_id\":\"test\",\"name\":\"void test()\",\"start_line\":1,\"function_body\":{},\"end_line\":1}}],\"file_name\":\""
+				"{\"file\":{\"functions\":[{\"return_type\":\"void\",\"declrator_id\":\"test\",\"name\":\"test()\",\"start_line\":1,\"function_body\":{},\"end_line\":1}],\"file_name\":\""
 						+ filename + "\"}}");
 
 		ParserTestCase functiondef_basic_cpp17 = new ParserTestCase("functiondefinition", filename,
 				"auto heaven() -> void {}");
 		functiondef_basic_cpp17.expected.add(
-				"{\"file\":{\"functions\":[{\"function\":{\"declrator_id\":\"heaven\",\"name\":\"auto heaven() -> void\",\"start_line\":1,\"function_body\":{},\"end_line\":1}}],\"file_name\":\""
+				"{\"file\":{\"functions\":[{\"return_type\":\"auto\",\"declrator_id\":\"heaven\",\"name\":\"heaven()->void\",\"start_line\":1,\"function_body\":{},\"end_line\":1}],\"file_name\":\""
 						+ filename + "\"}}");
 
 		ParserTestCase originalnamespacedefinition = new ParserTestCase("originalnamespacedefinition", filename,
 				"namespace Hello {}");
 		originalnamespacedefinition.expected.add("{\"file\":{\"file_name\":\"" + filename
-				+ "\",\"namespaces\":[{\"namespace\":{\"name\":\"Hello\"}}]}}");
+				+ "\",\"namespaces\":[{\"name\":\"Hello\"}]}}");
 
 		ParserTestCase usingdirective = new ParserTestCase("usingdirective", filename, "using namespace Hello;");
 		usingdirective.expected.add("{\"file\":{\"file_name\":\"" + filename
-				+ "\",\"using_namespaces\":[{\"namespace\":{\"line_number\":1,\"name\":\"Hello\"}}]}}");
+				+ "\",\"using_namespaces\":[{\"line_number\":1,\"name\":\"Hello\"}]}}");
 
 		ParserTestCase usingdirectiveNested = new ParserTestCase("usingdirective", filename,
 				"using namespace Hello::Hi::Bonjour;");
 		usingdirectiveNested.expected.add("{\"file\":{\"file_name\":\"" + filename
-				+ "\",\"using_namespaces\":[{\"namespace\":{\"line_number\":1,\"name\":\"Hello::Hi::Bonjour\"}}]}}");
+				+ "\",\"using_namespaces\":[{\"line_number\":1,\"name\":\"Hello::Hi::Bonjour\"}]}}");
 
 		ParserTestCase expressionstatement = new ParserTestCase("expressionstatement", filename, "void test() {f();}");
-		expressionstatement.expected.add("{\"file\":{\"file_name\":\"" + filename
-				+ "\",\"using_namespaces\":[{\"namespace\":{\"line_number\":1,\"name\":\"Hello::Hi::Bonjour\"}}]}}");
+		expressionstatement.expected.add("{\"file\":{\"file_name\":\"" + filename + "\"}}");
 
 		cases.add(functiondef_basic);
 		cases.add(functiondef_basic_cpp17);
