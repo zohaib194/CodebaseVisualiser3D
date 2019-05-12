@@ -4,11 +4,11 @@ package util
 import (
 	"bytes"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"strings"
 	"testing"
-	"io/ioutil"
 )
 
 var out bytes.Buffer
@@ -93,7 +93,7 @@ func checkSubstrings(str string, subs []string) (bool, int) {
 
 	for _, sub := range subs {
 		if strings.Contains(str, sub) {
-			matches += 1
+			matches++
 		} else {
 			isCompleteMatch = false
 		}
@@ -225,31 +225,31 @@ func TestSetLogLevel(t *testing.T) {
 func TestSetLogFile(t *testing.T) {
 	file := "testlogfile"
 	tests := []struct {
-		name string
+		name     string
 		filepath string
-		want bool
+		want     bool
 	}{
 		// Valid test cases.
 		{
-			name: "./Valid_LogFile",
+			name:     "./Valid_LogFile",
 			filepath: file,
-			want: true,
+			want:     true,
 		},
 		// Invalid test cases.
 		{
-			name: "Invalid_FilePath_LogFile",
+			name:     "Invalid_FilePath_LogFile",
 			filepath: "./TestLog/Lorem Ipsum",
-			want: false,
+			want:     false,
 		},
 		{
-			name: "Invalid_Empty_LogFile",
+			name:     "Invalid_Empty_LogFile",
 			filepath: "",
-			want: false,
+			want:     false,
 		},
 		{
-			name: "Invalid_Path_LogFile",
+			name:     "Invalid_Path_LogFile",
 			filepath: "./Hey/",
-			want: false,
+			want:     false,
 		},
 	}
 

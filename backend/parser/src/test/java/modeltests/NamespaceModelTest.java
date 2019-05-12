@@ -53,7 +53,6 @@ public class NamespaceModelTest {
 		assertEquals(0, model.getFunctions().size(), "Pre-existing functions field");
 		assertEquals(0, model.getNamespaces().size(), "Pre-existing namespace field");
 		assertEquals(0, model.getUsingNamespaces().size(), "Pre-existing using namespace field");
-		assertEquals(0, model.getCalls().size(), "Pre-existing call field");
 		assertEquals(0, model.getVariables().size(), "Pre-existing variable field");
 
 		// Fill with data.
@@ -62,7 +61,6 @@ public class NamespaceModelTest {
 		assertEquals(1, model.getFunctions().size(), "Empty functions list");
 		assertEquals(1, model.getNamespaces().size(), "Empty namespace list");
 		assertEquals(1, model.getUsingNamespaces().size(), "Empty using namespace list");
-		assertEquals(1, model.getCalls().size(), "Empty call list");
 		assertEquals(1, model.getVariables().size(), "Empty variable list");
 
 		// Try adding objects with illegal types!
@@ -91,7 +89,6 @@ public class NamespaceModelTest {
 		assertEquals(1, jsonObj.getJSONArray("functions").length(), "Incorrect nr of functions");
 		assertEquals(1, jsonObj.getJSONArray("namespaces").length(), "Incorrect nr of namespaces");
 		assertEquals(1, jsonObj.getJSONArray("using_namespaces").length(), "Incorrect nr of using_namespaces");
-		assertEquals(1, jsonObj.getJSONArray("calls").length(), "Incorrect nr of calls");
 		assertEquals(1, jsonObj.getJSONArray("variables").length(), "Incorrect nr of variables");
 	}
 }

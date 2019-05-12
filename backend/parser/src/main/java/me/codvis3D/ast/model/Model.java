@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import java.util.Stack;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
@@ -32,17 +33,14 @@ public class Model {
 	 *
 	 * @return List of given objects as JSONObject.
 	 */
-	public <T extends Model> List<JSONObject> convertClassListJsonObjectList(List<T> objectList, String objectNames) {
+
+	protected <T extends Model> JSONArray convertClassListJsonObjectList(List<T> objectList) {
 		if (objectList.size() > 0) {
-			List<JSONObject> parsedObjects = new ArrayList<>();
-
-			for (T object : objectList) {
-				JSONObject parsedObject = new JSONObject();
-				parsedObject.put(objectNames, object.getParsedCode());
-				parsedObjects.add(parsedObject);
+			JSONArray jsonArray = new JSONArray();
+			for (T obj : objectList) {
+				jsonArray.put(obj.getParsedCode());
 			}
-
-			return parsedObjects;
+			return jsonArray;
 		}
 		return null;
 	}

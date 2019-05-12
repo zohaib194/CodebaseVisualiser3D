@@ -1,9 +1,9 @@
 package me.codvis.ast;
 
-import java.util.Stack;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
@@ -14,9 +14,9 @@ public class NamespaceModel extends Model {
 	private List<FunctionModel> functions;
 	private List<NamespaceModel> namespaces;
 	private List<UsingNamespaceModel> usingNamespaces;
-	private List<String> calls;
 	private List<VariableModel> variables;
-
+	private List<ClassModel> classes;
+	private List<String> includes;
 	/**
 	 * Constructs the namespace, setting the name.
 	 *
@@ -27,8 +27,45 @@ public class NamespaceModel extends Model {
 		this.functions = new ArrayList<>();
 		this.namespaces = new ArrayList<>();
 		this.usingNamespaces = new ArrayList<>();
-		this.calls = new ArrayList<>();
 		this.variables = new ArrayList<>();
+		this.classes = new ArrayList<>();
+		this.includes = new ArrayList<>();
+	}
+
+	/**
+	 * Adds a function.
+	 *
+	 * @param      function  The function
+	 */
+	public void addFunction(FunctionModel function) {
+		this.functions.add(function);
+	}
+
+	/**
+	 * Adds a namespace.
+	 *
+	 * @param      namespace  The namespace
+	 */
+	public void addNamespace(NamespaceModel namespace) {
+		this.namespaces.add(namespace);
+	}
+
+	/**
+	 * Adds an using namespace.
+	 *
+	 * @param      namespace  The namespace
+	 */
+	public void addUsingNamespace(UsingNamespaceModel namespace) {
+		this.usingNamespaces.add(namespace);
+	}
+
+	/**
+	 * Adds an class.
+	 *
+	 * @param clazz The class
+	 */
+	public void addClass(ClassModel clazz) {
+		this.classes.add(clazz);
 	}
 
 	/**
@@ -43,46 +80,28 @@ public class NamespaceModel extends Model {
 	/**
 	 * Gets the functions.
 	 *
-	 * @return The functions.
+	 * @return     The functions.
 	 */
-	public List<FunctionModel> getFunctions() {
+	public List<FunctionModel> getFunctions(){
 		return this.functions;
 	}
 
 	/**
 	 * Gets the namespaces.
 	 *
-	 * @return The namespaces.
+	 * @return     The namespaces.
 	 */
-	public List<NamespaceModel> getNamespaces() {
+	public List<NamespaceModel> getNamespaces(){
 		return this.namespaces;
 	}
 
 	/**
-	 * Gets the usingNamespaces.
+	 * Gets the using namespaces.
 	 *
-	 * @return The usingNamespaces.
+	 * @return     The using namespaces.
 	 */
-	public List<UsingNamespaceModel> getUsingNamespaces() {
+	public List<UsingNamespaceModel> getUsingNamespaces(){
 		return this.usingNamespaces;
-	}
-
-	/**
-	 * Gets the calls.
-	 *
-	 * @return The calls.
-	 */
-	public List<String> getCalls() {
-		return this.calls;
-	}
-
-	/**
-	 * Gets the variables.
-	 *
-	 * @return The variables.
-	 */
-	public List<VariableModel> getVariables() {
-		return this.variables;
 	}
 
 	/**
@@ -113,57 +132,48 @@ public class NamespaceModel extends Model {
 	}
 
 	/**
-	 * Sets the variables.
+	 * Sets the classes list.
 	 *
-	 * @param variables The variables
+	 * @param classes The classes
 	 */
-	public void setVariables(List<VariableModel> variables) {
-		this.variables = variables;
-	}
-
-	/**
-	 * Adds a function.
-	 *
-	 * @param function The function
-	 */
-	public void addFunction(FunctionModel function) {
-		this.functions.add(function);
-	}
-
-	/**
-	 * Adds a namespace.
-	 *
-	 * @param namespace The namespace
-	 */
-	public void addNamespace(NamespaceModel namespace) {
-		this.namespaces.add(namespace);
-	}
-
-	/**
-	 * Adds an using namespace.
-	 *
-	 * @param namespace The namespace
-	 */
-	public void addUsingNamespace(UsingNamespaceModel namespace) {
-		this.usingNamespaces.add(namespace);
-	}
-
-	/**
-	 * Adds a call.
-	 *
-	 * @param functionCall The function call
-	 */
-	public void addCall(String functionCall) {
-		this.calls.add(functionCall);
+	public void setClasses(List<ClassModel> classes) {
+		this.classes = classes;
 	}
 
 	/**
 	 * Adds a variable.
 	 *
-	 * @param variable The variable
+	 * @param      variable  The variable
 	 */
 	public void addVariable(VariableModel variable) {
 		this.variables.add(variable);
+	}
+
+	/**
+	 * Adds an include.
+	 *
+	 * @param      include  The include
+	 */
+	public void addInclude(String include) {
+		this.includes.add(include);
+	}
+
+	/**
+	 * Gets the variables.
+	 *
+	 * @return     The variables.
+	 */
+	public List<VariableModel> getVariables() {
+		return this.variables;
+	}
+
+	/**
+	 * Sets the variables.
+	 *
+	 * @param      variables  The variables
+	 */
+	public void setVariables(List<VariableModel> variables) {
+		this.variables = variables;
 	}
 
 	/**
@@ -183,13 +193,17 @@ public class NamespaceModel extends Model {
 		} else if (data instanceof UsingNamespaceModel) {
 			this.addUsingNamespace((UsingNamespaceModel) data);
 
-		} else if (data instanceof String) {
-			this.addCall((String) data);
-
 		} else if (data instanceof VariableModel) {
 			this.addVariable((VariableModel) data);
 
+		} else if (data instanceof ClassModel) {
+			this.addClass((ClassModel) data);
+
+		} else if (data instanceof String){
+			this.addInclude((String) data);
+
 		} else {
+
 			System.err.println("Error adding data in namespace model");
 			System.exit(1);
 		}
@@ -206,28 +220,33 @@ public class NamespaceModel extends Model {
 
 		parsedCode.put("name", this.name);
 
-		List<JSONObject> parsedFunctions = this.convertClassListJsonObjectList(this.functions, "function");
+		JSONArray parsedFunctions = this.convertClassListJsonObjectList(this.functions);
 		if (parsedFunctions != null) {
 			parsedCode.put("functions", parsedFunctions);
 		}
 
-		List<JSONObject> parsedNamespaces = this.convertClassListJsonObjectList(this.namespaces, "namespace");
+		JSONArray parsedNamespaces = this.convertClassListJsonObjectList(this.namespaces);
 		if (parsedNamespaces != null) {
 			parsedCode.put("namespaces", parsedNamespaces);
 		}
 
-		List<JSONObject> parsedUsingNamespaces = this.convertClassListJsonObjectList(this.usingNamespaces, "namespace");
+		JSONArray parsedUsingNamespaces = this.convertClassListJsonObjectList(this.usingNamespaces);
 		if (parsedUsingNamespaces != null) {
 			parsedCode.put("using_namespaces", parsedUsingNamespaces);
 		}
 
-		List<JSONObject> parsedVariables = this.convertClassListJsonObjectList(this.variables, "variable");
+		JSONArray parsedVariables = this.convertClassListJsonObjectList(this.variables);
 		if (parsedVariables != null) {
 			parsedCode.put("variables", parsedVariables);
 		}
 
-		if (this.calls.size() > 0) {
-			parsedCode.put("calls", this.calls);
+		JSONArray parsedClasses = this.convertClassListJsonObjectList(this.classes);
+		if (parsedClasses != null) {
+			parsedCode.put("classes", parsedClasses);
+		}
+
+		if (this.includes.size() > 0 ) {
+			parsedCode.put("includes", this.includes);
 		}
 
 		return parsedCode;

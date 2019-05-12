@@ -5,7 +5,14 @@ import java.util.ArrayList;
 
 import java.util.Stack;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
+
+import me.codvis.ast.FunctionModel;
+import me.codvis.ast.NamespaceModel;
+import me.codvis.ast.UsingNamespaceModel;
+import me.codvis.ast.VariableModel;
+import me.codvis.ast.ClassModel;
 
 /**
  * Class for file model.
@@ -15,7 +22,9 @@ public class FileModel extends Model {
 	private List<FunctionModel> functions;
 	private List<NamespaceModel> namespaces;
 	private List<UsingNamespaceModel> usingNamespaces;
+	private List<String> includes;
 	private List<VariableModel> variables;
+	private List<ClassModel> classes;
 
 	/**
 	 * Constructs the object, setting the filename.
@@ -27,94 +36,15 @@ public class FileModel extends Model {
 		this.functions = new ArrayList<>();
 		this.namespaces = new ArrayList<>();
 		this.usingNamespaces = new ArrayList<>();
+		this.includes = new ArrayList<>();
 		this.variables = new ArrayList<>();
-	}
-
-	/**
-	 * Gets the filename.
-	 *
-	 * @return The filename.
-	 */
-	public String getFilename() {
-		return this.fileName;
-	}
-
-	/**
-	 * Gets the functions.
-	 *
-	 * @return The functions.
-	 */
-	public List<FunctionModel> getFunctions() {
-		return this.functions;
-	}
-
-	/**
-	 * Gets the namespaces.
-	 *
-	 * @return The namespaces.
-	 */
-	public List<NamespaceModel> getNamespaces() {
-		return this.namespaces;
-	}
-
-	/**
-	 * Gets the using namespaces.
-	 *
-	 * @return The used namespaces.
-	 */
-	public List<UsingNamespaceModel> getUsingNamespaces() {
-		return this.usingNamespaces;
-	}
-
-	/**
-	 * Gets the using variables.
-	 *
-	 * @return The used variables.
-	 */
-	public List<VariableModel> getVariables() {
-		return this.variables;
-	}
-
-	/**
-	 * Sets the functions.
-	 *
-	 * @param functions The functions
-	 */
-	public void setFunctions(List<FunctionModel> functions) {
-		this.functions = functions;
-	}
-
-	/**
-	 * Sets the namespaces.
-	 *
-	 * @param namespaces The namespaces
-	 */
-	public void setNamespaces(List<NamespaceModel> namespaces) {
-		this.namespaces = namespaces;
-	}
-
-	/**
-	 * Sets the usingNamespaces.
-	 *
-	 * @param usingNamespaces The usingNamespaces
-	 */
-	public void setUsingNamespaces(List<UsingNamespaceModel> usingNamespaces) {
-		this.usingNamespaces = usingNamespaces;
-	}
-
-	/**
-	 * Sets the variables.
-	 *
-	 * @param variables The variables
-	 */
-	public void setVariables(List<VariableModel> variables) {
-		this.variables = variables;
+		this.classes = new ArrayList<>();
 	}
 
 	/**
 	 * Adds a function.
 	 *
-	 * @param function The function
+	 * @param      function  The function
 	 */
 	public void addFunction(FunctionModel function) {
 		this.functions.add(function);
@@ -123,7 +53,7 @@ public class FileModel extends Model {
 	/**
 	 * Adds a namespace.
 	 *
-	 * @param namespace The namespace
+	 * @param      namespace  The namespace
 	 */
 	public void addNamespace(NamespaceModel namespace) {
 		this.namespaces.add(namespace);
@@ -132,25 +62,115 @@ public class FileModel extends Model {
 	/**
 	 * Adds an using namespace.
 	 *
-	 * @param namespace The namespace
+	 * @param      namespace  The namespace
 	 */
-	public void addUsingNamespace(UsingNamespaceModel usingNamespace) {
-		this.usingNamespaces.add(usingNamespace);
+	public void addUsingNamespace(UsingNamespaceModel namespace) {
+		this.usingNamespaces.add(namespace);
 	}
 
 	/**
 	 * Adds a variable.
 	 *
-	 * @param variable The variable
+	 * @param      variable  The variable
 	 */
 	public void addVariable(VariableModel variable) {
 		this.variables.add(variable);
 	}
 
 	/**
-	 * Adds the data in model.
+	 * Adds a class.
 	 *
-	 * @param data The data
+	 * @param      clazz  The class
+	 */
+	public void addClass(ClassModel clazz) {
+		this.classes.add(clazz);
+	}
+
+	/**
+	 * Adds an include.
+	 *
+	 * @param      include  The include
+	 */
+	public void addInclude(String include){
+		this.includes.add(include);
+	}
+
+	/**
+	 * Gets the variables.
+	 *
+	 * @return     The variables.
+	 */
+	public List<VariableModel> getVariables() {
+		return this.variables;
+	}
+
+	/**
+	 * Sets the functions.
+	 *
+	 * @param      functions  The functions
+	 */
+	public void setFunctions(List<FunctionModel> functions) {
+		this.functions = functions;
+	}
+
+	/**
+	 * Sets the classes.
+	 *
+	 * @param      classes  The classes
+	 */
+	public void setClasses(List<ClassModel> classes) {
+		this.classes = classes;
+	}
+
+	/**
+	 * Gets the filename.
+	 *
+	 * @return     The filename.
+	 */
+	public String getFilename() {
+		return this.fileName;
+	}
+
+	/**
+	 * Gets the functions.
+	 *
+	 * @return     The functions.
+	 */
+	public List<FunctionModel> getFunctions() {
+		return this.functions;
+	}
+
+	/**
+	 * Gets the namespaces.
+	 *
+	 * @return     The namespaces.
+	 */
+	public List<NamespaceModel> getNamespaces() {
+		return this.namespaces;
+	}
+
+	/**
+	 * Gets the using namespaces.
+	 *
+	 * @return     The using namespaces.
+	 */
+	public List<UsingNamespaceModel> getUsingNamespaces() {
+		return this.usingNamespaces;
+	}
+
+	/**
+	 * Gets the classes.
+	 *
+	 * @return     The classes.
+	 */
+	public List<ClassModel> getClasses() {
+		return this.classes;
+	}
+
+	/**
+	 * Adds a data in model.
+	 *
+	 * @param      data  The data
 	 */
 	@Override
 	protected <T> void addDataInModel(T data) {
@@ -167,7 +187,12 @@ public class FileModel extends Model {
 		} else if (data instanceof VariableModel) {
 			this.addVariable((VariableModel) data);
 
-		} else {
+		} else if (data instanceof ClassModel) {
+			this.addClass((ClassModel) data);
+
+		} else if (data instanceof String){
+			this.addInclude((String) data);
+		} else{
 			System.err.println("Error adding data in file model");
 			System.exit(1);
 		}
@@ -185,26 +210,34 @@ public class FileModel extends Model {
 
 		parsedCode.put("file_name", this.fileName);
 
-		List<JSONObject> parsedFunctions = this.convertClassListJsonObjectList(this.functions, "function");
+		JSONArray parsedFunctions = this.convertClassListJsonObjectList(this.functions);
 		if (parsedFunctions != null) {
 			parsedCode.put("functions", parsedFunctions);
 		}
 
-		List<JSONObject> parsedNamespaces = this.convertClassListJsonObjectList(this.namespaces, "namespace");
+		JSONArray parsedNamespaces = this.convertClassListJsonObjectList(this.namespaces);
 		if (parsedNamespaces != null) {
 			parsedCode.put("namespaces", parsedNamespaces);
 		}
 
-		List<JSONObject> parsedUsingNamespaces = this.convertClassListJsonObjectList(this.usingNamespaces, "namespace");
+		JSONArray parsedUsingNamespaces = this.convertClassListJsonObjectList(this.usingNamespaces);
 		if (parsedUsingNamespaces != null) {
 			parsedCode.put("using_namespaces", parsedUsingNamespaces);
 		}
 
-		List<JSONObject> parsedVariables = this.convertClassListJsonObjectList(this.variables, "variable");
+		JSONArray parsedVariables = this.convertClassListJsonObjectList(this.variables);
 		if (parsedVariables != null) {
 			parsedCode.put("variables", parsedVariables);
 		}
 
+		JSONArray parsedClasses = this.convertClassListJsonObjectList(this.classes);
+		if (parsedClasses != null) {
+			parsedCode.put("classes", parsedClasses);
+		}
+
+		if (this.includes.size() > 0 ) {
+			parsedCode.put("includes", this.includes);
+		}
 		return parsedCode;
 	}
 

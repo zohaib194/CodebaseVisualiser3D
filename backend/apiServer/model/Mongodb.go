@@ -198,3 +198,22 @@ func (db *MongoDB) Count() int {
 
 	return count
 }
+
+// Update updates the repo model matching rm.
+func (db *MongoDB) Update(rm *RepoModel) error {
+	util.TypeLogger.Debug("%s: Call for Update", packageName)
+	defer util.TypeLogger.Debug("%s: Ended Call for Update", packageName)
+
+	session, err := mgo.Dial(db.DatabaseURL)
+	if err != nil {
+		util.TypeLogger.Fatal("%s: Failed to connect to database", packageName)
+	}
+	defer session.Close()
+
+	err = session.DB(db.DatabaseName).C(db.RepoColl).UpdateId(rm.ID, bson.M{"$set": bson.M{"parsedrepo": rm.ParsedRepo}})
+	if err != nil {
+		util.TypeLogger.Fatal("%s: Failed to get db Update: %v", packageName, err)
+	}
+
+	return nil
+}

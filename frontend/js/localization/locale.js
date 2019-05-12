@@ -182,7 +182,7 @@ var LOCALE = (function() {
                         value: "Mottat data fra API server"
                     }
                 ]
-            },  
+            },
             {
                 id: "backend_data_not_received",
                 values: [
@@ -288,6 +288,19 @@ var LOCALE = (function() {
                 ]
             },
             {
+                id: "quality_metric_variable_count",
+                values: [
+                    {
+                        language: "english",
+                        value: "Number of variables"
+                    },
+                    {
+                        language: "norwegian",
+                        value: "Antall \"variabler\"s"
+                    }
+                ]
+            },
+            {
                 id: "quality_metric_lines_count",
                 values: [
                     {
@@ -344,9 +357,9 @@ var LOCALE = (function() {
         if (typeof id === "undefined" || id === ""){
             return;
         }
-        
+
         var result = "";
-        
+
         // Find the sentence from a specific languge.
         // If not found, default to english.
         // If english is not found, give error.
@@ -356,15 +369,15 @@ var LOCALE = (function() {
                     if (language.language == currentLanguage) {
                         result = language.value;
                         return;
-                    }   
+                    }
                 });
 
                 // Found the sentence in the specified language, return it.
                 if (result != "") {
                     return result;
                 }
-                
-                // Defaulting to english language if 
+
+                // Defaulting to english language if
                 // wanted language isn't found.
                 sentence.values.forEach((language) => {
                     if (language.language == languages[0]) {
@@ -384,7 +397,7 @@ var LOCALE = (function() {
         }
         console.log(getSentence("language_not_found"));
     }
-    
+
     /**
      * Getter for languages.
      */

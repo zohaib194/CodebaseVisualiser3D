@@ -86,8 +86,9 @@ public class VariableListModel extends Model {
 	 * @param data The data
 	 */
 	@Override
-	protected <T> void addDataInModel(T data) {
-		System.err.println("Error adding data in variable list model " + data.getClass());
+
+	protected <T> void addDataInModel(T data){
+		System.err.println("Error adding data in variable list model");
 		System.exit(1);
 	}
 

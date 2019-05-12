@@ -1,4 +1,3 @@
-var indexStack = new Array();
 var functionModels = new Map();
 
 var fileCount = 0;
@@ -14,31 +13,122 @@ var functionCount = 0;
 // Number of namespaces found in the project.
 var namespaceCount = 0;
 
+// Number of variable found in the project.
+var variableCount = 0;
+
 /**
- * Function to get new random position.
+ * Function to get new random position within a radius of a position.
+ * @param {THREE.Vector3} center - Where to calculate position from.
+ * @param {float} radius - Maximum offset from center
  */
-function randomPosition() {
+function randomPosition(center, radius) {
     return new THREE.Vector3(
-        // Random nr [0-19].
-        Math.floor(Math.random() * 20),
-        Math.floor(Math.random() * 20),
-        Math.floor(Math.random() * 20)
+        // Gets a number between center - radius and center + radis
+        Math.random() * (2 * radius) + center.x - radius,
+        Math.random() * (2 * radius) + center.y - radius,
+        Math.random() * (2 * radius) + center.z - radius
     );
 }
+
 /**
- * Function for linking the two last elements in indexStack.
+ * Links function calls.
  */
-function linkElements() {
-    // If I have a parent, add attractive link between us.
-    if (indexStack.length >= 2) {
-        fdg.addLink(
-            indexStack[indexStack.length - 2], 
-            indexStack[indexStack.length - 1], 
-            new LinkProperties(1)
-        );
-    } else {    // Missing parrent, state so.
-        console.log(LOCALE.getSentence("fdg_link_missing_parent"));
-    }
+function linkFunctionCalls(){
+    fdg.getNodes().forEach( function(node, callerIndex) {
+
+        if(node.getType() == "function") {
+            var fm = functionModels.get(node.getName());
+
+
+            if(typeof fm.getCalls() !== "undefined") {
+                fm.getCalls().forEach( function(callModel, callIndex) {
+                    console.log("callModel: ", callModel);
+
+
+                    var calleeNode = null;
+                    var calleeIndex = -1;
+                    var scopePath = [];
+                    console.log("Initial: ", scopePath, " | ", scopePath.length )
+                    if (typeof callModel.scopes !== "undefined"){
+                        callModel.scopes.every( function(scope, scopeIndex) {
+
+                            if (scopeIndex === 0 && scopePath.length === 0) {
+                                if (scope.identifier == "this") {
+                                    scopePath.push(node.getEncapsulatingClass());
+                                }else{
+
+                                    var nodeToSearch = node;
+
+                                    // Where to search if called scope exist.
+                                    while(scopeIndex == 0 && scopePath.length == 0){
+
+                                        var foundScope = nodeToSearch.getChildByNameAndType(scope.identifier, scope.type);
+                                        if (foundScope != null) {
+
+                                            scopePath.push(foundScope);
+                                        }else{
+
+                                            nodeToSearch = nodeToSearch.getParent();
+
+                                            if (nodeToSearch == null) {
+                                                return false;
+                                            }
+                                        }
+                                    }
+                                }
+                            } else {
+                                var childNode = scopePath[scopePath.length - 1].getChildByNameAndType(scope.identifier, scope.type);
+                                if (childNode != null) {
+                                    scopePath.push(childNode);
+                                }
+                            }
+                            return true;
+                        });
+
+                        if (scopePath.length > 0) {
+                            calleeNode = scopePath[scopePath.length - 1].getChildByNameAndType(callModel.identifier, "function");
+                            if (calleeNode != null) {
+
+                                calleeIndex = calleeNode.getFinalizedIndex();
+                            } else {
+                                calleeIndex = scopePath[scopePath.length -1].getFinalizedIndex();
+                            }
+                        }
+                    } else {
+
+                        var nodeToSearch = node;
+                        var provenNotToExist = false;
+                        var foundNode = null;
+                        // Where to search if called scope exist.
+                        while(!provenNotToExist && !foundNode){
+
+                            foundNode = nodeToSearch.getChildByNameAndType(callModel.identifier, "function");
+                            if (foundNode == null) {
+
+                                nodeToSearch = nodeToSearch.getParent();
+
+                                if (nodeToSearch == null) {
+                                    provenNotToExist = true;
+                                }
+                            }
+                        }
+
+                        if(foundNode != null){
+                            calleeIndex = foundNode.getFinalizedIndex();
+                        }
+                    }
+
+                    fdg.addLink(node.getFinalizedIndex(), calleeIndex, new LinkProperties(1));
+
+                    console.log("Before: ", scopePath, " | ", scopePath.length)
+                    scopePath = [];
+                    console.log("After: ", scopePath, " | ", scopePath.length)
+                });
+
+            }
+        }
+
+    });
 }
 
 /**
@@ -46,26 +136,50 @@ function linkElements() {
  * @param {JSONObject} classData - Data about a class.
  */
 function handleClassData(classData, filename) {
-    classCount++;
+    var children = [];
+    if (typeof classData.access_specifiers !== "undefined") {
+        // Handle all functions
+        classData.access_specifiers.forEach( (object) => {
+            children = children.concat(handleAccessSpecifiers(object, filename));
+        });
+    }
+    var position = randomPosition({x:0, y:0, z:0}, 5);
+    var size = 5;
+
+    children.forEach( function(child, index) {
+        size += child.getSize();
+    });
+
     // Add node and save index.
-    indexStack.push(
-        fdg.addNode(
-            new Node(
-                randomPosition(), 
-                classData.Class.name, 
-                "class"
-            )
-        )
+    nodeSelf = new Node(
+        position,
+        classData.name,
+        size,
+        "class"
     );
 
-    // If I have a parent, add link between us.
-    linkElements();
+    classCount++;
 
-    // Handle any children.
-    handleCodeData(classData.Class, filename);
+    children.forEach( function(child, index) {
+        nodeSelf.addChild(child);
+        child.setParent(nodeSelf);
+    });
 
-    // We're done in this part of the tree.
-    indexStack.pop();
+    return nodeSelf;
+}
+
+/**
+ * Function for handling access specifiers.
+ * @param {JSONObject} accessData - Data about access rights.
+ */
+function handleAccessSpecifiers(accessData, filename) {
+    var children = handleCodeData(accessData, filename);
+
+    children.forEach( function(child, index) {
+        child.access = accessData.name;
+    });
+
+    return children;
 }
 
 /**
@@ -73,27 +187,30 @@ function handleClassData(classData, filename) {
  * @param {JSONObject} namespaceData - Data about namespace.
  */
 function handleNamespaceData(namespaceData, filename) {
-    // Add node and save index to stack.
-    indexStack.push(
-        fdg.addNode(
-            new Node(
-                randomPosition(), 
-                namespaceData.namespace.name, 
-                "namespace"
-            )
-        )
-    );
+    // Handle any children.
+    var children = handleCodeData(namespaceData, filename);
+    var position = randomPosition({x:0, y:0, z:0}, 5);
+    var size = 5;
 
-    // If I have a parent, add link between us.
-    linkElements();
+    children.forEach( function(child, index) {
+        size += child.getSize();
+    });
+
+    nodeSelf = new Node(
+        position,
+        namespaceData.name,
+        size,
+        "namespace"
+    )
 
     namespaceCount++;
 
-    // Handle any children.
-    handleCodeData(namespaceData.namespace, filename);
+    children.forEach( function(child, index) {
+        nodeSelf.addChild(child);
+        child.setParent(nodeSelf);
+    });
 
-    // We're done in this part of the tree.
-    indexStack.pop();
+    return nodeSelf;
 }
 
 /**
@@ -101,36 +218,71 @@ function handleNamespaceData(namespaceData, filename) {
  * @param {JSONObject} functionData - Data about a function JSONObject.
  */
 function handleFunctionData(functionData, filename) {
-    // Add node and save index to stack.
-    indexStack.push(
-        fdg.addNode(
-            new Node(
-                randomPosition(), 
-                functionData.function.name, 
-                "function"
-            )
-        )
-    );
-    // Save the function data in function model.
-    functionModels.set(
-        functionData.function.name,
-        new FunctionMetaData( 
-            filename,
-            functionData.function.start_line, 
-            functionData.function.end_line
-        )
+    // Handle any children.
+    var children = handleCodeData(functionData, filename);
+    var position = randomPosition({x:0, y:0, z:0}, 5);
+    var size = 5;
+
+    nodeSelf = new Node(
+        position,
+        functionData.name,
+        size,
+        "function"
     );
 
-    // If I have a parent, add link between us.
-    linkElements();
+
+    // Save the function data in function model.
+    functionModels.set(
+        functionData.name,
+        new FunctionMetaData(
+            filename,
+            functionData.function_body.calls,
+            functionData.returnType,
+            functionData.declid,
+            functionData.start_line,
+            functionData.end_line
+        )
+    );
 
     functionCount++;
 
-    // Handle any children.
-    handleCodeData(functionData.function, filename);
+    children.forEach( function(child, index) {
+        nodeSelf.addChild(child);
+        child.setParent(nodeSelf);
+    });
 
-    // We're done in this part of the tree.
-    indexStack.pop();
+    return nodeSelf;
+}
+
+function handleVariableData(variableData, filename) {
+    // Handle any children.
+    var children = handleCodeData(variableData, filename);
+    var position = randomPosition({x:0, y:0, z:0}, 5);
+    var size = 5;
+
+    children.forEach( function(child, index) {
+        size += child.getSize();
+    });
+
+    nodeSelf = new Node(
+        position,
+        variableData.name,
+        size,
+        "variable"
+    )
+
+    nodeSelf.setModelSpecificMetaData({
+        type: variableData.type,
+    });
+
+    variableCount++;
+
+    children.forEach( function(child, index) {
+        nodeSelf.addChild(child);
+        child.setParent(nodeSelf);
+    });
+
+    return nodeSelf;
 }
 
 /**
@@ -138,22 +290,38 @@ function handleFunctionData(functionData, filename) {
  * @param {JSONObject} codeData  - Data about general code.
  */
 function handleCodeData(codeData, filename) {
-    if (codeData.namespaces != null) {
+    var children = new Array();
+    if (typeof codeData.using_namespaces !== "undefined") {
+        console.log("Something: ");
+    }
+    if (typeof codeData.namespaces !== "undefined") {
         // Handle all namespaces
         codeData.namespaces.forEach((object) => {
-            handleNamespaceData(object, filename);
-        });
-    } else if (codeData.classes != null) {
-        // Handle all classes
-        codeData.classes.forEach((object, filename) => {
-            handleClassData(object);
-        });
-    } else if (codeData.functions != null) {
-        // Handle all functions
-        codeData.functions.forEach((object) => {
-            handleFunctionData(object, filename);
+           children.push(handleNamespaceData(object, filename));
         });
     }
+    if (typeof codeData.classes !== "undefined") {
+        // Handle all classes
+        codeData.classes.forEach((object) => {
+           children.push(handleClassData(object, filename));
+        });
+    }
+    if (typeof codeData.functions !== "undefined") {
+        // Handle all functions
+        codeData.functions.forEach((object) => {
+           children.push(handleFunctionData(object, filename));
+        });
+    }
+
+    if (typeof codeData.variables !== "undefined") {
+        // Handle all functions
+        codeData.variables.forEach((object) => {
+           children.push(handleVariableData(object, filename));
+        });
+    }
+
+
+    return children;
 }
 
 /**
@@ -165,23 +333,45 @@ function handleProjectData(projectData) {
     classCount = 0;
     functionCount = 0;
     namespaceCount = 0;
+    variableCount = 0;
     lineCount = 0;
+    var size = 5;
+
+    var root = new Node(
+        new THREE.Vector3(0,0,0),
+        "root",
+        null,
+        "root"
+    );
+
     // Handle every file given.
     projectData.files.forEach((file) => {
 
-        // If file is not parsed, skip it 
+        // If file is not parsed, skip it
         // ("return" returns from lambda not forEach).
-        if (file.file.parsed != true) {
+        if (file.parsed != true) {
             return;
         }
-    
+
         // File is parsed correctly, process it.
-        lineCount += file.file.linesInFile;
-        handleCodeData(file.file, file.file.file_name);
+        lineCount += file.linesInFile;
+        var children = handleCodeData(file, file.file_name);
+
+        children.forEach( function(child, index) {
+            root.addChild(child);
+            child.setParent(root);
+            size += child.getSize();
+        });
+
     });
+    root.setSize(size);
+    fdg.setTree(root);
 
     windowMgr.setFunctionCount(functionCount);
     windowMgr.setClassCount(classCount);
     windowMgr.setNamespaceCount(namespaceCount);
+    windowMgr.setVariableCount(variableCount);
     windowMgr.setLineCount(lineCount);
+
+    linkFunctionCalls();
 }

@@ -8,7 +8,7 @@ public class Main {
     public static String target="";
     public static String context="";
     public static String file="";
-    
+
     public static void main(String[] argv) throws IOException {
 
         parseArgs(argv);
@@ -26,7 +26,7 @@ public class Main {
                 CppParserFacade cppParserFacade = new CppParserFacade();
                 cppParserFacade.parse(new File(file), context);
                 break;
-            
+
             case "JAVA":
                 JavaParserFacade javaParserFacade = new JavaParserFacade();
                 javaParserFacade.parse(new File(file), context);
@@ -44,7 +44,7 @@ public class Main {
      */
     public static void parseArgs(String[] argv){
         for (int i = 0; i < argv.length; i++) {
-            
+
             flag = argv[i];
 
             switch(flag){
@@ -64,7 +64,7 @@ public class Main {
                     break;
 
                 case "--help":
-                    String help = "Usage: java Main [option...] \n\n" 
+                    String help = "Usage: java Main [option...] \n\n"
                         + " -t, --Target \t Language target in which source file is written in.\n"
                         + " -f, --File \t Relative path to source file.\n"
                         + " -c, --Context \t Context to be achieved from the source file.\n";
@@ -80,7 +80,7 @@ public class Main {
         }
     }
 }
-        
+
 
 
 

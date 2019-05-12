@@ -48,9 +48,10 @@ public class CppParserFacadeTest {
 				"ValidIntMainTest.cpp",
 				"Initial",
 				"\nint main(){\n"+ "\tint i; \n" +"}",
-				"{\"file\":{\"functions\":[{\"function\":{\"declrator_id\":\"main\",\"name\":"+
-				"\"int main()\",\"start_line\":2,\"function_body\":{\"variables\":[{\"variable\""+
-				":{\"name\":\"i\",\"type\":\"int\"}}]},\"end_line\":4}}],\"file_name\":\"/tmp/TestData/ValidIntMainTest.cpp\"}}\n"
+
+				"{\"file\":{\"functions\":[{\"return_type\":\"int\",\"declrator_id\":\"main\",\"name\":"+
+				"\"main()\",\"start_line\":2,\"function_body\":{\"variables\":[{\"name\":\"i\",\"type\":\"int\"}]}"+
+				",\"end_line\":4}],\"file_name\":\"/tmp/TestData/ValidIntMainTest.cpp\"}}\n"
 			)
 		);
 
@@ -61,13 +62,11 @@ public class CppParserFacadeTest {
 				"Initial",
 				"\nint main(){\n" + "\tint i; \n \tHelloWorld hw; \n" + "}\n\n" +
 				"void foo(){\n" + "\t bool isOk; \n" + "}\n\n" ,
-				"{\"file\":{\"functions\":[{\"function\":{\"declrator_id\":\"main\","+
-				"\"name\":\"int main()\",\"start_line\":2,\"function_body\":{\"variables\"" +
-				":[{\"variable\":{\"name\":\"i\",\"type\":\"int\"}},{\"variable\":{\"name\":" +
-				"\"hw\",\"type\":\"HelloWorld\"}}]},\"end_line\":5}},{\"function\":{\"declrator_id\":" +
-				"\"foo\",\"name\":\"void foo()\",\"start_line\":7,\"function_body\":{\"variables\":" +
-				"[{\"variable\":{\"name\":\"isOk\",\"type\":\"bool\"}}]},\"end_line\":9}}],\"file_name\""+
-				":\"/tmp/TestData/ValidTwoFunctionsTest.cpp\"}}\n"
+				"{\"file\":{\"functions\":[{\"return_type\":\"int\",\"declrator_id\":\"main\",\"name\":\"main()\","+
+				"\"start_line\":2,\"function_body\":{\"variables\":[{\"name\":\"i\",\"type\":\"int\"},{\"name\":\"hw\""+
+				",\"type\":\"HelloWorld\"}]},\"end_line\":5},{\"return_type\":\"void\",\"declrator_id\":\"foo\",\"name\":\"foo()\""+
+				",\"start_line\":7,\"function_body\":{\"variables\":[{\"name\":\"isOk\",\"type\":\"bool\"}]},\"end_line\":9}],"+
+				"\"file_name\":\"/tmp/TestData/ValidTwoFunctionsTest.cpp\"}}\n"
 			)
 		);
 

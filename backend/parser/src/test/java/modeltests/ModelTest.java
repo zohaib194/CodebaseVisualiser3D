@@ -8,6 +8,7 @@ import java.util.List;
 
 import com.ginsberg.junit.exit.ExpectSystemExitWithStatus;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -65,21 +66,19 @@ public class ModelTest {
 	@Test
 	public void testConvertClassListJsonObjectList() {
 		// Test empty list
-		List<JSONObject> jsonFileList = model.convertClassListJsonObjectList(files, "file");
+		JSONArray jsonFile = model.convertClassListJsonObjectList(files);
 
-		assertEquals(jsonFileList, null, "Output list not null for empty list");
+		assertEquals(jsonFile, null, "Output list not null for empty list");
 
 		// Fill file list and test it.
 		fillLists();
 
-		jsonFileList = model.convertClassListJsonObjectList(files, "file");
+		jsonFile = model.convertClassListJsonObjectList(files);
 
-		assertEquals(jsonFileList.size(), nrModels, "Incorrect nr of models in file list");
-		assertTrue(jsonFileList.get(0).has("file"), "Missing files field");
-		assertTrue(jsonFileList.get(0).getJSONObject("file").has("variables"), "Missing variables field");
-		assertTrue(jsonFileList.get(0).getJSONObject("file").has("functions"), "Missing functions field");
-		assertTrue(jsonFileList.get(0).getJSONObject("file").has("file_name"), "Missing file_name field");
-		assertTrue(jsonFileList.get(0).getJSONObject("file").has("using_namespaces"), "Missing using_namespaces field");
-		assertTrue(jsonFileList.get(0).getJSONObject("file").has("namespaces"), "Missing namespaces field");
+		assertTrue(jsonFile.getJSONObject(0).has("variables"), "Missing variables field");
+		assertTrue(jsonFile.getJSONObject(0).has("functions"), "Missing functions field");
+		assertTrue(jsonFile.getJSONObject(0).has("file_name"), "Missing file_name field");
+		assertTrue(jsonFile.getJSONObject(0).has("using_namespaces"), "Missing using_namespaces field");
+		assertTrue(jsonFile.getJSONObject(0).has("namespaces"), "Missing namespaces field");
 	}
 }

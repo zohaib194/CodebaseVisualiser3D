@@ -2,17 +2,38 @@
 #include <vector>
 #include <unordered_map>
 
+int singleLineGlobalVar;
 int globalVariable, globalVariable1 = 0;
 
+int a = 1, *p = NULL, f(), g(), m(), (*pf)(double);
+
+void (*signal(int, void (*fp)(int)))(int);
 using namespace std;
 class helloworld
 {
 	class hei
 	{
+		double sfdgnfggggdn;
 	public:
 		hei();
-		~hei();
-
+		~hei() {};
+	private:
+		int* getMeSomethingNice(int trell, float troll);
+	public:
+		int j, k, l, m = 0, o;
+		int a(), b(), c();
+		double aoo();
+		float boo();
+		int coo();
+		double doo();
+	protected:
+		int a;
+		double eoo();
+		float foo();
+		int goo();
+		double hoo();
+	private:
+		int ioo();
 	};
 public:
 	helloworld();
@@ -20,9 +41,11 @@ public:
 	void print3(int *i){
 
 	}
+
 	~helloworld(){
 	}
-
+private:
+	int i;
 };
 
 void InputHandler::setCurrentWindow(GLFWwindow* window) {
@@ -33,37 +56,48 @@ helloworld::helloworld(){
 
 }
 
-void lolasdasdasd(){
+void testasdasdasd(){
 }
-void lol(){
+void test(){
 
 }
 
 int main(int argc, char** argv)
 {
-	int i;
-	int j;
+	int i2;
+	int j2;
 	bool ol;
 	bool lo;
-    helloworld hello = helloworld();
+
+	j = 3;
+	i *= 2;
+	helloworld hello = helloworld();
+	helloworld* hello1 = new helloworld();
+	helloworld* hello2;
+	hello2 = new helloworld();
+
 	hello.print();
-	lolasdasdasd();
-    std::cout << "Hello World!";
-    return 0;
+	hello.hei.aoo();
+	hello1->print();
+	testasdasdasd();
+	outerOuterNamespace::outerNamespace::hello::objectInNamespace.print();
+
+	std::cout << "Hello World!";
+
+	return 0;
 }
 
 // Function pointers are not parsed in current implementation.
-//void (*signal(int, void (*fp)(int)))(int);
 
 auto hell(helloworld* hey) -> bool {
-    return true;
+	return true;
 }
 
 auto heaven() -> bool {
-    return false;
+	return false;
 }
 
-int lolasdasdasd(int i, int j, bool istrue, float normalFloat){
+int testasdasdasd(int i, int j, bool istrue, float normalFloat){
 	helloworld* hw = new helloworld();
 
 	int z,w,l = 0;
@@ -80,7 +114,7 @@ int lolasdasdasd(int i, int j, bool istrue, float normalFloat){
 
 	hw->print();
 	if(true){
-		lol();
+		test();
 	}
 
 	return 0;
@@ -91,12 +125,13 @@ namespace hello{
 	#include <iostream>
 	int globalVarFromNameSpace;
 	int globalInlineVarFromNameSpace, globalInlineVarFromNameSpace1 = 0;
+	helloworld objectInNamespace;
 
 	void foo();
 	void foo(int i);
-    void foo1(int i){
+	void foo1(int i){
 
-    }
+	}
 	void boo(){
 		foo();
 		foo(1);
@@ -105,18 +140,23 @@ namespace hello{
 	}
 
 	auto hoo() -> bool {
-	    return false;
+		return false;
 	}
 }
 
 void hello::foo(){
-	lol();
+	test();
 }
 
 void hello::foo(int i){
-    lol();
+	test();
 }
 
 void helloworld::print() {
 
 }
+
+union UnionTest {
+	int a;
+	int b;
+};

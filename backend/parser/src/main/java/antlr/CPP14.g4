@@ -29,7 +29,6 @@ translationunit
    : declarationseq? EOF
    ;
 /*Expressions*/
- 
 
 primaryexpression
    : literal
