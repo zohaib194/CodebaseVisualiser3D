@@ -1,7 +1,7 @@
 // Find canvas.
 var canvas = document.getElementById("output");
 
-// Make as setup renderer for rendering on canvas.
+// Setup renderer for rendering on canvas.
 var renderer = new THREE.WebGLRenderer({ canvas: canvas });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setClearColor(STYLE.getColors().background, 1);
@@ -118,7 +118,7 @@ function runFDGOnJSONData(data) {
     // Run for 100 iterations shifting the position of nodes.
     document.getElementById("status").innerHTML =
         LOCALE.getSentence("userinfo_organization");
-    fdg.execute(5000);
+    fdg.execute(2000);
 
     // Draw nodes using display manager.
     document.getElementById("status").innerHTML =
@@ -222,7 +222,7 @@ function sendInitialRequest() {
         // set the id related to repository.
         id = response.body.id;
 
-        // Everything went ok, display data.
+        // Client side error, display initial request failed.
         if (response.statuscode >= 400) {
             // Update status and exit.
             document.getElementById("status").innerHTML =

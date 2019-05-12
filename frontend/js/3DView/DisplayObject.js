@@ -51,10 +51,10 @@ let destroyNameplate = function(name) {
  * A generic object used for representing functions and other syntax.
  * @constructor
  *
- * @param {THREE.Vector3} position - Position the cube willl be placed at.
+ * @param {THREE.Vector3} position - Position the cube will be placed at.
  * @param {Integer} color - The color of the cube, preferrably not black.
  * @param {string} name - Name of the object to be display on hover (not active).
- * @param {THREE.Geometry} geometry - Mesh to display. Defualt white cube (0.1,0.1,0.1).
+ * @param {THREE.Geometry} geometry - Mesh to display. Default white cube (0.1,0.1,0.1).
  */
 var Drawable = (function (
         pos,
@@ -75,7 +75,6 @@ var Drawable = (function (
     // Position THREE.js drawable.
     mesh.position.set(pos.x, pos.y, pos.z);
     mesh.name = name;
-    mesh.frustumCulled = false;
     parent.add(mesh);
 
     // Drawable's edge highlight setup.

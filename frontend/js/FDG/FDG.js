@@ -25,8 +25,10 @@ var FDG = (function FDG(
         )}
 
         /**
-         * Function ofr getting node index from nodes array.
-         * @param {string} name - name of node to fetch.
+         * Gets the node index.
+         *
+         * @param      {string}  name    The name
+         * @return     {number}  The node index.
          */
         var getNodeIndex = function(name) {
             // Find node based on name.
@@ -34,14 +36,18 @@ var FDG = (function FDG(
         }
 
         /**
-         * Getter for nodes array.
+         * Gets the nodes.
+         *
+         * @return     {array}  The nodes.
          */
         var getNodes = function() {
             return tree.root.getSuccessors(0);
         }
 
         /**
-         * Getter for maximum size of the graph.
+         * Gets the maximum size.
+         *
+         * @return     {number}  The maximum size.
          */
         var getMaxSize = function() {
             return maxSize;
@@ -77,7 +83,6 @@ var FDG = (function FDG(
             nodeTo = tree.root.getNode(indexTo, 0);
             // Nodes doesn't exists, nodes are the same,
             // or both nodes has a link to eachother, abort linking!
-            // console.log("from("+indexFrom+"): ", nodeFrom, "To("+indexTo+"): ", nodeTo);
             if (
                 nodeFrom === null ||
                 nodeTo === null ||
@@ -87,7 +92,7 @@ var FDG = (function FDG(
                 (nodeFrom.getLinks().has(indexTo) &&
                 nodeTo.getLinks().has(indexFrom))
             ) {
-                console.log("Can not link nodes, either null, same or already connected", "from/to: ("+ indexFrom +"/"+ indexTo+")");
+                console.log("Can not link nodes, either null, same or already connected");
                 return;
             }
             // Add bi-directional links.
@@ -145,6 +150,9 @@ var FDG = (function FDG(
             }
         }
 
+        /**
+         * Sets the global index of all nodes.
+         */
         var finalize = function(){
             getNodes().forEach( function(node, index) {
                 node.setFinalizedIndex(index);

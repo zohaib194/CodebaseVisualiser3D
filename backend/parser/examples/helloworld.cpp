@@ -18,7 +18,6 @@ class helloworld
 		hei();
 		~hei() {};
 	private:
-		float EEEEEEEEEEEEELLLLLLLLLLLLLLOOOOOOOOOOOO;
 		int* getMeSomethingNice(int trell, float troll);
 	public:
 		int j, k, l, m = 0, o;
@@ -57,9 +56,9 @@ helloworld::helloworld(){
 
 }
 
-void lolasdasdasd(){
+void testasdasdasd(){
 }
-void lol(){
+void test(){
 
 }
 
@@ -80,7 +79,7 @@ int main(int argc, char** argv)
 	hello.print();
 	hello.hei.aoo();
 	hello1->print();
-	lolasdasdasd();
+	testasdasdasd();
 	outerOuterNamespace::outerNamespace::hello::objectInNamespace.print();
 
 	std::cout << "Hello World!";
@@ -98,7 +97,7 @@ auto heaven() -> bool {
 	return false;
 }
 
-int lolasdasdasd(int i, int j, bool istrue, float normalFloat){
+int testasdasdasd(int i, int j, bool istrue, float normalFloat){
 	helloworld* hw = new helloworld();
 
 	int z,w,l = 0;
@@ -115,7 +114,7 @@ int lolasdasdasd(int i, int j, bool istrue, float normalFloat){
 
 	hw->print();
 	if(true){
-		lol();
+		test();
 	}
 
 	return 0;
@@ -146,11 +145,11 @@ namespace hello{
 }
 
 void hello::foo(){
-	lol();
+	test();
 }
 
 void hello::foo(int i){
-	lol();
+	test();
 }
 
 void helloworld::print() {
@@ -158,6 +157,6 @@ void helloworld::print() {
 }
 
 union UnionTest {
-	int aShit;
-	int bShit;
+	int a;
+	int b;
 };

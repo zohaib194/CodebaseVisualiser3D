@@ -2,7 +2,7 @@
  * Function for making a node object.
  * Represents any datastructure (function, class, namespace, variable, etc.).
  * @constructor
- * @param {THREE.Vector3()} position - Position of the node in the world.
+ * @param {THREE.Vector3()} pos - Position of the node in the world.
  * @param {string} name - Name of the node (identifier).
  * @param {float} size - Size of the node
  * @param {string} type - Type of the node.
@@ -110,13 +110,16 @@ var Node = (function(pos, name, size, type) {
             gravity.normalize().multiplyScalar(maxSize-0.1);
         }
 
-        //console.log(leftIndex, minDistance, maxDistance, maxSize, gravityForce, gravityCenter);
-        //console.log(dist, maxSize, maxDistance, gravityForce);
         gravityForce = (Math.log10(distanceFromOrigin + maxSize) - Math.log10(maxSize - distanceFromOrigin)) * gravityForce;
         // Return force with added gravity.
         return force.add(gravity.normalize().multiplyScalar(gravityForce));
     }
 
+    /**
+     * Determines if node.
+     *
+     * @return     {boolean}  True.
+     */
     var isNode = function(){
         return true;
     }
@@ -132,7 +135,9 @@ var Node = (function(pos, name, size, type) {
 
 
     /**
-     * Getter for name.
+     * Gets the name.
+     *
+     * @return     {string}  The name.
      */
     var getName = function() {
         return metadata.name;
@@ -158,21 +163,27 @@ var Node = (function(pos, name, size, type) {
     }
 
     /**
-     * getter for size
+     * Gets the size.
+     *
+     * @return     {number}  The size.
      */
      var getSize = function(){
         return size;
      }
 
     /**
-     * Getter for type.
+     * Gets the type.
+     *
+     * @return     {string}  The type.
      */
     var getType = function() {
         return metadata.type;
     };
 
     /**
-     * Getter for links array.
+     * Gets the links.
+     *
+     * @return     {object}  The links.
      */
     var getLinks = function() {
         return links;
@@ -181,7 +192,7 @@ var Node = (function(pos, name, size, type) {
     /**
      * Gets the parent node.
      *
-     * @return     {Node}  The parent.
+     * @return     {object}  The parent.
      */
     var getParent = function(){
         return parent;
@@ -190,12 +201,19 @@ var Node = (function(pos, name, size, type) {
     /**
      * Gets the child nodes.
      *
-     * @return {Array}  The children.
+     * @return {array}  The children.
      */
     var getChildren = function(){
         return children;
     }
 
+    /**
+     * Gets the child by name and type.
+     *
+     * @param      {string}    name    The name
+     * @param      {string}    type    The type
+     * @return     {object}  The child by name and type.
+     */
     var getChildByNameAndType = function(name, type){
         var requestedChild = null;
         children.every(function(child, index){
@@ -220,7 +238,10 @@ var Node = (function(pos, name, size, type) {
     }
 
     /**
-     * Gets the all sucessors.
+     * Gets the successors.
+     *
+     * @param      {number}  level   The level
+     * @return     {Array}   The successors.
      */
     var getSuccessors = function(level){
         var successors = new Array();
@@ -232,7 +253,7 @@ var Node = (function(pos, name, size, type) {
     }
 
     /**
-     * Gets the siblings including itself.
+     * Gets the siblings.
      */
     var getSiblings = function(){
         if (parent != null) {
@@ -293,18 +314,38 @@ var Node = (function(pos, name, size, type) {
         return requestedNode;                               // indicate that node was not found
     }
 
+    /**
+     * Gets the finalized index.
+     *
+     * @return     {number}  The finalized index.
+     */
     var getFinalizedIndex = function(){
         return finalizedIndex;
     }
 
+    /**
+     * Gets the drawable index.
+     *
+     * @return     {number}  The drawable index.
+     */
     var getDrawableIndex = function(){
         return drawableIndex;
     }
 
+    /**
+     * Gets the model specific meta data.
+     *
+     * @return     {object}  The model specific meta data.
+     */
     var getModelSpecificMetaData = function(){
         return modelSpecificMetaData;
     }
 
+    /**
+     * Gets the encapsulating class.
+     *
+     * @return     {object}  The encapsulating class.
+     */
     var getEncapsulatingClass = function(){
         if( metadata.type === "class" ){
             return this;
@@ -312,6 +353,12 @@ var Node = (function(pos, name, size, type) {
             return parent.getEncapsulatingClass();
         }
     }
+
+    /**
+     * Sets the model specific meta data.
+     *
+     * @param      {object}  newModelSpecificMetaData  The new model specific meta data
+     */
     var setModelSpecificMetaData = function(newModelSpecificMetaData){
         modelSpecificMetaData = newModelSpecificMetaData;
     }
@@ -365,42 +412,70 @@ var Node = (function(pos, name, size, type) {
      */
     var setPosition = function(pos) {
         position.set(pos.x, pos.y, pos.z);
-        //console.log("new position: ", position, " name: ", metadata.name);
     };
 
     /**
-     * Setter for name.
+     * Sets the name.
+     *
+     * @param      {string}  name    The name
+     * @return     {string}  name    The name
      */
     var setName = function(name) {
         return metadata.name = name;
     };
 
     /**
-     * Getter for type.
+     * Sets the type.
+     *
+     * @param      {string}  type    The type
+     * @return     {string}  type    The type
      */
     var setType = function(type) {
         return metadata.type = type;
     };
 
-    /**
-     * Getter for link.
-     */
+   /**
+    * Sets the link.
+    *
+    * @param      {number}  linkToIndex  The link to index
+    * @param      {number}  strength     The strength
+    */
     var setLink = function(linkToIndex, strength) {
         links.set(linkToIndex, strength);
     };
 
+    /**
+     * Sets the parent.
+     *
+     * @param      {object}  newParent  The new parent
+     */
     var setParent = function(newParent){
         parent = newParent;
     }
 
+    /**
+     * Sets the size.
+     *
+     * @param      {number}  newSize  The new size
+     */
     var setSize = function(newSize){
         size = newSize;
     }
 
+    /**
+     * Sets the finalized index.
+     *
+     * @param      {number}  index   The index
+     */
     var setFinalizedIndex = function(index){
         finalizedIndex = index;
     }
 
+    /**
+     * Sets the drawable index.
+     *
+     * @param      {number}  newDrawableIndex  The new drawable index
+     */
     var setDrawableIndex = function(newDrawableIndex){
         drawableIndex = newDrawableIndex;
     }

@@ -7,7 +7,6 @@ var STYLE = (function() {
      *     icosahedron, octahedron, tetrahedron.
      *
      * Color formats:
-     * - RGB: {255, 255, 255}   // white
      * - Hex: 0x00ff00          // green
      */
     var style = {

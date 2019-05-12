@@ -26,7 +26,7 @@ type RepoModel struct {
 	ParsedRepo ProjectModel  `json:"parsedrepo,omitempty"`    // Parsed repository in json format
 }
 
-// SaveResponse is used by save function to update channel used by go rutine to indicate
+// SaveResponse is used by save function to update channel used by go routine to indicate
 // status of the save request.
 type SaveResponse struct {
 	ID         string
@@ -46,7 +46,7 @@ type ParseResponse struct {
 	Result           ProjectModel
 }
 
-// Save is expected to run assa a go rutine writing to a c.
+// Save is expected to run as a go rutine writing to a c.
 func (repo RepoModel) Save(c chan SaveResponse) {
 	util.TypeLogger.Debug("%s: Call to Save", packageName)
 	defer util.TypeLogger.Debug("%s: Ended call to Save", packageName)
@@ -96,8 +96,6 @@ func (repo RepoModel) Load(file string, target string) (data FileModel, err erro
 		util.TypeLogger.Error("%s: Failed to convert string to int: %s", packageName, err.Error())
 		return data, err
 	}
-
-	util.TypeLogger.Debug("Parsing file: %s", file)
 
 	// Setup the command to parse the file.
 	cmd = exec.Command("java", "me.codvis.ast.Main", "-f", file, "-t", target, "-c", "Initial")
@@ -232,9 +230,8 @@ func (repo RepoModel) ParseDataFromFiles(files string, responsePerNFiles int, c 
 			data = FileModel{Parsed: false, FileName: sourceFile}
 
 		}
-		util.TypeLogger.Debug("%v", data)
 		projectModel.Files = append(projectModel.Files, data)
-		if n%responsePerNFiles == 0 {
+		if n % responsePerNFiles == 0 {
 			c <- response
 		}
 

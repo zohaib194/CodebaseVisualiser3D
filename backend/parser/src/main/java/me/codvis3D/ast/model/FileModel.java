@@ -80,7 +80,7 @@ public class FileModel extends Model {
 	/**
 	 * Adds a class.
 	 *
-	 * @param      clazz  The clazz
+	 * @param      clazz  The class
 	 */
 	public void addClass(ClassModel clazz) {
 		this.classes.add(clazz);

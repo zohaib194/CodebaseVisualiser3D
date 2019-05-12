@@ -212,7 +212,7 @@ public class FunctionModel extends Model {
 		} else if (data instanceof VariableModel) {
 			this.addParameter((VariableModel) data);
 		} else {
-			System.err.println("Error adding data in function model " + data.getClass());
+			System.err.println("Error adding data in function model");
 			System.exit(1);
 		}
 	}

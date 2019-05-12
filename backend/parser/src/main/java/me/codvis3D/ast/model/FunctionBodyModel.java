@@ -69,7 +69,7 @@ public class FunctionBodyModel extends Model {
 
 		} else {
 
-			System.err.println("Error adding data in function body model: " + data.getClass());
+			System.err.println("Error adding data in function body model");
 			System.exit(1);
 		}
 

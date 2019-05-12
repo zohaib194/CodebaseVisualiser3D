@@ -27,7 +27,7 @@ import java.lang.reflect.InvocationTargetException;
 import org.json.JSONObject;
 
 /**
- * Class for exstending listeners and parsing code requiered for initial 3D view
+ * Class for extending listeners and parsing code requiered for initial 3D view
  * for code abstraction.
  */
 public class CppLstnr_Initial extends CppExtendedListener {
@@ -99,7 +99,7 @@ public class CppLstnr_Initial extends CppExtendedListener {
 				this.exitScope();
 				if (this.scopeStack.peek() instanceof ClassModel) {
 					ClassModel classModel = (ClassModel) this.scopeStack.peek();
-					// Get exsiting access specifier model with name
+					// Get existing access specifier model with name
 					AccessSpecifierModel asm = classModel.getAccessSpecifier(name);
 					// New specifier, add it and set as current scope.
 					if (asm == null) {
@@ -139,7 +139,7 @@ public class CppLstnr_Initial extends CppExtendedListener {
 			System.err.println("Couldn't find name of class!");
 		}
 
-		// Inside AccessSpecifierModel, update ClassModel underneath if existant.
+		// if inside AccessSpecifierModel, update ClassModel underneath if existant.
 		if (this.scopeStack.peek() instanceof AccessSpecifierModel && className != "") {
 			AccessSpecifierModel asm = (AccessSpecifierModel) this.exitScope();
 			if (this.scopeStack.peek() instanceof ClassModel) {
@@ -318,35 +318,35 @@ public class CppLstnr_Initial extends CppExtendedListener {
 		CallModel call = (CallModel) this.exitScope();
 
 		String context = ctx.getText();
-		int countParantheses = 0;
-		int startParantheses = 0;
-		int endParantheses = 0;
+		int countParentheses = 0;
+		int startParentheses = 0;
+		int endParentheses = 0;
 
 		for (int i = context.length() - 1; i >= 0; i--) {
 			char character = context.charAt(i);
 
 			if (character == ')') {
-				countParantheses++;
-				if (endParantheses == 0) {
-					endParantheses = i;
+				countParentheses++;
+				if (endParentheses == 0) {
+					endParentheses = i;
 				}
 
 			} else if (character == '(') {
-				countParantheses--;
-				if (countParantheses == 0) {
-					startParantheses = i;
+				countParentheses--;
+				if (countParentheses == 0) {
+					startParentheses = i;
 
 					break;
 				}
 			}
 		}
 
-		if (startParantheses != endParantheses) {
+		if (startParentheses != endParentheses) {
 
-			if (!context.subSequence(startParantheses, endParantheses + 2).toString().contains("=")
+			if (!context.subSequence(startParentheses, endParentheses + 2).toString().contains("=")
 					&& !ctx.getText().contains("=")) {
 
-				CharSequence parameterList = context.subSequence(startParantheses, endParantheses + 1);
+				CharSequence parameterList = context.subSequence(startParentheses, endParentheses + 1);
 
 				context = context.replace(parameterList, "");
 
@@ -589,7 +589,7 @@ public class CppLstnr_Initial extends CppExtendedListener {
 		} else if (this.scopeStack.peek() instanceof DeclaratorListModel) {
 			this.scopeStack.peek().addDataInModel(ctx.getText());
 		} else {
-			System.err.println("Could not understand parent model for variable modifier. " + ctx.getStart().getLine());
+			System.err.println("Could not understand parent model for variable modifier.");
 		}
 	}
 

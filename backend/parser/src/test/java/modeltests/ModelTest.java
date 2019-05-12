@@ -75,8 +75,6 @@ public class ModelTest {
 
 		jsonFile = model.convertClassListJsonObjectList(files);
 
-	//	assertEquals(jsonFile.size(), nrModels, "Incorrect nr of models in file list");
-	//	assertTrue(jsonFile.getJSONObject(0), "Missing files field");
 		assertTrue(jsonFile.getJSONObject(0).has("variables"), "Missing variables field");
 		assertTrue(jsonFile.getJSONObject(0).has("functions"), "Missing functions field");
 		assertTrue(jsonFile.getJSONObject(0).has("file_name"), "Missing file_name field");

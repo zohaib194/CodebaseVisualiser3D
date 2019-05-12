@@ -3,6 +3,7 @@ package me.codvis.ast;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,14 +29,6 @@ import me.codvis.ast.CppLstnr_Initial;
 public class CppLstnr_InitialTest {
 	String filename = "main.cpp";
 	private List<ParserTestCase> cases = new ArrayList<>();// Arrays.asList(// ,
-	/*
-	 * new ParserTestCase( "variable", "int a;", Array.toList(
-	 * "{\"file\":{\"functions\":[{\"function\":{\"name\":\"int main()\",\"start_line\":0,\"function_body\":{},\"parameters\":[],\"end_line\":0}}]}}"
-	 * ) Array.toList(
-	 * "{\"file\":{\"functions\":[{\"function\":{\"name\":\"int main()\",\"start_line\":0,\"function_body\":{},\"parameters\":[],\"end_line\":0}}]}}"
-	 * ) ),
-	 */
-	// );
 
 	@BeforeAll
 	public void setup() {
@@ -89,14 +82,14 @@ public class CppLstnr_InitialTest {
 			try {
 				parserMethod = parser.getClass().getDeclaredMethod(caseData.listenername);
 			} catch (NoSuchMethodException e) {
-				assertTrue(false, "The given listener doesn't exsist within ParseTree class");
+				fail("The given listener doesn't exsist within ParseTree class");
 			}
 
 			Object tree = null;
 			try {
 				tree = parserMethod.invoke(parser);
 			} catch (Exception e) {
-				assertTrue(false, "Failed to invoke method: " + e.toString());
+				fail("Failed to invoke method: " + e.toString());
 			}
 
 			CppExtendedListener listener = new CppLstnr_Initial(caseData.filename);
@@ -106,8 +99,6 @@ public class CppLstnr_InitialTest {
 			walker.walk(listener, (ParseTree) tree);
 
 			for (String expected : caseData.expected) {
-				System.out.println(caseData.input);
-				System.out.println(expected);
 				assertEquals(expected, listener.getParsedCode().toString(), "Not equal");
 			}
 

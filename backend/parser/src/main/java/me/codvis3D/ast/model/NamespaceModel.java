@@ -62,7 +62,7 @@ public class NamespaceModel extends Model {
 	/**
 	 * Adds an class.
 	 *
-	 * @param class The class
+	 * @param clazz The class
 	 */
 	public void addClass(ClassModel clazz) {
 		this.classes.add(clazz);
@@ -141,9 +141,9 @@ public class NamespaceModel extends Model {
 	}
 
 	/**
-	 * Adds a function.
+	 * Adds a variable.
 	 *
-	 * @param variable The variable
+	 * @param      variable  The variable
 	 */
 	public void addVariable(VariableModel variable) {
 		this.variables.add(variable);
@@ -152,25 +152,25 @@ public class NamespaceModel extends Model {
 	/**
 	 * Adds an include.
 	 *
-	 * @param      variable  The variable
+	 * @param      include  The include
 	 */
 	public void addInclude(String include) {
 		this.includes.add(include);
 	}
 
 	/**
-	 * Adds a namespace.
+	 * Gets the variables.
 	 *
-	 * @return The variables.
+	 * @return     The variables.
 	 */
 	public List<VariableModel> getVariables() {
 		return this.variables;
 	}
 
 	/**
-	 * Adds an using namespace.
+	 * Sets the variables.
 	 *
-	 * @param variables The variables
+	 * @param      variables  The variables
 	 */
 	public void setVariables(List<VariableModel> variables) {
 		this.variables = variables;
@@ -204,7 +204,7 @@ public class NamespaceModel extends Model {
 
 		} else {
 
-			System.err.println("Error adding data in namespace model: " + data.getClass().getName());
+			System.err.println("Error adding data in namespace model");
 			System.exit(1);
 		}
 	}

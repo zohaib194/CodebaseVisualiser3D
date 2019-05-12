@@ -30,7 +30,6 @@ translationunit
    ;
 /*Expressions*/
 
-
 primaryexpression
    : literal
    | This
