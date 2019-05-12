@@ -20,7 +20,7 @@ import java.nio.file.Files;
  * Class for for setting up cpp parsers.
  */
 public class CppParserFacade {
-    
+
     /**
      * Function reads a file.
      *
@@ -31,11 +31,11 @@ public class CppParserFacade {
      *
      * @throws     IOException  Input/output exception
      */
-    private static String readFile(File file, Charset encoding) throws IOException {
+    public static String readFile(File file, Charset encoding) throws IOException {
         byte[] encoded = Files.readAllBytes(file.toPath());
         return new String(encoded, encoding);
     }
-    
+
     /**
      * Function parse a cpp file and adds a listener on parser.
      *
@@ -46,12 +46,11 @@ public class CppParserFacade {
     public void parse(File file, String context) throws IOException {
         String code = readFile(file, Charset.forName("UTF-8"));
         CPP14Lexer lexer = new CPP14Lexer(new ANTLRInputStream(code));
-
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         CPP14Parser parser = new CPP14Parser(tokens);
 
         ParseTree tree = parser.translationunit();
-        
+
         CppExtendedListener listener = null;
         switch(context){
             case "Initial":
@@ -64,10 +63,11 @@ public class CppParserFacade {
                 System.err.println("[ERROR] Invalid context\n");
                 System.exit(0);
         }
-        
+
         ParseTreeWalker walker =  new ParseTreeWalker();
-        
+
         if(listener == null){
+            System.err.println("[ERROR] no valid listener attacted.\n");
             System.exit(0);
         }
         walker.walk(listener, tree);

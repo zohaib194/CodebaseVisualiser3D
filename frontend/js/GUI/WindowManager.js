@@ -6,6 +6,8 @@ var WindowManager = (function(){
 
     var classCount = 0;
     var functionCount = 0;
+    var namespaceCount = 0;
+    var variableCount = 0;
     var lineCount = 0;
     var implementation = "";
     var repos = new Array();
@@ -44,8 +46,8 @@ var WindowManager = (function(){
 
         ImGui_Impl.NewFrame(time);
         ImGui.NewFrame();
-        
-        // menu bar of the program.        
+
+        // menu bar of the program.
         menubar.initializeWindow();
 
         // File tree window.
@@ -60,11 +62,13 @@ var WindowManager = (function(){
         codeInspectionWindow = codeInspection(namespaceWindow.getWindowSize(), namespaceWindow.getWindowPosition());
         codeInspectionWindow.setImplementation(implementation);
         codeInspectionWindow.initializeWindow();
-        
+
         // Quality metrics window.
         qualityMetricsWindow = qualityMetrics(codeInspectionWindow.getWindowSize(), codeInspectionWindow.getWindowPosition());
         qualityMetricsWindow.setFunctionCount(functionCount);
         qualityMetricsWindow.setClassCount(classCount);
+        qualityMetricsWindow.setNamespaceCount(namespaceCount);
+        qualityMetricsWindow.setVariableCount(variableCount);
         qualityMetricsWindow.setLineCount(lineCount);
         qualityMetricsWindow.initializeWindow();
 
@@ -119,7 +123,15 @@ var WindowManager = (function(){
      * @param {int} count - Amount of namespaces in program.
      */
     function setNamespaceCount(count){
-       classCount = count;
+       namespaceCount = count;
+    }
+
+    /**
+     * Sets the variable count.
+     * @param      {int}  count   The count
+     */
+    function setVariableCount(count){
+       variableCount = count;
     }
 
     /**
@@ -158,6 +170,7 @@ var WindowManager = (function(){
         setFunctionCount: setFunctionCount,
         setClassCount: setClassCount,
         setNamespaceCount: setNamespaceCount,
+        setVariableCount: setVariableCount,
         setDataStructureImplementation: setDataStructureImplementation,
         setRepositories: setRepositories,
         setLineCount: setLineCount,

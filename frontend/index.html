@@ -2,16 +2,16 @@
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
 <!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <title>Codebase Visualizer 3D</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        
+
         <link rel="stylesheet" href="./css/main.css">
-        
+
         <script src="./js/localization/locale.js"></script>
         <script src="./js/config/config.js"></script>
         <script src="./js/config/style.js"></script>
@@ -23,15 +23,15 @@
         <div class="container">
             <!--[if lt IE 7]>
                 <p class="browsehappy">
-                    You are using an <strong>outdated</strong> browser. 
+                    You are using an <strong>outdated</strong> browser.
                     Please upgrade your browser to improve your experience.
                 </p>
             <![endif]-->
             <div id=logo>
-                <img src="/img/CodeVis3D_Large.png">
-            </div> 
+                <img src="/img/CodeVis3D_Large.png" alt="Codebase Visualizer 3D - Get an overview"/>
+            </div>
             <header>
-                <h3>Gain a better understanding of libraries by visualizing their code</h3>
+                <h1>Gain a better understanding of libraries by visualizing their code</h1>
                 <p>
                     If you consider using an external library, but are unsure of the arcitecural quality
                     or afraid of shortcommings, then perhaps it would help with a 3D representation of the codebase.
@@ -42,7 +42,7 @@
                 </p>
             </header>
             <div id="browse_support">
-                <h3>Supported browsers</h3> 
+                <h2>Supported browsers</h2>
                 <table>
                     <tr>    <th>Browser</th>                <th>Version</th>                </tr>
                     <tr>    <td>Explorer</td>               <td class="non">Non</td>        </tr>
@@ -66,16 +66,17 @@
             </div>
             <main>
                 <div id="loader"></div>
-                <form id="repositoryform">
+                <form id="repositoryform" onsubmit="return submitRepoName()">
                     <div class="repoform">
-                        <p id="gitrepotitle">Git Repository:</p>
-                        <input type="uri" name="reponame" id="reponame" 
+                        <label id="gitrepotitle">Git Repository:</label>
+                        <input type="uri" name="reponame" id="reponame"
                             placeholder="https://github.com/zohaib194/CodebaseVisualizer3D.git">
+
                         <button type="button" onclick="submitRepoName()"> Submit </button>
                     </div>
-                </form> 
+                </form>
                 <article>
-                    <h3>Currently supported language features</h3>
+                    <h2>Currently supported language features</h2>
 
                     <table>
                         <tr>
@@ -93,30 +94,30 @@
                             <td>C++</td>
                             <td class="partial">Partial</td>
                             <td class="partial">Partial</td>
+                            <td class="partial">Partial</td>
                             <td class="non">Non</td>
                             <td class="non">Non</td>
                             <td class="non">Non</td>
-                            <td class="non">Non</td>
-                            <td class="non">Non</td>
+                            <td class="partial">Partial</td>
                             <td class="non">Non</td>
                         </tr>
                         <tr>
                             <td >Java</td>
-                            <td class="partial">partial</td>
-                            <td class="partial">partial</td>
+                            <td class="partial">Partial</td>
+                            <td class="partial">Partial</td>
+                            <td class="partial">Partial</td>
                             <td class="non">Non</td>
                             <td class="non">Non</td>
                             <td class="non">Non</td>
+                            <td class="partial">Partial</td>
                             <td class="non">Non</td>
-                            <td class="non">Non</td>
-                            <td class="non">Non</td> 
                         </tr>
-                            
+
                     </table>
                 </article>
             </main>
             <footer>
-                Github: <a href="https://github.com/zohaib194/CodebaseVisualizer3D">github.com/zohaib194/CodebaseVisualizer3D</a>  Feedback: <a href="https://github.com/zohaib194/CodebaseVisualizer3D/issues"> Issue tracker</a> 
+                Github: <a href="https://github.com/zohaib194/CodebaseVisualizer3D">github.com/zohaib194/CodebaseVisualizer3D</a>  Feedback: <a href="https://github.com/zohaib194/CodebaseVisualizer3D/issues"> Issue tracker</a>
             </footer>
         </div>
     </body>

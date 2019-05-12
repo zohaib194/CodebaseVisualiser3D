@@ -1,18 +1,19 @@
 // Find canvas.
 var canvas = document.getElementById("output");
 
-// Make as setup renderer for rendering on canvas. 
+// Setup renderer for rendering on canvas.
 var renderer = new THREE.WebGLRenderer({ canvas: canvas });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setClearColor(STYLE.getColors().background, 1);
+renderer.setFaceCulling(THREE.CullFaceNone)
 
 // Make scene to render.
 const scene = new THREE.Scene();
 
 // Setup camera.
 var camera = new THREE.PerspectiveCamera(
-    STYLE.getGraphics().camera.fov, 
-    window.innerWidth / window.innerHeight, 
+    STYLE.getGraphics().camera.fov,
+    window.innerWidth / window.innerHeight,
     STYLE.getGraphics().camera.nearPlane,
     STYLE.getGraphics().camera.farPlane,
 );
@@ -29,7 +30,7 @@ var light = new THREE.AmbientLight(
 scene.add(light);
 
 var directionalLight = new THREE.DirectionalLight(
-    STYLE.getColors().light, 
+    STYLE.getColors().light,
     0.5
 );
 directionalLight.position.set(1, 1, 1);
@@ -47,7 +48,7 @@ renderer.render(scene, camera);
 
 // Cube marking origin of world.
 var originGeometry = new THREE.CubeGeometry(0.05, 0.05, 0.05);
-var originMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+var originMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent: true, opacity: 0.5});
 var originCube = new THREE.Mesh(originGeometry, originMaterial);
 originCube.position.set(0, 0, 0);
 scene.add(originCube);
@@ -94,7 +95,7 @@ function mainloop(time) {
 
     render();
     windowMgr.ImGuiRender();
-    
+
     // Schedule the next frame.
     requestAnimationFrame(mainloop);
 }
@@ -107,124 +108,25 @@ function mainloop(time) {
 */
 function runFDGOnJSONData(data) {
     // Build fdg graph from parsed json data.
-    document.getElementById("status").innerHTML = 
+    document.getElementById("status").innerHTML =
         LOCALE.getSentence("userinfo_read");
     handleProjectData(data);
 
     // Apply negative links on those who aren't related
-    for (i = 0; i < fdg.getNodes().length; i++) {
-        for (j = 0; j < fdg.getNodes().length; j++) {
-            fdg.addLink(i, j, new LinkProperties(-1));
-        }
-    }
+    var nodesforLinking = fdg.getNodes();
 
     // Run for 100 iterations shifting the position of nodes.
-    document.getElementById("status").innerHTML = 
+    document.getElementById("status").innerHTML =
         LOCALE.getSentence("userinfo_organization");
-    fdg.execute(100);
+    fdg.execute(2000);
 
     // Draw nodes using display manager.
-    document.getElementById("status").innerHTML = 
+    document.getElementById("status").innerHTML =
         LOCALE.getSentence("userinfo_structure_visualization_assigment");
-    fdg.getNodes().forEach((node) => {
-        /**
-         * Function for selecting proper type from configuration.
-         * @param {string} type - The type of node.
-         */
-        let getDrawableGeometry = (function(type) {
-            switch(type) {
-                case "cube":
-                    return new THREE.BoxGeometry(0.1, 0.1, 0.1);
-                case "sphere":
-                    return new THREE.SphereGeometry(0.1, 32, 16);
-                case "cylinder":
-                    return new THREE.CylinderGeometry(0.05, 0.05, 0.1, 16);
-                case "cone":
-                    return new THREE.ConeGeometry(0.05, 0.1, 16);
-                case "dodecahedron":
-                    return new THREE.DodecahedronGeometry(0.05);
-                case "icosahedron":
-                    return new THREE.IcosahedronGeometry(0.05);
-                case "octahedron":
-                    return new THREE.OctahedronGeometry(0.05);
-                case "tetrahedron":
-                    return new THREE.TetrahedronGeometry(0.05);
-            }
-        });
 
-        var nodeType = node.getType();
-        var supportedType = false;
-        var drawableGeometry;
-        var drawableColor;
-
-        // Select shape and color based on node type.
-        switch (nodeType) {
-            case "function": {
-                drawableColor = STYLE.getDrawables().function.color;
-                drawableGeometry = getDrawableGeometry(
-                    STYLE.getDrawables().function.shape
-                );
-                supportedType = true;
-                break;
-            }
-            case "class": {
-                drawableGeometry = getDrawableGeometry(
-                    STYLE.getDrawables().class.shape
-                );
-                drawableColor = STYLE.getDrawables().class.color;
-                supportedType = true;
-                break;
-            }
-            case "namespace": {
-                drawableGeometry = getDrawableGeometry(
-                    STYLE.getDrawables().namespace.shape
-                );
-                drawableColor = STYLE.getDrawables().namespace.color;
-                supportedType = true;
-                break;
-            }
-            default: {   // Unsupported node type, mention this!
-                console.log(
-                    LOCALE.getSentence("geometry_invalid_type") + ": " + node.getType()
-                );
-                break;
-            }
-        }
-        
-        // Found a supported type.
-        document.getElementById("status").innerHTML = 
-            LOCALE.getSentence("userinfo_ready_display");
-        if (supportedType) {
-            // Add it for display.
-            displayMgr.addObject(
-                node.getType(),
-                new Drawable(
-                    node.getPosition(),
-                    drawableColor,
-                    node.getName(),
-                    drawableGeometry
-                )
-            );
-
-            // Draw nodes links with three.js
-            node.getLinks().forEach((link, otherIndex) => {
-                if (link.attraction > 0) {
-                    var material = new THREE.LineBasicMaterial({
-                        color: STYLE.getDrawables().link.color
-                    });
-                    
-                    var geometry = new THREE.Geometry();
-                    geometry.vertices.push(
-                        node.getPosition(),
-                        fdg.getNodes()[otherIndex].getPosition()
-                    );
-                    
-                    var line = new THREE.Line(geometry, material);
-                    scene.add(line);
-                }
-            });
-        }
-    });
+    var projectTree = fdg.getProjectRoot()
+    displayMgr.setSceneGraph(projectTree, scene);
+    displayMgr.setLinks(projectTree, scene);
 }
 
 // ########## Mouse events functions ##########
@@ -250,12 +152,12 @@ function onMouseClick(event) {
     if(intersects !== "undefined" && intersects.length > 0) {
         var funcName = intersects[0].object.name.substr(0, intersects[0].object.name.indexOf(' |'));
 
-        sendGetRequest("http://" + config.serverInfo.api_ip + ":" + config.serverInfo.api_port + 
-            "/repo/" + id + "/file/read/?lineStart=" + functionModels.get(funcName).getStartLine() + 
+        sendGetRequest("http://" + config.serverInfo.api_ip + ":" + config.serverInfo.api_port +
+            "/repo/" + id + "/file/read/?lineStart=" + functionModels.get(funcName).getStartLine() +
             "&lineEnd=" + functionModels.get(funcName).getEndLine() +
             "&filePath=" + functionModels.get(funcName).getFileName())
         .then(json => {
-            windowMgr.setDataStructureImplementation(json.implementation); 
+            windowMgr.setDataStructureImplementation(json.implementation);
         });
     }
 }
@@ -300,7 +202,7 @@ function sendGetRequest(url){
 // Request to get the list of repositories stored in DB.
 sendGetRequest("http://" + config.serverInfo.api_ip + ":" + config.serverInfo.api_port + "/repo/list")
 .then(json => {
-   windowMgr.setRepositories(json); 
+   windowMgr.setRepositories(json);
 });
 
 /**
@@ -320,11 +222,11 @@ function sendInitialRequest() {
         // set the id related to repository.
         id = response.body.id;
 
-        // Everything went ok, display data.
+        // Client side error, display initial request failed.
         if (response.statuscode >= 400) {
             // Update status and exit.
-            document.getElementById("status").innerHTML = 
-                LOCALE.getSentence("userinfo_websocket_initial_message_failed") + 
+            document.getElementById("status").innerHTML =
+                LOCALE.getSentence("userinfo_websocket_initial_message_failed") +
                 ": " + response.body.id;
             return;
         }
@@ -335,8 +237,8 @@ function sendInitialRequest() {
         var fileCountExists = typeof response.body.fileCount !== "undefined";
 
         // Updating variables
-        if (parsedCountExists && 
-            skipCountExists && 
+        if (parsedCountExists &&
+            skipCountExists &&
             currentFileExists
         ) {
             parsedFileCount = response.body.parsedFileCount;
@@ -346,13 +248,13 @@ function sendInitialRequest() {
 
         // Display file counts and loading bar.
         if (parsedCountExists) {
-            document.getElementById("status_parsedcount").innerHTML = 
-                LOCALE.getSentence("userinfo_websocket_initial_message_parsed") + 
+            document.getElementById("status_parsedcount").innerHTML =
+                LOCALE.getSentence("userinfo_websocket_initial_message_parsed") +
                 ": " + parsedFileCount;
         }
         if (skipCountExists) {
-            document.getElementById("status_skippedcount").innerHTML = 
-                LOCALE.getSentence("userinfo_websocket_initial_message_skipped") + 
+            document.getElementById("status_skippedcount").innerHTML =
+                LOCALE.getSentence("userinfo_websocket_initial_message_skipped") +
                 ": " + skippedFileCount;
         }
 
@@ -366,12 +268,12 @@ function sendInitialRequest() {
         }
 
         switch (response.body.status) {
-            // Still parsing. 
+            // Still parsing.
             case "Parsing": {
                 // Display parsing text.
                 if (currentFileExists) {
-                    document.getElementById("status").innerHTML = 
-                        LOCALE.getSentence("userinfo_websocket_initial_message_status_parsing") + 
+                    document.getElementById("status").innerHTML =
+                        LOCALE.getSentence("userinfo_websocket_initial_message_status_parsing") +
                         ": " + response.body.currentFile;
                 }
 
@@ -380,7 +282,7 @@ function sendInitialRequest() {
             // Finished parsing.
             case "Done": {
                 // Display finished message and final file count.
-                document.getElementById("status").innerHTML = 
+                document.getElementById("status").innerHTML =
                     LOCALE.getSentence("userinfo_websocket_initial_message_status_finished");
 
                 // Continue with parsing.
@@ -389,7 +291,7 @@ function sendInitialRequest() {
             }
         }
     };
-    
+
     websocket.onclose = function (event) {
         // Disable the loader icon and status tags.
         document.getElementById("loader").style.display = "none";
@@ -400,7 +302,7 @@ function sendInitialRequest() {
 
         // Start three.js loop
         requestAnimationFrame(mainloop);
-        
+
         // Closed websocket.
         websocket.close();
     }
@@ -409,7 +311,7 @@ function sendInitialRequest() {
 /**
  * Sends an add request to submit the repository and update feedback status through websockets.
  */
-function sendAddRequest(){ 
+function sendAddRequest(){
     // Websocket connection for the api endpoint.
     var websocket = new WebSocket("ws://" + config.serverInfo.api_ip + ":" + config.serverInfo.api_port + "/repo/add");
 
@@ -423,11 +325,11 @@ function sendAddRequest(){
         // Parse the server response.
         var response = JSON.parse(event.data)
 
-        
+
         if (response.statuscode == 202) {
             // set the id related to repository.
             id = response.body.id;
-            
+
             // Update status.
             document.getElementById("status").innerHTML = response.body.status;
         }
@@ -444,7 +346,7 @@ function sendAddRequest(){
             location.assign("../index.html");
             return;
         }
-        
+
         // Open websocket for initial request status data.
         sendInitialRequest();
         websocket.close();

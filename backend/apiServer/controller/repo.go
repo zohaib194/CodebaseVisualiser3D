@@ -4,14 +4,16 @@ package controller
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"regexp"
 
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/model"
+	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/util"
 )
+
+var packageName = "controller"
 
 // RepoController represents metadata for a git repository.
 type RepoController struct {
@@ -90,6 +92,9 @@ var upgrader = websocket.Upgrader{
 // NewRepoFromURI upgrades a getrequest to a websocket expecting the client to
 // send a json with uri field and saves the git repository it refers to.
 func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request) {
+	util.TypeLogger.Info("%s: Received request for new repo", packageName)
+	defer util.TypeLogger.Info("%s: Ended request for new repo", packageName)
+
 	http.Header.Add(w.Header(), "content-type", "application/json")
 	http.Header.Add(w.Header(), "Access-Control-Allow-Origin", "*")
 
@@ -98,18 +103,18 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
 			http.Error(w, "Expected to established WebSocket", http.StatusBadRequest)
-			log.Println("Could not upgrade:", err)
+			util.TypeLogger.Error("%s: Failed to upgrade to websocket: %s", packageName, err.Error())
 			return
 		}
 
 		messageType, r, err := conn.NextReader()
 		if err != nil {
-			log.Println("Could not read request: ", err)
+			util.TypeLogger.Error("%s: Failed to read websocket message: %s", packageName, err.Error())
 			return
 		}
 
 		if messageType != websocket.TextMessage {
-			log.Println("Got unexpected websocket messageType")
+			util.TypeLogger.Warn("%s: Received unexpected websocket message type", packageName)
 			err := conn.WriteMessage(
 				websocket.CloseMessage,
 				websocket.FormatCloseMessage(
@@ -118,7 +123,7 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 				),
 			)
 			if err != nil {
-				log.Println("Could not write closer: ", err.Error())
+				util.TypeLogger.Error("%s: Failed to write webSocket closer: %s", packageName, err.Error())
 				return
 			}
 
@@ -129,7 +134,7 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 		var postData map[string]string
 
 		if err := decoder.Decode(&postData); err != nil {
-			log.Println("Could not decode json error: ", err.Error())
+			util.TypeLogger.Error("%s: Failed to decode Json: %s", packageName, err.Error())
 			err := conn.WriteMessage(
 				websocket.CloseMessage,
 				websocket.FormatCloseMessage(
@@ -138,7 +143,7 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 				),
 			)
 			if err != nil {
-				log.Println("Could not write closer: ", err.Error())
+				util.TypeLogger.Error("%s: Failed to read websocket message: %s", packageName, err.Error())
 				return
 			}
 			return
@@ -147,7 +152,7 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 		// Check that valid uri is given and that it is a .git
 		if isValid, err := validateURI(postData["uri"],
 			func(url string) (isValid bool, err error) { return regexp.Match(`\.git$`, []byte(postData["uri"])) }); !isValid || (err != nil) {
-			log.Println("Not a valid URI to git repository.")
+			util.TypeLogger.Error("%s: Received invalid URI to git repository", packageName)
 			reason := WebsocketResponse{
 				StatusText: http.StatusText(http.StatusBadRequest),
 				StatusCode: http.StatusBadRequest,
@@ -158,7 +163,7 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 			}
 			jsonResponse, err := json.Marshal(reason)
 			if err != nil {
-				log.Println("Could not encode json")
+				util.TypeLogger.Error("%s: Failed to encode Json: %s", packageName, err.Error())
 				return
 			}
 			err = conn.WriteMessage(
@@ -169,7 +174,7 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 				),
 			)
 			if err != nil {
-				log.Println("Could not write closer: ", err.Error())
+				util.TypeLogger.Error("%s: Failed to write webSocket closer: %s", packageName, err.Error())
 				return
 			}
 			return
@@ -188,7 +193,7 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 
 			if saverResponse.Err != nil {
 				if saverResponse.Err.Error() == "Already exists" {
-					log.Println("Request conflict with existing repository")
+					util.TypeLogger.Info("%s: Request conflicted with existing repository", packageName)
 					reason := WebsocketResponse{
 						StatusText: http.StatusText(http.StatusConflict),
 						StatusCode: http.StatusConflict,
@@ -199,7 +204,7 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 					}
 					jsonResponse, err := json.Marshal(reason)
 					if err != nil {
-						log.Println("Could not encode json")
+						util.TypeLogger.Error("%s: Failed to encode Json: %s", packageName, err.Error())
 						return
 					}
 					err = conn.WriteMessage(
@@ -210,7 +215,7 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 						),
 					)
 					if err != nil {
-						log.Println("Could not write closer: ", err.Error())
+						util.TypeLogger.Error("%s: Failed to write webSocket closer: %s", packageName, err.Error())
 						return
 					}
 					return
@@ -226,7 +231,7 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 				}
 				jsonResponse, err := json.Marshal(reason)
 				if err != nil {
-					log.Println("Could not encode json")
+					util.TypeLogger.Error("%s: Failed to encode Json: %s", packageName, err.Error())
 					return
 				}
 				err = conn.WriteMessage(
@@ -237,7 +242,7 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 					),
 				)
 				if err != nil {
-					log.Println("Error creating repository: ", err.Error())
+					util.TypeLogger.Error("%s: Failed to write webSocket closer: %s", packageName, err.Error())
 					return
 				}
 				return
@@ -255,7 +260,7 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 
 				err = conn.WriteJSON(response)
 				if err != nil {
-					log.Println("Could not write message: ", err.Error())
+					util.TypeLogger.Error("%s: Failed to write webSocket message: %s", packageName, err.Error())
 					return
 				}
 			} else if saverResponse.StatusText == "Done" {
@@ -270,7 +275,7 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 
 				jsonResponse, err := json.Marshal(response)
 				if err != nil {
-					log.Println("Could not encode json")
+					util.TypeLogger.Error("%s: Failed to encode Json: %s", packageName, err.Error())
 					return
 				}
 
@@ -282,7 +287,7 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 					),
 				)
 				if err != nil {
-					log.Println("Could not write closer: ", err.Error())
+					util.TypeLogger.Error("%s: Failed to write webSocket closer: %s", packageName, err.Error())
 					return
 				}
 
@@ -294,7 +299,7 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 
 	} else { // if not Get request
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
-		log.Println("Unsuported method", r.Method)
+		util.TypeLogger.Warn("%s: Received unsuported method", packageName)
 		return
 	}
 }
@@ -441,6 +446,9 @@ func (repo RepoController) NewRepoFromURI(w http.ResponseWriter, r *http.Request
 
 // ParseInitial parse a repository for functions of a certain project in repos directory.
 func (repo RepoController) ParseInitial(w http.ResponseWriter, r *http.Request) {
+	util.TypeLogger.Info("%s: Received request for initial data", packageName)
+	defer util.TypeLogger.Info("%s: Ended request for initial data", packageName)
+
 	http.Header.Add(w.Header(), "content-type", "application/json")
 	http.Header.Add(w.Header(), "Access-Control-Allow-Origin", "*")
 
@@ -449,7 +457,7 @@ func (repo RepoController) ParseInitial(w http.ResponseWriter, r *http.Request) 
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
 			http.Error(w, "Expected to established WebSocket", http.StatusBadRequest)
-			log.Println("Could not upgrade:", err)
+			util.TypeLogger.Error("%s: Failed to upgrade to websocket: %s", packageName, err.Error())
 			return
 		}
 		vars := mux.Vars(r)
@@ -458,7 +466,7 @@ func (repo RepoController) ParseInitial(w http.ResponseWriter, r *http.Request) 
 		exstRepo, err := model.RepoModel{}.GetRepoByID(vars["repoId"])
 
 		if err != nil {
-			log.Println("Could not find repo in db: ", err.Error())
+			util.TypeLogger.Error("%s: Failed to find repository in database: %s", packageName, err.Error())
 			reason := WebsocketResponse{
 				StatusText: http.StatusText(http.StatusNotFound),
 				StatusCode: http.StatusNotFound,
@@ -468,7 +476,40 @@ func (repo RepoController) ParseInitial(w http.ResponseWriter, r *http.Request) 
 				},
 			}
 			if err := socketCloseWithResponse(conn, reason); err != nil {
-				log.Println("Could not close websocket")
+				util.TypeLogger.Error("%s: Failed to write webSocket closer: %s", packageName, err.Error())
+			}
+			return
+		}
+
+		if len(exstRepo.ParsedRepo.Files) > 0 {
+			util.TypeLogger.Error("%v", exstRepo.ParsedRepo)
+			// Respond with message
+			reason := WebsocketResponse{
+				StatusText: http.StatusText(http.StatusOK),
+				StatusCode: http.StatusOK,
+				Body: map[string]interface{}{
+					"id":               vars["repoId"],
+					"status":           "Done",
+					"parsedFileCount":  0,
+					"skippedFileCount": 0,
+					"fileCount":        0,
+					"result":           exstRepo.ParsedRepo,
+				},
+			}
+			if err := conn.WriteJSON(reason); err != nil {
+				util.TypeLogger.Error("%s: Failed to write final webSocket message: %s", packageName, err.Error())
+				return
+			}
+			// close after response
+			err = conn.WriteMessage(
+				websocket.CloseMessage,
+				websocket.FormatCloseMessage(
+					websocket.CloseNormalClosure,
+					"Done",
+				),
+			)
+			if err != nil {
+				util.TypeLogger.Error("%s: Failed to write webSocket closer: %s", packageName, err.Error())
 			}
 			return
 		}
@@ -477,7 +518,7 @@ func (repo RepoController) ParseInitial(w http.ResponseWriter, r *http.Request) 
 		files, err := exstRepo.GetRepoFiles()
 
 		if err != nil {
-			log.Println("Could not find files error: ", err.Error())
+			util.TypeLogger.Error("%s: Failed to find repository files: %s", packageName, err.Error())
 			reason := WebsocketResponse{
 				StatusText: http.StatusText(http.StatusInternalServerError),
 				StatusCode: http.StatusInternalServerError,
@@ -487,7 +528,7 @@ func (repo RepoController) ParseInitial(w http.ResponseWriter, r *http.Request) 
 				},
 			}
 			if err := socketCloseWithResponse(conn, reason); err != nil {
-				log.Println("Could not close websocket", err)
+				util.TypeLogger.Error("%s: Failed to write webSocket closer: %s", packageName, err.Error())
 			}
 			return
 		}
@@ -503,7 +544,7 @@ func (repo RepoController) ParseInitial(w http.ResponseWriter, r *http.Request) 
 		}
 
 		if err := conn.WriteJSON(response); err != nil {
-			log.Println("Could not send message over websocket", err)
+			util.TypeLogger.Error("%s: Failed to write webSocket message: %s", packageName, err.Error())
 			return
 		}
 		// Setting up channel and go routine to parse all files in repository
@@ -514,7 +555,7 @@ func (repo RepoController) ParseInitial(w http.ResponseWriter, r *http.Request) 
 		parserResponse := <-parseChannel
 		for {
 			if parserResponse.Err != nil {
-				log.Println("Error while parsing: ", err.Error())
+				util.TypeLogger.Error("%s: Failed to parse files: %s", packageName, err.Error())
 				reason := WebsocketResponse{
 					StatusText: http.StatusText(http.StatusInternalServerError),
 					StatusCode: http.StatusInternalServerError,
@@ -524,7 +565,7 @@ func (repo RepoController) ParseInitial(w http.ResponseWriter, r *http.Request) 
 					},
 				}
 				if err := socketCloseWithResponse(conn, reason); err != nil {
-					log.Println("Could not close websocket", err)
+					util.TypeLogger.Error("%s: Failed to write webSocket closer: %s", packageName, err.Error())
 				}
 				return
 			}
@@ -545,7 +586,7 @@ func (repo RepoController) ParseInitial(w http.ResponseWriter, r *http.Request) 
 				}
 
 				if err = conn.WriteJSON(response); err != nil {
-					log.Println("Could not send update message")
+					util.TypeLogger.Error("%s: Failed to write webSocket message: %s", packageName, err.Error())
 				}
 
 			} else { // if done
@@ -563,7 +604,7 @@ func (repo RepoController) ParseInitial(w http.ResponseWriter, r *http.Request) 
 					},
 				}
 				if err := conn.WriteJSON(reason); err != nil {
-					log.Println("Could not send final message", err)
+					util.TypeLogger.Error("%s: Failed to write final webSocket message: %s", packageName, err.Error())
 					return
 				}
 				// close after response
@@ -575,7 +616,7 @@ func (repo RepoController) ParseInitial(w http.ResponseWriter, r *http.Request) 
 					),
 				)
 				if err != nil {
-					log.Println("Could not send closer for websocket")
+					util.TypeLogger.Error("%s: Failed to write webSocket closer: %s", packageName, err.Error())
 				}
 				return
 			}
@@ -584,6 +625,7 @@ func (repo RepoController) ParseInitial(w http.ResponseWriter, r *http.Request) 
 
 	} else { // if not GET request
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		util.TypeLogger.Warn("%s: Received unsuported method", packageName)
 		return
 	}
 
@@ -623,6 +665,9 @@ func (repo RepoController) ParseInitial(w http.ResponseWriter, r *http.Request) 
 
 // GetAllRepos gets all repositories stored.
 func (repo RepoController) GetAllRepos(w http.ResponseWriter, r *http.Request) {
+	util.TypeLogger.Info("%s: Received request for repository list", packageName)
+	defer util.TypeLogger.Info("%s: Ended request for repository list", packageName)
+
 	http.Header.Add(w.Header(), "content-type", "application/json")
 	http.Header.Add(w.Header(), "Access-Control-Allow-Origin", "*")
 
@@ -631,7 +676,7 @@ func (repo RepoController) GetAllRepos(w http.ResponseWriter, r *http.Request) {
 
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-			log.Println("Could not find repositories error: ", err.Error())
+			util.TypeLogger.Error("%s: Failed to find repositories %s", packageName, err.Error())
 			return
 		}
 
@@ -640,12 +685,15 @@ func (repo RepoController) GetAllRepos(w http.ResponseWriter, r *http.Request) {
 
 	} else { // if not GET request
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		util.TypeLogger.Warn("%s: Received unsuported method", packageName)
 		return
 	}
 
 }
 
 func socketCloseWithResponse(conn *websocket.Conn, reason WebsocketResponse) error {
+	util.TypeLogger.Debug("%s: Received request for repository list", packageName)
+	defer util.TypeLogger.Debug("%s: Ended request for repository list", packageName)
 	jsonResponse, err := json.Marshal(reason)
 	if err != nil {
 		return err

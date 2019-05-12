@@ -7,10 +7,11 @@
  * @return     {Object}  object contains qualityMetrics functions.
  */
 let qualityMetrics = (function (previousWindowSize, previousWindowPos){
-    
+
     var functionCount = 0;
     var classCount = 0;
     var namespaceCount = 0;
+    var variableCount = 0;
     var lineCount
 
     /**
@@ -23,7 +24,7 @@ let qualityMetrics = (function (previousWindowSize, previousWindowPos){
         ImGui.Begin("Quality Metrics");
         this.wSize = ImGui.GetWindowSize();
         this.wPos = ImGui.GetWindowPos();
-        
+
         ImGui.Text(
             LOCALE.getSentence("quality_metric_namespace_count") + ": " + namespaceCount
         );
@@ -34,12 +35,15 @@ let qualityMetrics = (function (previousWindowSize, previousWindowPos){
             LOCALE.getSentence("quality_metric_funciton_count") + ": " + functionCount
         );
         ImGui.Text(
+            LOCALE.getSentence("quality_metric_variable_count") + ": " + variableCount
+        );
+        ImGui.Text(
             LOCALE.getSentence("quality_metric_lines_count") + ": " + lineCount
         );
 
         ImGui.End();
     }
-    
+
     /**
      * Gets the position.
      *
@@ -107,6 +111,22 @@ let qualityMetrics = (function (previousWindowSize, previousWindowPos){
     }
 
     /**
+     * Sets the variable count.
+     * @param      {(number)}  count   The count
+     */
+    function setVariableCount(count){
+        if (count === "undefined") {
+            console.log(LOCALE.getSentence("generic_undefined"));
+            return;
+        } else if (count < 0) {
+            console.log(LOCALE.getSentence("generic_negative"));
+            return;
+        }
+
+        variableCount = count;
+    }
+
+    /**
      * Setter of the lines of code.
      * @param {int} count - Lines of code.
      */
@@ -128,7 +148,8 @@ let qualityMetrics = (function (previousWindowSize, previousWindowPos){
         getWindowSize: getSize,
         setFunctionCount: setFunctionCount,
         setClassCount: setClassCount,
-        setNamespaceCount: setNamespaceCount,    
+        setNamespaceCount: setNamespaceCount,
+        setVariableCount: setVariableCount,
         setLineCount: setLineCount,
     };
 });

@@ -16,14 +16,6 @@ let placeNameplate = function (name, x_pos, y_pos) {
         nameplate.textContent = name;
         nameplate.className = "nameplate";
         nameplate.id = name;
-        nameplate.style = `
-            position: absolute;
-            z-index: 9999;
-            text-align: center;
-            display: block;
-            color: #000000;
-            pointer-events: none;
-        `;
     }
 
     // Set position to be near the threejs object with name "name".
@@ -50,63 +42,63 @@ let destroyNameplate = function(name) {
 /**
  * A generic object used for representing functions and other syntax.
  * @constructor
- * 
- * @param {THREE.Vector3} position - Position the cube willl be placed at.
+ *
+ * @param {THREE.Vector3} position - Position the cube will be placed at.
  * @param {Integer} color - The color of the cube, preferrably not black.
  * @param {string} name - Name of the object to be display on hover (not active).
- * @param {THREE.Geometry} geometry - Mesh to display. Defualt white cube (0.1,0.1,0.1).
+ * @param {THREE.Geometry} geometry - Mesh to display. Default white cube (0.1,0.1,0.1).
  */
 var Drawable = (function (
-        pos, 
-        color, 
-        name, 
-        geometry
+        pos,
+        color,
+        name,
+        geometry,
+        parent
     ) {
-
     if (typeof geometry === "undefined") {
         console.log(
             name + ": " + LOCALE.getSentence("geometry_missing_type")
         );
         return;
     }
-    
+
     // Drawable setup.
-    var mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ color: color }));
+    var mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ color: color, transparent: true, opacity: 0.5}));
     // Position THREE.js drawable.
     mesh.position.set(pos.x, pos.y, pos.z);
     mesh.name = name;
-    scene.add(mesh);
-    
+    parent.add(mesh);
+
     // Drawable's edge highlight setup.
     var edgeGeometry = new THREE.EdgesGeometry(mesh.geometry);
     var edgeMaterial = new THREE.LineBasicMaterial({
-        color: STYLE.getDrawables().edge.color, 
+        color: STYLE.getDrawables().edge.color,
         linewidth: 1
     });
     var wireframe = new THREE.LineSegments(edgeGeometry, edgeMaterial);
     wireframe.name = mesh.name + " | Wireframe";
     // Position wireframe.
     wireframe.position.set(pos.x, pos.y, pos.z);
-    scene.add(wireframe);
+    parent.add(wireframe);
 
     /**
      * Function for drawing drawable object.
      */
     var draw = function() {
-        // Has no object to display, abort. 
+        // Has no object to display, abort.
         if (typeof mesh === "undefined") {
             console.log(LOCALE.getSentence("displayobject_undefined"));
             return;
         }
-        
+
         // Calc camera forward.
         var cameraForward = new THREE.Vector3(0, 0, 0);
         cameraForward.subVectors(controls.target, camera.position);
 
-        // Calc vector from camrea to object.
+        // Calc vector from camera to object.
         var cameraToObject = new THREE.Vector3(0, 0, 0);
         cameraToObject.subVectors(mesh.position, camera.position);
-        
+
         // If object is in-front of camera, display nameplate.
         if (cameraForward.dot(cameraToObject) > 0) {
             var widthHalf = window.innerWidth / 2;
@@ -120,7 +112,8 @@ var Drawable = (function (
             cameraRight.multiplyScalar(0.2);
 
             // Copy my position (+ offset) and convert to screen coords.
-            var posNameplate = mesh.position.clone();
+            scene.updateMatrixWorld();
+            var posNameplate = new THREE.Vector3().setFromMatrixPosition(mesh.matrixWorld);
             posNameplate.add(cameraRight);
             posNameplate.add(worldUp);
             posNameplate.project(camera);
@@ -136,8 +129,18 @@ var Drawable = (function (
         }
     };
 
+    /**
+     * Gets the mesh.
+     *
+     * @return     {Object}  The mesh.
+     */
+    var getMesh = function() {
+        return mesh;
+    }
+
     // Expose private functions for global use.
     return {
-        draw: draw
+        draw: draw,
+        getMesh: getMesh,
     }
 });

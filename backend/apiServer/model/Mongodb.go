@@ -2,11 +2,14 @@ package model
 
 import (
 	"errors"
-	"log"
 
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+
+	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/util"
 )
+
+var packageName = "model"
 
 // MongoDB stores the details of the DB connection.
 type MongoDB struct {
@@ -15,22 +18,21 @@ type MongoDB struct {
 	RepoColl     string
 }
 
-const logWarn = "[WARNING]: "
-const logError = "[ERROR]: "
-const logInfo = "[INFO]: "
-
 // DB is a mongo database with name CodeVis3D and collection gitRepository
 var DB = &MongoDB{"mongodb://localhost", "CodeVis3D", "gitRepository"}
 
 // Init - initializes the mongoDB database
 func (db *MongoDB) Init() error {
+	util.TypeLogger.Debug("%s: Call for Init", packageName)
+	defer util.TypeLogger.Debug("%s: Ended Call for Init", packageName)
+
 	// Setup session with database
-	log.Println(logInfo + "Dialing database! Setting up a session!")
+	util.TypeLogger.Info("%s: Dialing database, setting up session", packageName)
 	session, err := mgo.Dial(db.DatabaseURL)
 
 	// Check for session error
 	if err != nil {
-		log.Println(logError + "Failed dialing database")
+		util.TypeLogger.Fatal("%s: Failed to dial database", packageName)
 		return err
 	}
 
@@ -44,28 +46,35 @@ func (db *MongoDB) Init() error {
 	}
 
 	// Ensure collation follows the index
-	log.Println(logInfo + "Make collection: " + db.RepoColl + "Ensure \"index\"")
+	util.TypeLogger.Info("%s: Creating collection %s Ensure \"index\"", packageName, db.RepoColl)
 	err = session.DB(db.DatabaseName).C(db.RepoColl).EnsureIndex(index)
 	if err != nil {
-		log.Println(logError + "Failed to ensure \"index\" on collection: " + db.RepoColl + "!")
+		util.TypeLogger.Fatal("%s: Failed to ensure \"index\" on collection %s: %s", packageName, db.RepoColl, err.Error())
 		return err
 	}
 
 	// Postpone closing connection until we return
 	defer session.Close()
 
-	log.Println(logInfo + "Initializing successfull!")
+	util.TypeLogger.Info("%s: Initializing successfull", packageName)
 	// Nothing bad happened!
 	return nil
 }
 
-//add adds rm to db if it is not already in it.
-func (db *MongoDB) add(rm *RepoModel) error {
+//Add adds rm to db if it is not already in it.
+func (db *MongoDB) Add(rm *RepoModel) error {
+	util.TypeLogger.Debug("%s: Call for add", packageName)
+	defer util.TypeLogger.Debug("%s: Ended Call for add", packageName)
+
 	session, err := mgo.Dial(db.DatabaseURL)
 	if err != nil {
-		log.Fatalln(logError+"Can't connect to database: ", err)
+		util.TypeLogger.Fatal("%s: Failed to connect to database", packageName)
 	}
 	defer session.Close()
+
+	if rm.URI == "" {
+		return errors.New("URI is empty")
+	}
 
 	exstRepo, err := db.findRepoByURI(rm.URI)
 
@@ -87,9 +96,12 @@ func (db *MongoDB) add(rm *RepoModel) error {
 // findRepoByURI takes the repo with field uri as given uri.
 // It returns empty repo if it is not in db.
 func (db *MongoDB) findRepoByURI(uri string) (repo RepoModel, err error) {
+	util.TypeLogger.Debug("%s: Call for findRepoByURI", packageName)
+	defer util.TypeLogger.Debug("%s: Ended Call for findRepoByURI", packageName)
+
 	session, err := mgo.Dial(db.DatabaseURL)
 	if err != nil {
-		log.Fatalln(logError+"Can't connect to database: ", err)
+		util.TypeLogger.Fatal("%s: Failed to connect to database", packageName)
 	}
 	defer session.Close()
 
@@ -107,15 +119,19 @@ func (db *MongoDB) findRepoByURI(uri string) (repo RepoModel, err error) {
 // FindRepoByID takes the repo with field id as given id.
 // It returns empty repo if it is not in db.
 func (db *MongoDB) FindRepoByID(id string) (repo RepoModel, err error) {
+	util.TypeLogger.Debug("%s: Call for FindRepoByID", packageName)
+	defer util.TypeLogger.Debug("%s: Ended Call for FindRepoByID", packageName)
+
 	session, err := mgo.Dial(db.DatabaseURL)
 	if err != nil {
-		log.Fatalln(logError+"Can't connect to database: ", err)
+		util.TypeLogger.Fatal("%s: Failed to connect to database", packageName)
 	}
 	defer session.Close()
 
 	if !bson.IsObjectIdHex(id) {
 		err = errors.New("Invalid id")
-		log.Println(logError+"Id received is incorrect: ", err)
+		util.TypeLogger.Error("%s: Received incorrect ID", packageName)
+
 		return RepoModel{}, err
 	}
 
@@ -132,9 +148,12 @@ func (db *MongoDB) FindRepoByID(id string) (repo RepoModel, err error) {
 
 // FindAllURI finds and returns all the repos stored in DB.
 func (db *MongoDB) FindAllURI() (repos []bson.M, err error) {
+	util.TypeLogger.Debug("%s: Call for FindAllURI", packageName)
+	defer util.TypeLogger.Debug("%s: Ended Call for FindAllURI", packageName)
+
 	session, err := mgo.Dial(db.DatabaseURL)
 	if err != nil {
-		log.Fatalln(logError+"Can't connect to database: ", err)
+		util.TypeLogger.Fatal("%s: Failed to connect to database", packageName)
 	}
 	defer session.Close()
 
@@ -145,4 +164,56 @@ func (db *MongoDB) FindAllURI() (repos []bson.M, err error) {
 	}
 
 	return repos, nil
+}
+
+// DropDB deletes the database
+func (db *MongoDB) DropDB() (err error) {
+	util.TypeLogger.Debug("%s: Call for DropDB", packageName)
+	defer util.TypeLogger.Debug("%s: Ended Call for DropDB", packageName)
+
+	session, err := mgo.Dial(db.DatabaseURL)
+	if err != nil {
+		util.TypeLogger.Fatal("%s: Failed to connect to database", packageName)
+	}
+	defer session.Close()
+
+	return session.DB(db.DatabaseName).DropDatabase()
+}
+
+// Count returns number of items in the collection.
+func (db *MongoDB) Count() int {
+	util.TypeLogger.Debug("%s: Call for Count", packageName)
+	defer util.TypeLogger.Debug("%s: Ended Call for Count", packageName)
+
+	session, err := mgo.Dial(db.DatabaseURL)
+	if err != nil {
+		util.TypeLogger.Fatal("%s: Failed to connect to database", packageName)
+	}
+	defer session.Close()
+
+	count, err := session.DB(db.DatabaseName).C(db.RepoColl).Count()
+	if err != nil {
+		util.TypeLogger.Fatal("%s: Failed to get db count", packageName)
+	}
+
+	return count
+}
+
+// Update updates the repo model matching rm.
+func (db *MongoDB) Update(rm *RepoModel) error {
+	util.TypeLogger.Debug("%s: Call for Update", packageName)
+	defer util.TypeLogger.Debug("%s: Ended Call for Update", packageName)
+
+	session, err := mgo.Dial(db.DatabaseURL)
+	if err != nil {
+		util.TypeLogger.Fatal("%s: Failed to connect to database", packageName)
+	}
+	defer session.Close()
+
+	err = session.DB(db.DatabaseName).C(db.RepoColl).UpdateId(rm.ID, bson.M{"$set": bson.M{"parsedrepo": rm.ParsedRepo}})
+	if err != nil {
+		util.TypeLogger.Fatal("%s: Failed to get db Update: %v", packageName, err)
+	}
+
+	return nil
 }

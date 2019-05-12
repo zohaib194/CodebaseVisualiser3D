@@ -18,7 +18,7 @@ import java.nio.file.Files;
  * Class for setting up java parsers.
  */
 public class JavaParserFacade {
-    
+
     /**
      * Function reads a file.
      *
@@ -29,11 +29,11 @@ public class JavaParserFacade {
      *
      * @throws     IOException  Input/output exception
      */
-    private static String readFile(File file, Charset encoding) throws IOException {
+    public static String readFile(File file, Charset encoding) throws IOException {
         byte[] encoded = Files.readAllBytes(file.toPath());
         return new String(encoded, encoding);
     }
-    
+
     /**
      * Function parse a java file and adds a listener on parser.
      *
@@ -49,7 +49,7 @@ public class JavaParserFacade {
         Java9Parser parser = new Java9Parser(tokens);
 
         ParseTree tree = parser.compilationUnit();
-        
+
         JavaExtendedListener listener = null;
         switch(context){
             case "Initial":
@@ -66,9 +66,10 @@ public class JavaParserFacade {
         ParseTreeWalker walker =  new ParseTreeWalker();
 
         if(listener == null){
+            System.err.println("[ERROR] no valid listener attacted.\n");
             System.exit(0);
         }
-        
+
         walker.walk(listener, tree);
 
         System.out.println(listener.getParsedCode());

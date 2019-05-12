@@ -1,17 +1,16 @@
 var STYLE = (function() {
     /**
      * Program style configuration.
-     * 
-     * Avaliabe shapes: 
-     *     cube, sphere, cylinder, cone, dodecahedron, 
+     *
+     * Avaliabe shapes:
+     *     cube, sphere, cylinder, cone, dodecahedron,
      *     icosahedron, octahedron, tetrahedron.
-     * 
+     *
      * Color formats:
-     * - RGB: {255, 255, 255}   // white
      * - Hex: 0x00ff00          // green
      */
     var style = {
-        applicationTheme: [ 
+        applicationTheme: [
             {
                 name: "default",
                 colors: {
@@ -32,11 +31,81 @@ var STYLE = (function() {
                     namespace: {
                         shape: "cone",
                         color: 0x0000ff
-                    }, 
+                    },
                     link: {
                         shape: null,
-                        color: 0xffff00
-                    }, 
+                        color: 0xac0000
+                    },
+                    edge: {
+                        shape: null,
+                        color: 0x000000
+                    }
+                }
+            },
+            {
+                name: "sublime",
+                colors: {
+                    default: 0x000000,
+                    background: 0x282923,
+                    ambientLight: 0x6d6e6a,
+                    light: 0xffffff
+                },
+                drawables: {
+                    function: {
+                        shape: "cube",
+                        color: 0xf92472
+                    },
+                    class: {
+                        shape: "cylinder",
+                        color: 0x67d8ef
+                    },
+                    namespace: {
+                        shape: "sphere",
+                        color: 0xac80ff
+                    },
+                    variable: {
+                        shape: "tetrahedron",
+                        color: 0xfff000
+                    },
+                    link: {
+                        shape: null,
+                        color: 0xffffff
+                    },
+                    edge: {
+                        shape: null,
+                        color: 0x000000
+                    }
+                }
+            },
+            {
+                name: "code_vis",
+                colors: {
+                    default: 0x000000,
+                    background: 0xffffff,
+                    ambientLight: 0xdfd8c5,
+                    light: 0xffffff
+                },
+                drawables: {
+                    function: {
+                        shape: "cube",
+                        color: 0x00ff00
+                    },
+                    class: {
+                        shape: "cylinder",
+                        color: 0xf58025
+                    },
+                    namespace: {
+                        shape: "cone",
+                        color: 0xad208e
+                    },
+                    variable: {
+                        shape: "cube",
+                        color: 0xad208e
+                    },
+                    link: {
+                        shape: null,
+                        color: 0x552988
+                    },
                     edge: {
                         shape: null,
                         color: 0x000000
@@ -48,12 +117,12 @@ var STYLE = (function() {
             camera: {
                 fov: 45,
                 nearPlane: 0.1,
-                farPlane: 1000
+                farPlane: 9001
             }
         }
     };
 
-    var currentApplicationTheme = 0;
+    var currentApplicationTheme = 1;
 
     /**
      * Getter for currently active application theme's name.

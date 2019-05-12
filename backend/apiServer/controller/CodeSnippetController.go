@@ -4,12 +4,12 @@ package controller
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"strconv"
 
 	"github.com/gorilla/mux"
 	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/model"
+	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/util"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -59,6 +59,9 @@ type CodeSnippetController struct {
 
 // GetImplementation fetch implementation of data structure based upon query parameters.
 func (codeSnippet CodeSnippetController) GetImplementation(w http.ResponseWriter, r *http.Request) {
+	util.TypeLogger.Info("%s: Received request for implementation", packageName)
+	defer util.TypeLogger.Info("%s: Ended request for implementation", packageName)
+
 	http.Header.Add(w.Header(), "content-type", "application/json")
 	http.Header.Add(w.Header(), "Access-Control-Allow-Origin", "*")
 
@@ -69,7 +72,7 @@ func (codeSnippet CodeSnippetController) GetImplementation(w http.ResponseWriter
 		lineStart, ok := r.URL.Query()["lineStart"]
 		if !ok || len(lineStart[0]) < 1 {
 			http.Error(w, "Invalid url parameter 'lineStart'", http.StatusBadRequest)
-			log.Println("Url parameter 'lineStart' is missing")
+			util.TypeLogger.Error("%s: Received request did not have \"lineStart\" field", packageName)
 			return
 		}
 
@@ -77,7 +80,7 @@ func (codeSnippet CodeSnippetController) GetImplementation(w http.ResponseWriter
 		lineEnd, ok := r.URL.Query()["lineEnd"]
 		if !ok || len(lineEnd[0]) < 1 {
 			http.Error(w, "Invalid url parameter 'lineEnd'", http.StatusBadRequest)
-			log.Println("Url parameter 'lineEnd' is missing")
+			util.TypeLogger.Error("%s: Received request did not have \"lineEnd\" field", packageName)
 			return
 		}
 
@@ -85,7 +88,7 @@ func (codeSnippet CodeSnippetController) GetImplementation(w http.ResponseWriter
 		filePath, ok := r.URL.Query()["filePath"]
 		if !ok || len(filePath[0]) < 1 {
 			http.Error(w, "Invalid url parameter 'filePath'", http.StatusBadRequest)
-			log.Println("Url parameter 'filePath' is missing")
+			util.TypeLogger.Error("%s: Received request contain invalid \"filePath\" field", packageName)
 			return
 		}
 
@@ -93,15 +96,26 @@ func (codeSnippet CodeSnippetController) GetImplementation(w http.ResponseWriter
 		startLine, err := strconv.Atoi(lineStart[0])
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-			log.Println("Could not convert startLine to integer", err.Error())
+			util.TypeLogger.Error("%s: Could not convert startLine to integer: %s", packageName, err.Error())
 			return
 		}
 
 		endLine, err := strconv.Atoi(lineEnd[0])
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-			log.Println("Could not convert endLine to integer", err.Error())
+			util.TypeLogger.Error("%s: Could not convert end Line to integer: %s", packageName, err.Error())
 			return
+		}
+
+		if startLine < 1 {
+			http.Error(w, "lineStart must be 1 or greater", http.StatusBadRequest)
+			util.TypeLogger.Warn("%s: Requested lineStart was befor start of file: %d", packageName, startLine)
+			return
+		}
+
+		if startLine > endLine {
+			http.Error(w, "Cant give negative interval", http.StatusBadRequest)
+			util.TypeLogger.Warn("%s: startLine vas greater than endLine: %d-%d", packageName, startLine, endLine)
 		}
 
 		// Fetch the content of file.
@@ -113,8 +127,13 @@ func (codeSnippet CodeSnippetController) GetImplementation(w http.ResponseWriter
 		}.FetchLinesOfCode()
 
 		if err != nil {
+			if err.Error() == "StartLine out of range" {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-			log.Println("Error occurred during FetchLinesOfCode", err.Error())
+			util.TypeLogger.Error("%s: Failed to get lines of code: %s", packageName, err.Error())
 			return
 		}
 
