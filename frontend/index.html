@@ -66,11 +66,12 @@
             </div>
             <main>
                 <div id="loader"></div>
-                <form id="repositoryform">
+                <form id="repositoryform" onsubmit="return submitRepoName()">
                     <div class="repoform">
                         <label id="gitrepotitle">Git Repository:</label>
                         <input type="uri" name="reponame" id="reponame"
                             placeholder="https://github.com/zohaib194/CodebaseVisualizer3D.git">
+
                         <button type="button" onclick="submitRepoName()"> Submit </button>
                     </div>
                 </form>

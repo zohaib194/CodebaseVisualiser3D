@@ -16,14 +16,6 @@ let placeNameplate = function (name, x_pos, y_pos) {
         nameplate.textContent = name;
         nameplate.className = "nameplate";
         nameplate.id = name;
-        nameplate.style = `
-            position: absolute;
-            z-index: 9999;
-            text-align: center;
-            display: block;
-            color: #000000;
-            pointer-events: none;
-        `;
     }
 
     // Set position to be near the threejs object with name "name".

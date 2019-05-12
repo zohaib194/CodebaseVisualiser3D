@@ -8,4 +8,5 @@ function submitRepoName(){
 
     // disable the form and enable a loader to the document.
     document.getElementById("repositoryform").style.display = "none";
+    return false;
 }

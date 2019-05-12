@@ -45,21 +45,21 @@ var DisplayManager = (function() {
     var getDrawableGeometry = (function(type, size) {
         switch(type) {
             case "cube":
-                return new THREE.BoxGeometry(0.1 * size, 0.1 * size, 0.1 * size);
+                return new THREE.BoxGeometry(0.5 * size, 0.5 * size, 0.5 * size);
             case "sphere":
-                return new THREE.SphereGeometry(0.1 * size, 32 * size, 16 * size);
+                return new THREE.SphereGeometry(1 * size, 32, 32);
             case "cylinder":
-                return new THREE.CylinderGeometry(0.05 * size, 0.05 * size, 0.1 * size, 16 * size);
+                return new THREE.CylinderGeometry(0.5 * size, 0.5 * size, 1 * size, 32);
             case "cone":
-                return new THREE.ConeGeometry(0.05 * size, 0.1 * size, 16 * size);
+                return new THREE.ConeGeometry(0.5 * size, 1 * size, 32);
             case "dodecahedron":
-                return new THREE.DodecahedronGeometry(1 * size);
+                return new THREE.DodecahedronGeometry(0.5 * size);
             case "icosahedron":
-                return new THREE.IcosahedronGeometry(0.05 * size);
+                return new THREE.IcosahedronGeometry(0.5 * size);
             case "octahedron":
-                return new THREE.OctahedronGeometry(0.05 * size);
+                return new THREE.OctahedronGeometry(0.5 * size);
             case "tetrahedron":
-                return new THREE.TetrahedronGeometry(0.05 * size);
+                return new THREE.TetrahedronGeometry(0.5 * size);
         }
     });
 
