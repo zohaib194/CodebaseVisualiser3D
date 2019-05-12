@@ -52,19 +52,19 @@ var STYLE = (function() {
                 },
                 drawables: {
                     function: {
-                        shape: "dodecahedron",
+                        shape: "cube",
                         color: 0xf92472
                     },
                     class: {
-                        shape: "dodecahedron",
+                        shape: "cylinder",
                         color: 0x67d8ef
                     },
                     namespace: {
-                        shape: "dodecahedron",
+                        shape: "sphere",
                         color: 0xac80ff
                     },
                     variable: {
-                        shape: "cube",
+                        shape: "tetrahedron",
                         color: 0xfff000
                     },
                     link: {

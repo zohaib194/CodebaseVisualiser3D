@@ -84,6 +84,15 @@ body {
     margin-right: auto;
 }
 
+div .nameplate {
+    position: absolute;
+    z-index: 9999;
+    text-align: center;
+    display: block;
+    color: #ffffff;
+    pointer-events: none;
+}
+
 /* Safari */
 @-webkit-keyframes spin {
     0% { -webkit-transform: rotate(0deg); }
