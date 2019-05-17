@@ -13,12 +13,13 @@ RUN apt-get install unzip
 
 # Gradle
 RUN wget --no-check-certificate https://services.gradle.org/distributions/gradle-5.2.1-all.zip
-RUN mkdir /opt/gradle 
+RUN mkdir /opt/gradle
 RUN unzip -d /opt/gradle gradle-5.2.1-all.zip
 
 # Antlr4
 WORKDIR /usr/local/lib
 RUN wget --no-check-certificate https://www.antlr.org/download/antlr-4.7.2-complete.jar
+RUN wget --no-check-certificate central.maven.org/maven2/org/json/json/20180813/json-20180813.jar
 
 # Build the java parser
 WORKDIR /go/src/github.com/zohaib194/CodebaseVisualizer3D/backend/parser
