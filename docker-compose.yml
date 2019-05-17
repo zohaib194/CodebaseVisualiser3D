@@ -6,8 +6,8 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        website_files: ${website_files}
-    ports: 
+        website_files: "."
+    ports:
       - "80:80"
     depends_on:
       - api
@@ -17,19 +17,19 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     ports:
-      - ${api_port}:${api_port}
+      - 5016:5016
     networks:
       - api-db
     depends_on:
       - mongo_db
     volumes:
       - repositoryStorage:/data/repos
-    environment: 
+    environment:
       - DB_LOCATION=mongodb://mongo_db:27017
       - REPOSITORY_PATH=/data/repos
-      - PORT=${api_port}
+      - PORT=5016
       - JAVA_PARSER=/go/src/github.com/zohaib194/CodebaseVisualizer3D/backend/parser/build/classes/java/main
-      - CLASSPATH=.:/usr/local/lib/antlr-4.7.2-complete.jar:$CLASSPATH
+      - CLASSPATH=.:/usr/local/lib/json-20180813.jar:/usr/local/lib/antlr-4.7.2-complete.jar:$CLASSPATH
       - antlr4=java -jar /usr/local/lib/antlr-4.7.2-complete.jar
       - grun=java org.antlr.v4.gui.TestRig
 
@@ -37,16 +37,16 @@ services:
     build:
       context: ./backend/apiServer
       dockerfile: Dockerfile
-    ports: 
-      - ${apidoc_port}:80
+    ports:
+      - 5017:80
     depends_on:
-      - api 
+      - api
 
   mongo_db:
     image: "mongo:latest"
-    networks: 
+    networks:
       - api-db
-    volumes: 
+    volumes:
       - DB-storage:/data/db
 
 volumes:
