@@ -58,6 +58,7 @@ func main() {
 	router.HandleFunc("/repo/list", controller.RepoController{}.GetAllRepos)
 	router.HandleFunc("/repo/{repoId}/initial/", controller.RepoController{}.ParseInitial)
 	router.HandleFunc("/repo/{repoId}/file/read/", controller.CodeSnippetController{}.GetImplementation)
+	router.HandleFunc("/graphql/", controller.GraphqlController.Example)
 
 	// Start server
 	util.TypeLogger.Info("%s: Listening on port: %s", packageName, port)
