@@ -3,6 +3,7 @@
 package model
 
 import (
+	"github.com/graphql-go/graphql"
 	"errors"
 	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/util"
 	"gopkg.in/mgo.v2/bson"
@@ -55,4 +56,53 @@ func (codeSnippet CodeSnippetModel) FetchLinesOfCode() (string, error) {
 	}
 
 	return string(output), err
+}
+
+func GetCodeSnippetObject() *graphql.Object {
+	return graphql.NewObject(graphql.ObjectConfig{
+		Name:        "code_snippet",
+		Description: "A section of code.",
+		Fields: graphql.Fields{
+			"file_path": &graphql.Field{
+				Type:         graphql.String,
+				Description: "File where snippet is from.",
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					if snippet, ok := p.Source.(CodeSnippetModel); ok {
+						return snippet.FilePath, nil
+					}
+					return nil, nil
+				},
+			},
+			"id": &graphql.Field{
+				Type:         graphql.Int,
+				Description: "ID of the associated Git repository.",
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					if snippet, ok := p.Source.(CodeSnippetModel); ok {
+						return snippet.ID, nil
+					}
+					return nil, nil
+				},
+			},
+			"start_line": &graphql.Field{
+				Type:         graphql.Int,
+				Description: "Where in the line the snippet starts",
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					if snippet, ok := p.Source.(CodeSnippetModel); ok {
+						return snippet.StartLine, nil
+					}
+					return nil, nil
+				},
+			},
+			"end_line": &graphql.Field{
+				Type:         graphql.Int,
+				Description: "Where in the line the snippet ends.",
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					if snippet, ok := p.Source.(CodeSnippetModel); ok {
+						return snippet.EndLine, nil
+					}
+					return nil, nil
+				},
+			},
+		},
+	})
 }

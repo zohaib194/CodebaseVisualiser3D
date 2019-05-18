@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 
 	"github.com/graphql-go/graphql"
+	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/model"
 	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/util"
 )
 
@@ -30,18 +31,29 @@ func newGraphqlController() graphqlController {
 	util.TypeLogger.Debug("%s: Call for newGraphqlController", packageName)
 	defer util.TypeLogger.Debug("%s: Ended Call for newGraphqlController", packageName)
 
-	fields := graphql.Fields{
-		"hello": &graphql.Field{
-			Type: graphql.String,
-			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-				return "world", nil
+	queryType := graphql.NewObject(graphql.ObjectConfig{
+		Name: "Query",
+		Fields: graphql.Fields{
+			"repo": &graphql.Field{
+				Type: model.GetRepositoryObject(),
+				Args: graphql.FieldConfigArgument{
+					"id": &graphql.ArgumentConfig{
+						Description: "Bison ID for repository",
+						Type: graphql.NewNonNull(graphql.String),
+					},
+				},
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					repo, err := model.RepoModel{}.GetRepoByID(p.Args["id"].(string))
+
+					return repo, err
+				},
 			},
 		},
-	}
+	})
 
-	rootQuery := graphql.ObjectConfig{Name: "RootQuery", Fields: fields}
-	schemaConfig := graphql.SchemaConfig{Query: graphql.NewObject(rootQuery)}
-	schema, err := graphql.NewSchema(schemaConfig)
+	schema, err := graphql.NewSchema(graphql.SchemaConfig{
+		Query: queryType,
+	})
 	if err != nil {
 		util.TypeLogger.Fatal("failed to setup controller for graphql. Schema error: %v", err)
 	}

@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/graphql-go/graphql"
 	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/util"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -263,4 +264,33 @@ func (repo RepoModel) FetchAll() (repoModels []bson.M, err error) {
 	}
 
 	return reposModels, nil
+}
+func GetRepositoryObject() *graphql.Object {
+
+	return graphql.NewObject(graphql.ObjectConfig{
+		Name:        "repo",
+		Description: "A Git repository.",
+		Fields: graphql.Fields{
+			"id": &graphql.Field{
+				Type:        graphql.NewNonNull(graphql.String),
+				Description: "The Bson id of the Git Repository.",
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					if repo, ok := p.Source.(RepoModel); ok {
+						return repo.ID, nil
+					}
+					return nil, nil
+				},
+			},
+			"content": &graphql.Field{
+				Type: GetProjectObject(),
+				Description: "The parsed content.",
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					if repo, ok := p.Source.(RepoModel); ok {
+						return repo.ParsedRepo, nil
+					}
+					return nil, nil
+				},
+			},
+		},
+	})
 }
