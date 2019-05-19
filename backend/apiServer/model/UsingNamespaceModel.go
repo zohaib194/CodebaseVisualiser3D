@@ -2,6 +2,8 @@ package model
 
 import(
 	"github.com/graphql-go/graphql"
+	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/util"
+	"fmt"
 )
 
 
@@ -12,6 +14,9 @@ type UsingNamespaceModel struct {
 }
 
 func GetUsingNamespaceObject() *graphql.Object {
+	fmt.Println("GetUsingNamespaceObject")
+	util.TypeLogger.Debug("%s: Call for GetUsingNamespaceObject", packageName)
+	defer util.TypeLogger.Debug("%s: Ended Call for GetUsingNamespaceObject", packageName)
 
 	return graphql.NewObject(graphql.ObjectConfig{
 		Name:        "using_namespace",

@@ -2,6 +2,8 @@ package model
 
 import(
 	"github.com/graphql-go/graphql"
+	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/util"
+	"fmt"
 )
 
 // AccessSpecifierModel represents code for a single access specifier
@@ -13,6 +15,9 @@ type AccessSpecifierModel struct {
 }
 
 func GetAccessSpecifierObject() *graphql.Object {
+	fmt.Println("GetAccessSpecifierObject")
+	util.TypeLogger.Debug("%s: Call for GetAccessSpecifierObject", packageName)
+	defer util.TypeLogger.Debug("%s: Ended Call for GetAccessSpecifierObject", packageName)
 
 	return graphql.NewObject(graphql.ObjectConfig{
 		Name:        "access_specifier",
@@ -27,7 +32,7 @@ func GetAccessSpecifierObject() *graphql.Object {
 					}
 					return nil, nil
 				},
-			},
+			},/*
 			"classes": &graphql.Field{
 				Type:         graphql.NewList(GetClassObject()),
 				Description: "Classes within this access specifier.",
@@ -37,7 +42,7 @@ func GetAccessSpecifierObject() *graphql.Object {
 					}
 					return nil, nil
 				},
-			},
+			},*/
 			"functions": &graphql.Field{
 				Type:         graphql.NewList(GetFunctionObject()),
 				Description: "Functions within this access specifier.",
@@ -47,7 +52,7 @@ func GetAccessSpecifierObject() *graphql.Object {
 					}
 					return nil, nil
 				},
-			},
+			},/*
 			"variables": &graphql.Field{
 				Type:         graphql.NewList(GetVariableObject()),
 				Description: "Variables within this access specifier.",
@@ -57,7 +62,7 @@ func GetAccessSpecifierObject() *graphql.Object {
 					}
 					return nil, nil
 				},
-			},
+			},*/
 		},
 	})
 }

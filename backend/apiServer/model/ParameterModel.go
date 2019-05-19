@@ -2,6 +2,8 @@ package model
 
 import(
 	"github.com/graphql-go/graphql"
+	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/util"
+	"fmt"
 )
 
 // ParameterModel represents a parameter from code.
@@ -11,6 +13,9 @@ type ParameterModel struct {
 }
 
 func GetParameterObject() *graphql.Object {
+	fmt.Println("GetParameterObject")
+	util.TypeLogger.Debug("%s: Call for GetParameterObject", packageName)
+	defer util.TypeLogger.Debug("%s: Ended Call for GetParameterObject", packageName)
 
 	return graphql.NewObject(graphql.ObjectConfig{
 		Name:        "parameter",

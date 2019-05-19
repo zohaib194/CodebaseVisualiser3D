@@ -2,6 +2,8 @@ package model
 
 import(
 	"github.com/graphql-go/graphql"
+	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/util"
+	"fmt"
 )
 
 // NamespaceModel represents code for a single namespace
@@ -16,6 +18,9 @@ type NamespaceModel struct {
 }
 
 func GetNamespaceObject() *graphql.Object {
+	fmt.Println("GetNamespaceObject")
+	util.TypeLogger.Debug("%s: Call for GetNamespaceObject", packageName)
+	defer util.TypeLogger.Debug("%s: Ended Call for GetNamespaceObject", packageName)
 
 	return graphql.NewObject(graphql.ObjectConfig{
 		Name:        "namespace",
@@ -30,7 +35,7 @@ func GetNamespaceObject() *graphql.Object {
 					}
 					return nil, nil
 				},
-			},
+			},/*
 			"functions": &graphql.Field{
 				Type: graphql.NewList(GetFunctionObject()),
 				Description: "Functions withing this namespace.",
@@ -40,7 +45,7 @@ func GetNamespaceObject() *graphql.Object {
 					}
 					return nil, nil
 				},
-			},
+			},/*
 			"namespaces": &graphql.Field{
 				Type: graphql.NewList(GetNamespaceObject()),
 				Description: "Namespaces within this namespace.",
@@ -50,7 +55,7 @@ func GetNamespaceObject() *graphql.Object {
 					}
 					return nil, nil
 				},
-			},
+			},*/
 			"using_namespaces": &graphql.Field{
 				Type: graphql.NewList(GetUsingNamespaceObject()),
 				Description: "Extractions of namespacces within this namespace.",

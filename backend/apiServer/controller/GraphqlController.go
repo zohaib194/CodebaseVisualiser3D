@@ -5,6 +5,7 @@ package controller
 import (
 	"net/http"
 	"encoding/json"
+	"fmt"
 
 	"github.com/graphql-go/graphql"
 	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/model"
@@ -28,8 +29,10 @@ type graphqlQueryString struct {
 }
 
 func newGraphqlController() graphqlController {
+	fmt.Println("newGraphqlController")
 	util.TypeLogger.Debug("%s: Call for newGraphqlController", packageName)
 	defer util.TypeLogger.Debug("%s: Ended Call for newGraphqlController", packageName)
+	fmt.Println("After debug")
 
 	queryType := graphql.NewObject(graphql.ObjectConfig{
 		Name: "Query",

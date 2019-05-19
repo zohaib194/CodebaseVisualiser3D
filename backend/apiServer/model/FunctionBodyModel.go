@@ -2,6 +2,8 @@ package model
 
 import(
 	"github.com/graphql-go/graphql"
+	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/util"
+	"fmt"
 )
 
 // FunctionBodyModel represents calls and variable from a function.
@@ -11,6 +13,9 @@ type FunctionBodyModel struct {
 }
 
 func GetFunctionBodyObject() *graphql.Object {
+	fmt.Println("GetFunctionBodyObject")
+	util.TypeLogger.Debug("%s: Call for GetFunctionBodyObject", packageName)
+	defer util.TypeLogger.Debug("%s: Ended Call for GetFunctionBodyObject", packageName)
 
 	return graphql.NewObject(graphql.ObjectConfig{
 		Name:        "function_body",
@@ -25,7 +30,7 @@ func GetFunctionBodyObject() *graphql.Object {
 					}
 					return nil, nil
 				},
-			},
+			},/*
 			"variables": &graphql.Field{
 				Type:         graphql.NewList(GetVariableObject()),
 				Description: "Variables defined in this function.",
@@ -35,7 +40,7 @@ func GetFunctionBodyObject() *graphql.Object {
 					}
 					return nil, nil
 				},
-			},
+			},*/
 		},
 	})
 }

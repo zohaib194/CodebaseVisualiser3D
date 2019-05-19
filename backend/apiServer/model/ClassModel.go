@@ -2,6 +2,8 @@ package model
 
 import(
 	"github.com/graphql-go/graphql"
+	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/util"
+	"fmt"
 )
 
 // ClassModel represents code for a single calss
@@ -12,9 +14,12 @@ type ClassModel struct {
 }
 
 func GetClassObject() *graphql.Object {
+	fmt.Println("GetClassObject")
+	util.TypeLogger.Debug("%s: Call for GetClassObject", packageName)
+	defer util.TypeLogger.Debug("%s: Ended Call for GetClassObject", packageName)
 
 	return graphql.NewObject(graphql.ObjectConfig{
-		Name:        "project",
+		Name:        "class",
 		Description: "A codeing project.",
 		Fields: graphql.Fields{
 			"name": &graphql.Field{

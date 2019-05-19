@@ -2,6 +2,8 @@ package model
 
 import(
 	"github.com/graphql-go/graphql"
+	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/util"
+	"fmt"
 )
 
 // FunctionModel represents code for a single function
@@ -17,6 +19,9 @@ type FunctionModel struct {
 }
 
 func GetFunctionObject() *graphql.Object {
+	fmt.Println("GetFunctionObject")
+	util.TypeLogger.Debug("%s: Call for GetFunctionObject", packageName)
+	defer util.TypeLogger.Debug("%s: Ended Call for GetFunctionObject", packageName)
 
 	return graphql.NewObject(graphql.ObjectConfig{
 		Name:        "function",

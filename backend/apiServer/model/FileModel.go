@@ -2,6 +2,8 @@ package model
 
 import(
 	"github.com/graphql-go/graphql"
+	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/util"
+	"fmt"
 )
 
 // FileWrapperModel is a wrapper for FileModel for json parsing
@@ -23,6 +25,9 @@ type FileModel struct {
 }
 
 func GetFileObject() *graphql.Object {
+	fmt.Println("GetFileObject")
+	util.TypeLogger.Debug("%s: Call for GetFileObject", packageName)
+	defer util.TypeLogger.Debug("%s: Ended Call for GetFileObject", packageName)
 
 	return graphql.NewObject(graphql.ObjectConfig{
 		Name:        "file",
@@ -47,7 +52,7 @@ func GetFileObject() *graphql.Object {
 					}
 					return nil, nil
 				},
-			},
+			},/*
 			"functions": &graphql.Field{
 				Type: graphql.NewList(GetFunctionObject()),
 				Description: "Functions being declared or defined.",
@@ -57,7 +62,7 @@ func GetFileObject() *graphql.Object {
 					}
 					return nil, nil
 				},
-			},
+			},*/
 			"namespaces": &graphql.Field{
 				Type: graphql.NewList(GetNamespaceObject()),
 				Description: "Namespaces being declared.",
@@ -67,7 +72,7 @@ func GetFileObject() *graphql.Object {
 					}
 					return nil, nil
 				},
-			},
+			},/*
 			"using_namespaces": &graphql.Field{
 				Type: graphql.NewList(GetUsingNamespaceObject()),
 				Description: "Extraction of a namespace.",
@@ -77,7 +82,7 @@ func GetFileObject() *graphql.Object {
 					}
 					return nil, nil
 				},
-			},
+			},*/
 			"includes": &graphql.Field{
 				Type: graphql.NewList(graphql.String),
 				Description: "Files included by this file.",
@@ -87,7 +92,7 @@ func GetFileObject() *graphql.Object {
 					}
 					return nil, nil
 				},
-			},
+			},/*
 			"classes": &graphql.Field{
 				Type: graphql.NewList(GetClassObject()),
 				Description: "Classes being defined.",
@@ -97,7 +102,7 @@ func GetFileObject() *graphql.Object {
 					}
 					return nil, nil
 				},
-			},
+			},/*
 			"variables": &graphql.Field{
 				Type: graphql.NewList(GetVariableObject()),
 				Description: "Variables being defined.",
@@ -107,7 +112,7 @@ func GetFileObject() *graphql.Object {
 					}
 					return nil, nil
 				},
-			},
+			},*/
 			"lines_count": &graphql.Field{
 				Type: graphql.Int,
 				Description: "Number of lines in the file.",
