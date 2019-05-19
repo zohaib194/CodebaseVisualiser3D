@@ -3,7 +3,6 @@ package model
 import(
 	"github.com/graphql-go/graphql"
 	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/util"
-	"fmt"
 )
 
 // AccessSpecifierModel represents code for a single access specifier
@@ -14,8 +13,9 @@ type AccessSpecifierModel struct {
 	Variables []VariableModel `json:"variables,omitempty"`
 }
 
-func GetAccessSpecifierObject() *graphql.Object {
-	fmt.Println("GetAccessSpecifierObject")
+var accessSpecifierObject = getAccessSpecifierObject()
+
+func getAccessSpecifierObject() *graphql.Object {
 	util.TypeLogger.Debug("%s: Call for GetAccessSpecifierObject", packageName)
 	defer util.TypeLogger.Debug("%s: Ended Call for GetAccessSpecifierObject", packageName)
 
@@ -32,19 +32,13 @@ func GetAccessSpecifierObject() *graphql.Object {
 					}
 					return nil, nil
 				},
-			},/*
-			"classes": &graphql.Field{
-				Type:         graphql.NewList(GetClassObject()),
-				Description: "Classes within this access specifier.",
-				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-					if access, ok := p.Source.(AccessSpecifierModel); ok {
-						return access.Classes, nil
-					}
-					return nil, nil
-				},
-			},*/
+			},
+			"variables": &graphql.Field{
+				Type: graphql.NewList(variableObject),
+				Description: "Variables within class.",
+			},
 			"functions": &graphql.Field{
-				Type:         graphql.NewList(GetFunctionObject()),
+				Type:         graphql.NewList(functionObject),
 				Description: "Functions within this access specifier.",
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 					if access, ok := p.Source.(AccessSpecifierModel); ok {
@@ -52,17 +46,15 @@ func GetAccessSpecifierObject() *graphql.Object {
 					}
 					return nil, nil
 				},
-			},/*
-			"variables": &graphql.Field{
-				Type:         graphql.NewList(GetVariableObject()),
-				Description: "Variables within this access specifier.",
-				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-					if access, ok := p.Source.(AccessSpecifierModel); ok {
-						return access.Variables, nil
-					}
-					return nil, nil
-				},
-			},*/
+			},
 		},
 	})
+
+
+	/* Handled by getClassObject
+
+	accessSpecifierObject.AddFieldConfig("classes", &graphql.Field{
+		Type: graphql.NewList(classObject),
+		Description: "Classes within class.",
+	})*/
 }

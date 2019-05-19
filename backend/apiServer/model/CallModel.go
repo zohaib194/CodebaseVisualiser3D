@@ -3,7 +3,6 @@ package model
 import(
 	"github.com/graphql-go/graphql"
 	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/util"
-	"fmt"
 )
 
 // CallModel represents a function call from code.
@@ -13,7 +12,6 @@ type CallModel struct {
 }
 
 func GetCallObject() *graphql.Object {
-	fmt.Println("GetCallObject")
 
 	util.TypeLogger.Debug("%s: Call for GetCallObject", packageName)
 	defer util.TypeLogger.Debug("%s: Ended Call for GetCallObject", packageName)

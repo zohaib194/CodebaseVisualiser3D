@@ -10,7 +10,6 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
-	"fmt"
 )
 
 // CodeSnippetModel represents metadata for a file from a git project.
@@ -60,7 +59,6 @@ func (codeSnippet CodeSnippetModel) FetchLinesOfCode() (string, error) {
 }
 
 func GetCodeSnippetObject() *graphql.Object {
-	fmt.Println("GetCodeSnippetObject")
 	util.TypeLogger.Debug("%s: Call for GetCodeSnippetObject", packageName)
 	defer util.TypeLogger.Debug("%s: Ended Call for GetCodeSnippetObject", packageName)
 

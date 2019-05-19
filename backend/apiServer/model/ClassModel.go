@@ -3,7 +3,6 @@ package model
 import(
 	"github.com/graphql-go/graphql"
 	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/util"
-	"fmt"
 )
 
 // ClassModel represents code for a single calss
@@ -13,12 +12,13 @@ type ClassModel struct {
 	Parents               []string               `json:"parents,omitempty"`
 }
 
-func GetClassObject() *graphql.Object {
-	fmt.Println("GetClassObject")
+var classObject = getClassObject()
+
+func getClassObject() *graphql.Object {
 	util.TypeLogger.Debug("%s: Call for GetClassObject", packageName)
 	defer util.TypeLogger.Debug("%s: Ended Call for GetClassObject", packageName)
 
-	return graphql.NewObject(graphql.ObjectConfig{
+	object := graphql.NewObject(graphql.ObjectConfig{
 		Name:        "class",
 		Description: "A codeing project.",
 		Fields: graphql.Fields{
@@ -33,7 +33,7 @@ func GetClassObject() *graphql.Object {
 				},
 			},
 			"access_specifiers": &graphql.Field{
-				Type:         graphql.NewList(GetAccessSpecifierObject()),
+				Type:         graphql.NewList(accessSpecifierObject),
 				Description: "Access scope of the class.",
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 					if calzz, ok := p.Source.(ClassModel); ok {
@@ -54,4 +54,11 @@ func GetClassObject() *graphql.Object {
 			},
 		},
 	})
+
+	accessSpecifierObject.AddFieldConfig("classes", &graphql.Field{
+		Type: graphql.NewList(object),
+		Description: "Classes within class.",
+	})
+
+	return object
 }

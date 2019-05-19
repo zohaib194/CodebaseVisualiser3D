@@ -3,7 +3,6 @@ package model
 import(
 	"github.com/graphql-go/graphql"
 	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/util"
-	"fmt"
 )
 
 
@@ -13,8 +12,9 @@ type UsingNamespaceModel struct {
 	LineNr int    `json:"lineNr"`
 }
 
-func GetUsingNamespaceObject() *graphql.Object {
-	fmt.Println("GetUsingNamespaceObject")
+var usingNamespaceObject = getUsingNamespaceObject()
+
+func getUsingNamespaceObject() *graphql.Object {
 	util.TypeLogger.Debug("%s: Call for GetUsingNamespaceObject", packageName)
 	defer util.TypeLogger.Debug("%s: Ended Call for GetUsingNamespaceObject", packageName)
 

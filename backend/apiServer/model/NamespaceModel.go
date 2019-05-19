@@ -3,7 +3,6 @@ package model
 import(
 	"github.com/graphql-go/graphql"
 	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/util"
-	"fmt"
 )
 
 // NamespaceModel represents code for a single namespace
@@ -17,12 +16,13 @@ type NamespaceModel struct {
 	Variables       []VariableModel       `json:"variables,omitempty"`
 }
 
-func GetNamespaceObject() *graphql.Object {
-	fmt.Println("GetNamespaceObject")
+var namespaceObject = getNamespaceObject()
+
+func getNamespaceObject() *graphql.Object {
 	util.TypeLogger.Debug("%s: Call for GetNamespaceObject", packageName)
 	defer util.TypeLogger.Debug("%s: Ended Call for GetNamespaceObject", packageName)
 
-	return graphql.NewObject(graphql.ObjectConfig{
+	object := graphql.NewObject(graphql.ObjectConfig{
 		Name:        "namespace",
 		Description: "A namespace.",
 		Fields: graphql.Fields{
@@ -35,29 +35,13 @@ func GetNamespaceObject() *graphql.Object {
 					}
 					return nil, nil
 				},
-			},/*
+			},
 			"functions": &graphql.Field{
-				Type: graphql.NewList(GetFunctionObject()),
-				Description: "Functions withing this namespace.",
-				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-					if namespace, ok := p.Source.(NamespaceModel); ok {
-						return namespace.Functions, nil
-					}
-					return nil, nil
-				},
-			},/*
-			"namespaces": &graphql.Field{
-				Type: graphql.NewList(GetNamespaceObject()),
-				Description: "Namespaces within this namespace.",
-				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-					if namespace, ok := p.Source.(NamespaceModel); ok {
-						return namespace.Namespaces, nil
-					}
-					return nil, nil
-				},
-			},*/
+				Type: graphql.NewList(functionObject),
+				Description: "functions within this namespace.",
+			},
 			"using_namespaces": &graphql.Field{
-				Type: graphql.NewList(GetUsingNamespaceObject()),
+				Type: graphql.NewList(usingNamespaceObject),
 				Description: "Extractions of namespacces within this namespace.",
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 					if namespace, ok := p.Source.(NamespaceModel); ok {
@@ -77,7 +61,7 @@ func GetNamespaceObject() *graphql.Object {
 				},
 			},
 			"classes": &graphql.Field{
-				Type: graphql.NewList(GetClassObject()),
+				Type: graphql.NewList(classObject),
 				Description: "classes within this namespace.",
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 					if namespace, ok := p.Source.(NamespaceModel); ok {
@@ -87,7 +71,7 @@ func GetNamespaceObject() *graphql.Object {
 				},
 			},
 			"variables": &graphql.Field{
-				Type: graphql.NewList(GetVariableObject()),
+				Type: graphql.NewList(variableObject),
 				Description: "Variables within this namespace.",
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 					if namespace, ok := p.Source.(NamespaceModel); ok {
@@ -98,4 +82,10 @@ func GetNamespaceObject() *graphql.Object {
 			},
 		},
 	})
+
+	object.AddFieldConfig("namespaces", &graphql.Field{
+		Type: graphql.NewList(object),
+		Description: "Namespaces within this namespace.",
+	})
+	return object
 }

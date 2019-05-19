@@ -3,7 +3,6 @@ package model
 import(
 	"github.com/graphql-go/graphql"
 	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/util"
-	"fmt"
 )
 
 // FileWrapperModel is a wrapper for FileModel for json parsing
@@ -24,8 +23,9 @@ type FileModel struct {
 	LinesInFile     int                   `json:"linesInFile"`
 }
 
+var fileObject = GetFileObject()
+
 func GetFileObject() *graphql.Object {
-	fmt.Println("GetFileObject")
 	util.TypeLogger.Debug("%s: Call for GetFileObject", packageName)
 	defer util.TypeLogger.Debug("%s: Ended Call for GetFileObject", packageName)
 
@@ -52,19 +52,13 @@ func GetFileObject() *graphql.Object {
 					}
 					return nil, nil
 				},
-			},/*
+			},
 			"functions": &graphql.Field{
-				Type: graphql.NewList(GetFunctionObject()),
-				Description: "Functions being declared or defined.",
-				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-					if file, ok := p.Source.(FileModel); ok {
-						return file.Functions, nil
-					}
-					return nil, nil
-				},
-			},*/
+				Type: graphql.NewList(functionObject),
+				Description: "Functions within this file.",
+			},
 			"namespaces": &graphql.Field{
-				Type: graphql.NewList(GetNamespaceObject()),
+				Type: graphql.NewList(namespaceObject),
 				Description: "Namespaces being declared.",
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 					if file, ok := p.Source.(FileModel); ok {
@@ -72,17 +66,11 @@ func GetFileObject() *graphql.Object {
 					}
 					return nil, nil
 				},
-			},/*
+			},
 			"using_namespaces": &graphql.Field{
-				Type: graphql.NewList(GetUsingNamespaceObject()),
-				Description: "Extraction of a namespace.",
-				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-					if file, ok := p.Source.(FileModel); ok {
-						return file.UsingNamespaces, nil
-					}
-					return nil, nil
-				},
-			},*/
+				Type: graphql.NewList(usingNamespaceObject),
+				Description: "Namespaces within this file.",
+			},
 			"includes": &graphql.Field{
 				Type: graphql.NewList(graphql.String),
 				Description: "Files included by this file.",
@@ -92,19 +80,13 @@ func GetFileObject() *graphql.Object {
 					}
 					return nil, nil
 				},
-			},/*
+			},
 			"classes": &graphql.Field{
-				Type: graphql.NewList(GetClassObject()),
-				Description: "Classes being defined.",
-				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-					if file, ok := p.Source.(FileModel); ok {
-						return file.Classes, nil
-					}
-					return nil, nil
-				},
-			},/*
+				Type: graphql.NewList(classObject),
+				Description: "Classes within this file.",
+			},
 			"variables": &graphql.Field{
-				Type: graphql.NewList(GetVariableObject()),
+				Type: graphql.NewList(variableObject),
 				Description: "Variables being defined.",
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 					if file, ok := p.Source.(FileModel); ok {
@@ -112,7 +94,7 @@ func GetFileObject() *graphql.Object {
 					}
 					return nil, nil
 				},
-			},*/
+			},
 			"lines_count": &graphql.Field{
 				Type: graphql.Int,
 				Description: "Number of lines in the file.",

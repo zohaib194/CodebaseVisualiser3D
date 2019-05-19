@@ -12,7 +12,6 @@ import (
 	"github.com/graphql-go/graphql"
 	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/util"
 	"gopkg.in/mgo.v2/bson"
-	"fmt"
 )
 
 // RepoPath is the path where git repositories are stored.
@@ -267,7 +266,6 @@ func (repo RepoModel) FetchAll() (repoModels []bson.M, err error) {
 	return reposModels, nil
 }
 func GetRepositoryObject() *graphql.Object {
-	fmt.Println("GetRepositoryObject")
 	util.TypeLogger.Debug("%s: Call for GetRepositoryObject", packageName)
 	defer util.TypeLogger.Debug("%s: Ended Call for GetRepositoryObject", packageName)
 

@@ -3,7 +3,6 @@ package model
 import(
 	"github.com/graphql-go/graphql"
 	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/util"
-	"fmt"
 )
 
 // FunctionModel represents code for a single function
@@ -18,8 +17,9 @@ type FunctionModel struct {
 	EndLine      int               `json:"end_line"`
 }
 
+var functionObject = GetFunctionObject()
+
 func GetFunctionObject() *graphql.Object {
-	fmt.Println("GetFunctionObject")
 	util.TypeLogger.Debug("%s: Call for GetFunctionObject", packageName)
 	defer util.TypeLogger.Debug("%s: Ended Call for GetFunctionObject", packageName)
 
@@ -58,7 +58,7 @@ func GetFunctionObject() *graphql.Object {
 				},
 			},
 			"function_body": &graphql.Field{
-				Type: GetFunctionBodyObject(),
+				Type: functionBodyObject,
 				Description: "Body of the function.",
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 					if function, ok := p.Source.(FunctionModel); ok {

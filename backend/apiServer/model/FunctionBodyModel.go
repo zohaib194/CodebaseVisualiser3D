@@ -12,7 +12,9 @@ type FunctionBodyModel struct {
 	Variables []VariableModel `json:"variables,omitempty"`
 }
 
-func GetFunctionBodyObject() *graphql.Object {
+var functionBodyObject = getFunctionBodyObject()
+
+func getFunctionBodyObject() *graphql.Object {
 	fmt.Println("GetFunctionBodyObject")
 	util.TypeLogger.Debug("%s: Call for GetFunctionBodyObject", packageName)
 	defer util.TypeLogger.Debug("%s: Ended Call for GetFunctionBodyObject", packageName)
@@ -30,17 +32,11 @@ func GetFunctionBodyObject() *graphql.Object {
 					}
 					return nil, nil
 				},
-			},/*
+			},
 			"variables": &graphql.Field{
-				Type:         graphql.NewList(GetVariableObject()),
-				Description: "Variables defined in this function.",
-				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-					if function, ok := p.Source.(FunctionBodyModel); ok {
-						return function.Variables, nil
-					}
-					return nil, nil
-				},
-			},*/
+				Type: graphql.NewList(variableObject),
+				Description: "Variables within class.",
+			},
 		},
 	})
 }

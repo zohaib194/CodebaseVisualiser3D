@@ -3,7 +3,6 @@ package model
 import(
 	"github.com/graphql-go/graphql"
 	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/util"
-	"fmt"
 )
 
 // VariableModel represents a variable from code.
@@ -12,8 +11,9 @@ type VariableModel struct {
 	Type string `json:"type"`
 }
 
+var variableObject = GetVariableObject()
+
 func GetVariableObject() *graphql.Object {
-	fmt.Println("GetVariableObject")
 	util.TypeLogger.Debug("%s: Call for GetVariableObject", packageName)
 	defer util.TypeLogger.Debug("%s: Ended Call for GetVariableObject", packageName)
 

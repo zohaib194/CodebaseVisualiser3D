@@ -3,7 +3,6 @@ package model
 import(
 	"github.com/graphql-go/graphql"
 	"github.com/zohaib194/CodebaseVisualizer3D/backend/apiServer/util"
-	"fmt"
 )
 
 // ScopeModel represents the scope and name of the function call.
@@ -13,7 +12,6 @@ type ScopeModel struct {
 }
 
 func GetScopeObject() *graphql.Object {
-	fmt.Println("GetScopeObject")
 	util.TypeLogger.Debug("%s: Call for GetScopeObject", packageName)
 	defer util.TypeLogger.Debug("%s: Ended Call for GetScopeObject", packageName)
 
