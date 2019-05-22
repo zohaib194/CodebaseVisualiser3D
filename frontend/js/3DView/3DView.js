@@ -126,6 +126,7 @@ function runFDGOnJSONData(data) {
 
     var projectTree = fdg.getProjectRoot()
     displayMgr.setSceneGraph(projectTree, scene);
+    scene.updateMatrixWorld();
     displayMgr.setLinks(projectTree, scene);
 }
 

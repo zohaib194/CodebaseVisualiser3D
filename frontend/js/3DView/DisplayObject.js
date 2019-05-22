@@ -112,7 +112,6 @@ var Drawable = (function (
             cameraRight.multiplyScalar(0.2);
 
             // Copy my position (+ offset) and convert to screen coords.
-            scene.updateMatrixWorld();
             var posNameplate = new THREE.Vector3().setFromMatrixPosition(mesh.matrixWorld);
             posNameplate.add(cameraRight);
             posNameplate.add(worldUp);

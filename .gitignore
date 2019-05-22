@@ -33,6 +33,7 @@ backend/parser/src/test/java/variable.cpp
 *.css.map
 *.sass.map
 *.scss.map
+css/
 
 ### SublimeText ###
 # Cache files for Sublime Text
