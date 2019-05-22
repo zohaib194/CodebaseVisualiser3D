@@ -163,7 +163,6 @@ var DisplayManager = (function() {
     };
 
     var setLinks = function(tree, scene){
-        scene.updateMatrixWorld();
         var nodes = tree.getSuccessors();
 
         nodes.forEach( function(node, index) {
