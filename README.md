@@ -23,7 +23,7 @@ CodebaseVisulizer3D is a bachelor project with the goal of making it easier to g
 ### Setup frontend
 
 - Download and Install [Emscripten](http://kripken.github.io/emscripten-site/docs/getting_started/downloads.html)
-- Intall [Sass](https://sass-lang.com/) by running the following command
+- Install [Sass](https://sass-lang.com/) by running the following command
   - ``` sudo get-apt install ruby-sass ```
 - Navigate to "frontend/" and run the following command
   - ``` sass --watch ./sass/:./css/ ```
